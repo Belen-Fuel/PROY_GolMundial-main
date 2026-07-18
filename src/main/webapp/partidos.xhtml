@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Administración - Partidos UTNGolMundial 2026</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .header-panel {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-panel h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .status-programado { background-color: #cbd5e1; color: #1e293b; }
+        .status-enjuego { background-color: #fef08a; color: #854d0e; }
+        .status-finalizado { background-color: #bbf7d0; color: #166534; }
+    </style>
+</h:head>
+
+<h:body>
+
+    <!-- Header Principal -->
+    <div class="header-panel">
+        <div>
+            <h1>Panel Administrativo - UTN GolMundial 2026</h1>
+            <small>Gestión del Calendario Oficial y Resultados</small>
+        </div>
+        <!-- Botón para regresar a Sedes -->
+        <p:button href="sedes.xhtml" value="Ver Sedes 🏟️" icon="pi pi-map" styleClass="ui-button-outlined ui-button-flat" style="color: white; border-color: white;"/>
+    </div>
+
+    <h:form id="formPartidos">
+        <!-- Notificaciones flotantes -->
+        <p:growl id="messages" showDetail="true" />
+
+        <p:card style="margin-bottom: 2em;">
+            <p:dataTable id="dtPartidos" var="partido" value="#{partioBean.partidos}" 
+                         widgetVar="wgPartidos" paginator="true" rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} partidos"
+                         rowsPerPageTemplate="5,10,20"
+                         emptyMessage="No se encontraron partidos programados.">
+
+                <f:facet name="header">
+                    <div class="flex justify-content-between align-items-center">
+                        <span style="font-weight: bold; font-size: 1.2rem">Calendario de Partidos (104 encuentros)</span>
+                    </div>
+                </f:facet>
+
+                <!-- ID del Partido -->
+                <p:column headerText="ID" width="50" style="text-align: center;">
+                    <h:outputText value="#{partido.id}" />
+                </p:column>
+
+                <!-- Fase -->
+                <p:column headerText="Fase" filterBy="#{partido.fase}" filterMatchMode="contains">
+                    <h:outputText value="#{partido.fase}" />
+                </p:column>
+
+                <!-- Fecha y Hora -->
+                <p:column headerText="Fecha / Hora">
+                    <h:outputText value="#{partido.fechaHoraEt}" />
+                </p:column>
+
+                <!-- Sede / Estadio -->
+                <p:column headerText="Estadio / Ciudad">
+                    <h:outputText value="#{partido.sede} - #{partido.ciudad}" />
+                </p:column>
+
+                <!-- Enfrentamiento -->
+                <p:column headerText="Enfrentamiento" style="text-align: center; font-weight: bold;">
+                    <h:outputText value="#{partido.seleccionLocal} " />
+                    <span style="color: #64748b;">vs</span>
+                    <h:outputText value=" #{partido.seleccionVisitante}" />
+                </p:column>
+
+                <!-- Marcador -->
+                <p:column headerText="Marcador" style="text-align: center; font-size: 1.1rem;">
+                    <h:outputText value="#{partido.golesLocal != null ? partido.golesLocal : '-'}" style="font-weight: bold;" />
+                    <span style="margin: 0 5px;">:</span>
+                    <h:outputText value="#{partido.golesVisitante != null ? partido.golesVisitante : '-'}" style="font-weight: bold;" />
+                </p:column>
+
+                <!-- Estado -->
+                <p:column headerText="Estado" style="text-align: center;">
+                    <span class="status-badge status-#{partido.estado.toLowerCase().replace('_', '')}">
+                        #{partido.estado}
+                    </span>
+                </p:column>
+
+                <!-- Acciones (Editar Marcador) -->
+                <p:column headerText="Acciones" style="text-align: center;" width="120">
+                    <p:commandButton icon="pi pi-pencil" 
+                                     update="@widgetVar(dlgMarcador)" 
+                                     oncomplete="PF('dlgMarcador').show()"
+                                     styleClass="edit-button rounded-button ui-button-success" 
+                                     process="@this"
+                                     title="Registrar Marcador">
+                        <f:setPropertyActionListener value="#{partido}" target="#{partioBean.partidoSeleccionado}" />
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </p:card>
+    </h:form>
+
+    <!-- Modal para Registrar Marcador Oficial -->
+    <p:dialog id="dialogRegistrarMarcador" header="Registrar Resultado Oficial" 
+              widgetVar="dlgMarcador" modal="true" responsive="true" 
+              showEffect="fade" hideEffect="fade" width="450"
+              appendTo="@(body)">
+        
+        <h:form id="formDialogInterno">
+            <p:outputPanel id="panelMarcador" class="ui-fluid" style="margin-top: 10px;">
+                <!-- Detalles del partido -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 14px; color: #64748b; font-weight: bold; text-transform: uppercase;">
+                        #{partioBean.partidoSeleccionado.fase}
+                    </span>
+                    <h3 style="margin: 5px 0;">
+                        #{partioBean.partidoSeleccionado.seleccionLocal} vs #{partioBean.partidoSeleccionado.seleccionVisitante}
+                    </h3>
+                    <small>#{partioBean.partidoSeleccionado.sede} - #{partioBean.partidoSeleccionado.ciudad}</small>
+                </div>
+
+                <!-- Entrada de Goles Local -->
+                <div class="p-field" style="margin-bottom: 15px;">
+                    <p:outputLabel for="golesL" value="Goles #{partioBean.partidoSeleccionado.seleccionLocal}" style="font-weight: bold;"/>
+                    <p:spinner id="golesL" value="#{partioBean.partidoSeleccionado.golesLocal}" min="0" max="20" required="true"/>
+                </div>
+
+                <!-- Entrada de Goles Visitante -->
+                <div class="p-field" style="margin-bottom: 15px;">
+                    <p:outputLabel for="golesV" value="Goles #{partioBean.partidoSeleccionado.seleccionVisitante}" style="font-weight: bold;"/>
+                    <p:spinner id="golesV" value="#{partioBean.partidoSeleccionado.golesVisitante}" min="0" max="20" required="true"/>
+                </div>
+
+                <!-- Cambio de Estado -->
+                <div class="p-field" style="margin-bottom: 20px;">
+                    <p:outputLabel for="estadoPart" value="Estado del Partido" style="font-weight: bold; display: block; margin-bottom: 5px;"/>
+                    <p:selectOneMenu id="estadoPart" value="#{partioBean.partidoSeleccionado.estado}">
+                        <f:selectItem itemLabel="PROGRAMADO" itemValue="PROGRAMADO" />
+                        <f:selectItem itemLabel="EN JUEGO" itemValue="EN_JUEGO" />
+                        <f:selectItem itemLabel="FINALIZADO (Liquidar apuestas)" itemValue="FINALIZADO" />
+                    </p:selectOneMenu>
+                </div>
+            </p:outputPanel>
+
+            <!-- Botones de Acción del Modal -->
+            <div style="text-align: right; margin-top: 15px;">
+                <p:commandButton value="Guardar Resultado" icon="pi pi-check" 
+                                 actionListener="#{partioBean.guardarResultado}"
+                                 update=":formPartidos:dtPartidos :formPartidos:messages" 
+                                 oncomplete="if (!args.validationFailed) PF('dlgMarcador').hide()"
+                                 styleClass="ui-button-primary" style="margin-right: 5px;"/>
+                <p:commandButton value="Cancelar" icon="pi pi-times" 
+                                 onclick="PF('dlgMarcador').hide()" 
+                                 class="ui-button-secondary" type="button"/>
+            </div>
+        </h:form>
+    </p:dialog>
+
+</h:body>
+</html>

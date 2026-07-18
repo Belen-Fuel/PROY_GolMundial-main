@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="
+             http://maven.apache.org/POM/4.0.0
+             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ec.edu.utn</groupId>
+    <artifactId>golmundial-estadisticas-api</artifactId>
+    <version>1.0.0</version>
+    <packaging>war</packaging>
+
+    <name>UTN GolMundial - Servicio de Estadísticas</name>
+    <description>
+        API REST Jakarta EE para administrar las estadísticas
+        del Mundial de Fútbol 2026.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>25</maven.compiler.release>
+        <jakartaee.version>10.0.0</jakartaee.version>
+    </properties>
+
+    <dependencies>
+
+        <!--
+            APIs de Jakarta EE 10.
+            WildFly proporciona estas librerías al desplegar la aplicación.
+        -->
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakartaee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 
+            PrimeFaces: Biblioteca de componentes UI para JSF.
+            Nos permite cumplir el requisito de diseño profesional, adaptativo 
+            y responsivo exigido en la guía del proyecto integrador.
+        -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>13.0.0</version> <!-- Versión totalmente compatible con Jakarta EE 10 -->
+            <classifier>jakarta</classifier> <!-- NOTA: Este clasificador es obligatorio para Jakarta EE 10 -->
+        </dependency>
+
+    </dependencies>
+
+    <build>
+
+        <!-- Nombre final del archivo WAR y del contexto web -->
+        <finalName>golmundial-estadisticas</finalName>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version>
+
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>
