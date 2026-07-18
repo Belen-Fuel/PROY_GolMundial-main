@@ -149,17 +149,17 @@
                 </div>
 
                 <!-- Entrada de Goles Local -->
-                <div class="p-field" style="margin-bottom: 15px;">
-                    <p:outputLabel for="golesL" value="Goles #{partidoBean.partidoSeleccionado.seleccionLocal}" style="font-weight: bold;"/>
-                    <p:spinner id="golesL" value="#{partidoBean.partidoSeleccionado.golesLocal}" min="0" max="20" required="true"/>
-                </div>
-
+		<div class="p-field" style="margin-bottom: 15px;">
+    		    <p:outputLabel for="golesL" value="Goles #{partidoBean.partidoSeleccionado.seleccionLocal}" style="font-weight: bold;"/>
+    		    <p:spinner id="golesL" value="#{partidoBean.partidoSeleccionado.golesLocal}" min="0" max="20" required="true"
+               		disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
+		</div>
                 <!-- Entrada de Goles Visitante -->
-                <div class="p-field" style="margin-bottom: 15px;">
-                    <p:outputLabel for="golesV" value="Goles #{partidoBean.partidoSeleccionado.seleccionVisitante}" style="font-weight: bold;"/>
-                    <p:spinner id="golesV" value="#{partidoBean.partidoSeleccionado.golesVisitante}" min="0" max="20" required="true"/>
-                </div>
-
+		<div class="p-field" style="margin-bottom: 15px;">
+    		    <p:outputLabel for="golesV" value="Goles #{partidoBean.partidoSeleccionado.seleccionVisitante}" style="font-weight: bold;"/>
+    		    <p:spinner id="golesV" value="#{partidoBean.partidoSeleccionado.golesVisitante}" min="0" max="20" required="true"
+               		disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
+		</div>
                 <!-- Cambio de Estado -->
                 <div class="p-field" style="margin-bottom: 20px;">
                     <p:outputLabel for="estadoPart" value="Estado del Partido" style="font-weight: bold; display: block; margin-bottom: 5px;"/>
@@ -172,15 +172,16 @@
             </p:outputPanel>
 
             <!-- Botones de Acción del Modal -->
-            <div style="text-align: right; margin-top: 15px;">
-		<p:commandButton value="Guardar Resultado" icon="pi pi-check"
-                 		 actionListener="#{partidoBean.guardarResultado}"
-                  		 update=":formPartidos:messages @(.ui-datatable)"
-                  		 oncomplete="if (!args.validationFailed) { PF('dlgMarcador').hide(); }"
-                   		 styleClass="ui-button-primary" style="margin-right: 5px;"/>
-                <p:commandButton value="Cancelar" icon="pi pi-times" 
-                                 onclick="PF('dlgMarcador').hide()" 
-                                 class="ui-button-secondary" type="button"/>
+		<div style="text-align: right; margin-top: 15px;">
+                    <p:commandButton value="Guardar Resultado" icon="pi pi-check"
+                                     actionListener="#{partidoBean.guardarResultado}"
+                                     update=":formPartidos:messages @(.ui-datatable)"
+                                     oncomplete="if (!args.validationFailed) { PF('dlgMarcador').hide(); }"
+                                     styleClass="ui-button-primary" style="margin-right: 5px;"
+                                     disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
+                    <p:commandButton value="Cancelar" icon="pi pi-times" 
+                                     onclick="PF('dlgMarcador').hide()" 
+                                     class="ui-button-secondary" type="button"/>
             </div>
         </h:form>
     </p:dialog>
