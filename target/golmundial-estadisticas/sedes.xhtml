@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Sedes - UTN GolMundial 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="text/css">
+        body {
+            background-color: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .header-title {
+            text-align: center;
+            color: #1e3c72;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="container">
+        <!-- Título Principal -->
+        <div class="header-title">
+            <h1>🏟️ Sedes del Mundial 2026</h1>
+            <p>Consulta los estadios oficiales de Estados Unidos, México y Canadá</p>
+        </div>
+
+        <h:form id="formSedes">
+            <!-- Mensajes globales para validar si falta algún campo al guardar -->
+            <p:growl id="msjs" showDetail="true" keepAlive="false" />
+
+            <!-- Botón para abrir el diálogo de registro -->
+            <div style="margin-bottom: 15px;">
+                <p:commandButton value="Nueva Sede" 
+                                 icon="pi pi-plus" 
+                                 onclick="PF('dlgSede').show()" 
+                                 styleClass="ui-button-success" />
+            </div>
+
+            <!-- Tabla adaptativa (responsiva) de PrimeFaces -->
+            <p:dataTable id="tablaSedes" var="sede" value="#{sedeBean.sedes}" 
+                         reflow="true" rows="10" paginator="true"
+                         paginatorPosition="bottom"
+                         emptyMessage="No se encontraron sedes cargadas en el sistema.">
+                
+                <p:column headerText="ID" style="width: 50px; text-align: center;">
+                    <h:outputText value="#{sede.id}" />
+                </p:column>
+
+                <p:column headerText="Nombre del Estadio">
+                    <h:outputText value="#{sede.nombre}" style="font-weight: bold; color: #2a5298;" />
+                </p:column>
+
+                <p:column headerText="Ciudad">
+                    <h:outputText value="#{sede.ciudad}" />
+                </p:column>
+
+                <p:column headerText="País">
+                    <h:outputText value="#{sede.pais}" />
+                </p:column>
+
+                <p:column headerText="Capacidad" style="text-align: right;">
+                    <h:outputText value="#{sede.capacidadAprox}">
+                        <f:convertNumber pattern="#,###" />
+                    </h:outputText>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <!-- Diálogo Modal para Registrar Nueva Sede -->
+        <p:dialog header="Registrar Nueva Sede" 
+                  widgetVar="dlgSede" 
+                  modal="true" 
+                  responsive="true" 
+                  showEffect="fade" 
+                  hideEffect="fade"
+                  resizable="false">
+                  
+            <h:form id="formNuevaSede">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank" style="margin-bottom: 10px;">
+                    
+                    <p:outputLabel for="nombre" value="Nombre del Estadio:" />
+                    <p:inputText id="nombre" 
+                                 value="#{sedeBean.nuevaSede.nombre}" 
+                                 required="true" 
+                                 requiredMessage="El nombre del estadio es obligatorio" />
+
+                    <p:outputLabel for="ciudad" value="Ciudad:" />
+                    <p:inputText id="ciudad" 
+                                 value="#{sedeBean.nuevaSede.ciudad}" 
+                                 required="true" 
+                                 requiredMessage="La ciudad es obligatoria" />
+
+                    <p:outputLabel for="pais" value="País:" />
+                    <p:inputText id="pais" 
+                                 value="#{sedeBean.nuevaSede.pais}" 
+                                 required="true" 
+                                 requiredMessage="El país es obligatorio" />
+
+                    <p:outputLabel for="capacidad" value="Capacidad:" />
+                    <p:inputNumber id="capacidad" 
+                                   value="#{sedeBean.nuevaSede.capacidadAprox}" 
+                                   decimalPlaces="0" 
+                                   required="true" 
+                                   requiredMessage="La capacidad es obligatoria" />
+                                   
+                </p:panelGrid>
+
+                <div style="text-align: right; margin-top: 15px;">
+                    <p:commandButton value="Cancelar" 
+                                     icon="pi pi-times" 
+                                     onclick="PF('dlgSede').hide()" 
+                                     styleClass="ui-button-secondary" 
+                                     type="button"
+                                     style="margin-right: .5rem;" />
+                                     
+                    <p:commandButton value="Guardar" 
+                                     icon="pi pi-check" 
+                                     actionListener="#{sedeBean.guardarSede}" 
+                                     update=":formSedes:tablaSedes :formSedes:msjs @form" 
+                                     oncomplete="if (!args.validationFailed) PF('dlgSede').hide()" />
+                </div>
+            </h:form>
+        </p:dialog>
+    </div>
+</h:body>
+</html>

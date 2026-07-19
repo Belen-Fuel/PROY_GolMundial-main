@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="GolMundial.Modelos/GolMundial.Modelos.csproj" />
-  <Project Path="GolMundial.API/GolMundial.API.csproj" />
-  <Project Path="GolMundial.Consumer/GolMundial.Consumer.csproj" />
-</Solution>
