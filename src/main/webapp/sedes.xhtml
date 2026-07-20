@@ -41,12 +41,28 @@
             <p:growl id="msjs" showDetail="true" keepAlive="false" />
 
             <!-- Botón para abrir el diálogo de registro -->
-            <div style="margin-bottom: 15px;">
-                <p:commandButton value="Nueva Sede" 
-                                 icon="pi pi-plus" 
-                                 onclick="PF('dlgSede').show()" 
-                                 styleClass="ui-button-success" />
-            </div>
+           <!-- Acciones -->
+                <div style="display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                            margin-bottom:15px;
+                            flex-wrap:wrap;
+                            gap:10px;">
+
+                    <p:button
+                            value="Volver al panel"
+                            icon="pi pi-home"
+                            href="dashboard.xhtml"
+                            styleClass="ui-button-secondary"/>
+
+                    <p:commandButton
+                            value="Nueva Sede"
+                            icon="pi pi-plus"
+                            onclick="PF('dlgSede').show()"
+                            type="button"
+                            styleClass="ui-button-success"/>
+
+                </div>
 
             <!-- Tabla adaptativa (responsiva) de PrimeFaces -->
             <p:dataTable id="tablaSedes" var="sede" value="#{sedeBean.sedes}" 

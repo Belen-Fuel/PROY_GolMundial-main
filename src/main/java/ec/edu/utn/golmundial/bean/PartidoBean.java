@@ -17,7 +17,7 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Named("partidoBean") // Mantiene la coincidencia exacta con tu archivo xhtml
+@Named("partioBean") // Mantiene la coincidencia exacta con tu archivo xhtml
 @ViewScoped
 public class PartidoBean implements Serializable {
 
@@ -51,49 +51,48 @@ public class PartidoBean implements Serializable {
     }
 
     // Método corregido para registrar el marcador oficial siguiendo el contrato de datos del Backend
-	public void guardarResultado() {
-        	Client cliente = null;
-        	try {
-            		cliente = ClientBuilder.newClient();
+    public void guardarResultado() {
+        Client cliente = null;
+        try {
+            cliente = ClientBuilder.newClient();
             
-            		ec.edu.utn.golmundial.dto.ResultadoPartidoRequest solicitudGoles = new ec.edu.utn.golmundial.dto.ResultadoPartidoRequest();
-            		solicitudGoles.setGolesLocal(partidoSeleccionado.getGolesLocal());
-            		solicitudGoles.setGolesVisitante(partidoSeleccionado.getGolesVisitante());
+            // 1. Construimos el objeto específico que exige el backend (ResultadoPartidoRequest)
+            ec.edu.utn.golmundial.dto.ResultadoPartidoRequest solicitudGoles = new ec.edu.utn.golmundial.dto.ResultadoPartidoRequest();
+            solicitudGoles.setGolesLocal(partidoSeleccionado.getGolesLocal());
+            solicitudGoles.setGolesVisitante(partidoSeleccionado.getGolesVisitante());
             
-            		String urlConId = API_URL + "/" + partidoSeleccionado.getId() + "/resultado";
+            // Endpoint para actualizar: /api/partidos/{id}/resultado
+            String urlConId = API_URL + "/" + partidoSeleccionado.getId() + "/resultado";
             
-			cliente.target(urlConId)
-                    		.request(MediaType.APPLICATION_JSON)
-                    		.header(jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION, "Basic YWRtaW46YWRtaW4xMjM=")
-                    		.put(Entity.entity(solicitudGoles, MediaType.APPLICATION_JSON));
+            // 2. Hacemos la petición incluyendo la cabecera de autorización y el objeto de goles correcto
+            Response respuesta = cliente.target(urlConId)
+                    .request(MediaType.APPLICATION_JSON)
+                    .header(jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION, "Bearer token_admin_valido_prueba") // Abre el candado del backend
+                    .put(Entity.entity(solicitudGoles, MediaType.APPLICATION_JSON)); // Envía únicamente los goles
 
-            		if (this.partidos != null) {
-                		for (ec.edu.utn.golmundial.dto.PartidoDTO p : this.partidos) {
-                    			if (p.getId().equals(partidoSeleccionado.getId())) {
-                        			p.setGolesLocal(partidoSeleccionado.getGolesLocal());
-                        			p.setGolesVisitante(partidoSeleccionado.getGolesVisitante());
-                        			p.setEstado(partidoSeleccionado.getEstado()); // Cambia el estado visualmente
-                        			break;
-                    			}
-                		}
-            		}
-			// Forzamos la actualización local y el mensaje de éxito directamente
-            
-            		FacesContext.getCurrentInstance().addMessage(null, 
-                		new FacesMessage(FacesMessage.SEVERITY_INFO, 
-				"¡Éxito!", "Marcador registrado correctamente."));
-
-        	} catch (Exception e) {
-            		FacesContext.getCurrentInstance().addMessage(null, 
-                		new FacesMessage(FacesMessage.SEVERITY_FATAL, 
-                		"Error de comunicación REST", e.getMessage()));
-            		e.printStackTrace();
-        	} finally {
-            		if (cliente != null) {
-                		cliente.close();
-            	}
+            if (respuesta.getStatus() == Response.Status.OK.getStatusCode()) {
+                cargarPartidos(); // Volvemos a cargar la lista para ver los cambios reflejados en la tabla
+                
+                FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, 
+                    "¡Éxito!", "Marcador registrado correctamente en el Backend REST."));
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, 
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, 
+                    "Error del Servidor: " + respuesta.getStatus(), "El backend rechazó la solicitud."));
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_FATAL, 
+                "Error de comunicación REST", e.getMessage()));
+            e.printStackTrace();
+        } finally {
+            if (cliente != null) {
+                cliente.close();
+            }
         }
     }
+
     // --- GETTERS Y SETTERS ---
 
     public List<PartidoDTO> getPartidos() {

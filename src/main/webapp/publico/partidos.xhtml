@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
 
@@ -51,18 +52,20 @@
             flex-wrap: wrap;
         }
 
-        .sesion-usuario{
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            color:white;
-            font-weight:bold;
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: bold;
         }
 
         .contenido {
-            max-width: 1250px;
+            max-width: 1300px;
             margin: 0 auto;
             padding: 30px 20px;
+
+            animation: aparecerPagina .45s ease;
         }
 
         .encabezado {
@@ -111,8 +114,160 @@
         }
 
         .resultado {
-            font-weight: bold;
-            font-size: 16px;
+            min-width: 100px;
+            padding: 13px 22px;
+            border-radius: 14px;
+            background: linear-gradient(135deg,#1d4ed8,#2563eb);
+            color: white;
+            font-size: 27px;
+            font-weight: 800;
+            text-align: center;
+        }
+        
+
+        .lista-partidos{
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+        }
+
+        .partido-card{
+            background:white;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            transition:.25s;
+        }
+
+        .partido-card:hover{
+            transform:translateY(-4px);
+            box-shadow:0 14px 30px rgba(0,0,0,.15);
+        }
+
+        .partido-header{
+            background:linear-gradient(135deg,#0f172a,#2563eb);
+            color:white;
+            padding:15px 22px;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .partido-header-izquierda{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+
+        .partido-header h3{
+            margin:0;
+            font-size:18px;
+        }
+
+        .grupo-partido{
+            background:white;
+            color:#2563eb;
+            padding:6px 12px;
+            border-radius:20px;
+            font-weight:bold;
+        }
+
+        .partido-body{
+
+            display:flex;
+            justify-content:space-around;
+            align-items:center;
+
+            padding:35px;
+            gap:25px;
+        }
+
+        .equipo{
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+
+            width:220px;
+        }
+
+        .bandera{
+
+            width:70px;
+            height:50px;
+            object-fit:cover;
+            margin-bottom:12px;
+        }
+
+        .nombre-equipo{
+
+            font-size:22px;
+            font-weight:bold;
+            text-align:center;
+        }
+
+        .partido-footer {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr auto;
+            align-items: center;
+            gap: 16px;
+
+            padding: 18px 22px;
+
+            border-top: 1px solid #e5e7eb;
+            background: #f8fafc;
+        }
+
+        .info-partido {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 12px 16px;
+
+            background-color: #ffffff;
+            border: 1px solid #dbe3ee;
+            border-radius: 11px;
+
+            color: #475569;
+
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
+        }
+
+        .info-partido i {
+            color: #2563eb;
+            font-size: 18px;
+        }
+
+        .info-partido strong {
+            color: #1e293b;
+        }
+
+        .estado{
+
+            font-weight:bold;
+            padding:8px 18px;
+            border-radius:20px;
+        }
+
+        .estado-programado{
+
+            background:#dbeafe;
+            color:#2563eb;
+        }
+
+        .estado-finalizado{
+
+            background:#dcfce7;
+            color:#15803d;
+        }
+
+        .estado-en-juego{
+
+            background:#fef3c7;
+            color:#b45309;
         }
 
         .pie {
@@ -121,6 +276,44 @@
             text-align: center;
             padding: 24px;
             margin-top: 35px;
+        }
+
+        .numero-partido{
+            color:#dbeafe;
+            font-size:12px;
+            margin-top:3px;
+        }
+
+        .codigo-equipo{
+
+            color:#64748b;
+            font-size:12px;
+        }
+
+        .bandera-alternativa{
+
+            display:none;
+
+            align-items:center;
+            justify-content:center;
+
+            width:70px;
+            height:50px;
+
+            border-radius:5px;
+
+            background:#e2e8f0;
+
+            color:#334155;
+
+            font-weight:bold;
+        }
+
+       @media (max-width: 900px) {
+
+            .lista-partidos {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 650px) {
@@ -132,7 +325,211 @@
             .menu {
                 width: 100%;
             }
+
+            .contenido {
+                padding: 20px 10px;
+            }
+
+            .partido-body {
+                grid-template-columns: 1fr;
+                padding: 25px 18px;
+            }
+
+            .resultado {
+                font-size: 22px;
+            }
+
+            .partido-footer {
+                grid-template-columns: 1fr;
+            }
+
+            .info-partido {
+                width: 100%;
+            }
+
+            .estado {
+                justify-self: start;
+            }
+
+            .partido-header {
+                align-items: flex-start;
+            }
         }
+        .contenido {
+            animation: aparecerPagina 0.55s ease-out;
+        }
+
+       .partido-card {
+
+            border:1px solid #e2e8f0;
+
+            box-shadow:0 5px 15px rgba(15,23,42,.08);
+
+            transition:.25s;
+        }
+
+        .partido-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16);
+            border-color: #93c5fd;
+        }
+
+        .partido-card:hover .bandera {
+            transform: scale(1.08);
+            box-shadow: 0 7px 16px rgba(15, 23, 42, 0.22);
+        }
+
+        .partido-card:hover .resultado {
+            transform: scale(1.05);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+        }
+
+        .partido-card:nth-child(2n) {
+            animation-delay: 0.06s;
+        }
+
+        .partido-card:nth-child(3n) {
+            animation-delay: 0.12s;
+        }
+
+        .bandera,
+        .resultado {
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .ui-button {
+            transition:
+                transform .18s ease,
+                box-shadow .18s ease,
+                filter .18s ease !important;
+        }
+
+        .ui-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+            filter: brightness(1.05);
+        }
+
+        .encabezado {
+            position: relative;
+            overflow: hidden;
+            animation: aparecerEncabezado 0.55s ease-out;
+        }
+
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes aparecerPagina {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aparecerTarjeta {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes aparecerEncabezado {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+         
+
+        .ui-button:hover{
+            transform:translateY(-2px);
+        }
+        .partido-card,
+        .seleccion-card,
+        .grupo-card{
+
+            border:1px solid #e2e8f0;
+
+            box-shadow:
+                0 5px 15px rgba(15,23,42,.08);
+
+            transition:.25s;
+        }
+        .bandera{
+
+            transition:.25s;
+        }
+
+        .bandera:hover{
+
+            transform:scale(1.12);
+        }
+        .grupo{
+
+            display:inline-block;
+
+            padding:5px 12px;
+
+            border-radius:30px;
+
+            background:#2563eb;
+
+            color:white;
+
+            font-weight:bold;
+        }
+        .encabezado h2{
+
+            position:relative;
+        }
+
+        .encabezado h2::after{
+
+            content:"";
+
+            display:block;
+
+            width:70px;
+
+            height:4px;
+
+            margin-top:8px;
+
+            border-radius:30px;
+
+            background:#2563eb;
+        }
+            .partido-card:hover{
+
+            border-color:#2563eb;
+        }
+
+
 
     </style>
 
@@ -154,78 +551,85 @@
 
         <h:form id="formMenu">
 
-<div class="menu">
+            <div class="menu">
 
-    <p:button
-            value="Inicio"
-            icon="pi pi-home"
-            href="inicio.xhtml"
-            styleClass="ui-button-outlined"/>
+                <p:button
+                        value="Inicio"
+                        icon="pi pi-home"
+                        href="inicio.xhtml"
+                        styleClass="ui-button-outlined"/>
 
-    <p:button
-            value="Partidos"
-            icon="pi pi-calendar"
-            href="partidos.xhtml"/>
+                <p:button
+                        value="Partidos"
+                        icon="pi pi-calendar"
+                        href="partidos.xhtml"/>
 
-    <p:button
-            value="Posiciones"
-            icon="pi pi-list"
-            href="posiciones.xhtml"
-            styleClass="ui-button-outlined"/>
+                <p:button
+                        value="Posiciones"
+                        icon="pi pi-list"
+                        href="posiciones.xhtml"
+                        styleClass="ui-button-outlined"/>
 
-    <p:button
-            value="Selecciones"
-            icon="pi pi-flag"
-            href="selecciones.xhtml"
-            styleClass="ui-button-outlined"/>
+                <p:button
+                        value="Selecciones"
+                        icon="pi pi-flag"
+                        href="selecciones.xhtml"
+                        styleClass="ui-button-outlined"/>
 
-    <p:button
-            value="Estadísticas"
-            icon="pi pi-chart-bar"
-            href="estadisticas.xhtml"
-            styleClass="ui-button-outlined"/>
+                <p:button
+                        value="Estadísticas"
+                        icon="pi pi-chart-bar"
+                        href="estadisticas.xhtml"
+                        styleClass="ui-button-outlined"/>
 
-    <h:panelGroup
-            rendered="#{not loginBean.logueado}"
-            layout="block"
-            style="display:inline-flex;align-items:center;gap:8px;">
+                <h:panelGroup
+                        rendered="#{not loginBean.logueado}"
+                        layout="block"
+                        style="display:inline-flex;
+                               align-items:center;
+                               gap:8px;">
 
-        <p:button
-                value="Registrarse"
-                icon="pi pi-user-plus"
-                href="registro.xhtml"
-                styleClass="ui-button-warning"/>
+                    <p:button
+                            value="Registrarse"
+                            icon="pi pi-user-plus"
+                            href="registro.xhtml"
+                            styleClass="ui-button-warning"/>
 
-        <p:button
-                value="Ingresar"
-                icon="pi pi-sign-in"
-                href="login.xhtml"
-                styleClass="ui-button-success"/>
+                    <p:button
+                            value="Ingresar"
+                            icon="pi pi-sign-in"
+                            href="login.xhtml"
+                            styleClass="ui-button-success"/>
 
-    </h:panelGroup>
+                </h:panelGroup>
 
-    <h:panelGroup
-            rendered="#{loginBean.usuarioRegistrado}"
-            layout="block"
-            style="display:inline-flex;align-items:center;gap:8px;">
+                <h:panelGroup
+                        rendered="#{loginBean.usuarioRegistrado}"
+                        layout="block"
+                        style="display:inline-flex;
+                               align-items:center;
+                               gap:8px;">
 
-        <span class="sesion-usuario">
-            <i class="pi pi-user"></i>
-            #{loginBean.usuario.nombre}
-        </span>
+                    <span class="sesion-usuario">
 
-        <p:commandButton
-                value="Cerrar sesión"
-                icon="pi pi-sign-out"
-                action="#{loginBean.cerrarSesionPublica}"
-                ajax="false"
-                styleClass="ui-button-danger"/>
+                        <i class="pi pi-user"></i>
 
-    </h:panelGroup>
+                        #{loginBean.usuario.nombre}
 
-</div>
+                    </span>
 
-</h:form>
+                    <p:commandButton
+                            value="Cerrar sesión"
+                            icon="pi pi-sign-out"
+                            action="#{loginBean.cerrarSesionPublica}"
+                            ajax="false"
+                            styleClass="ui-button-danger"/>
+
+                </h:panelGroup>
+
+            </div>
+
+        </h:form>
 
     </div>
 
@@ -251,147 +655,204 @@
 
             <div class="acciones">
 
-                <p:commandButton
+                <p:button
+                        value="Volver al inicio"
+                        icon="pi pi-home"
+                        href="inicio.xhtml"
+                        styleClass="ui-button-secondary"/>
+
+               <p:commandButton
                         value="Actualizar"
                         icon="pi pi-refresh"
                         actionListener="#{publicoBean.cargarPartidos}"
                         process="@this"
-                        update=":formPartidos:tablaPartidos
-                                :formPartidos:mensajes"/>
+                        update=":formPartidos:panelPartidos
+                                :formPartidos:mensajes"
+                        styleClass="ui-button-success"/>
 
             </div>
 
-            <p:card>
+            <h:panelGroup
+            id="panelPartidos"
+            layout="block"
+            styleClass="lista-partidos">
 
-                <p:dataTable
-                        id="tablaPartidos"
-                        value="#{publicoBean.partidos}"
-                        var="p"
-                        paginator="true"
-                        rows="12"
-                        reflow="true"
-                        paginatorPosition="bottom"
-                        rowsPerPageTemplate="12,24,48"
-                        emptyMessage="No existen partidos disponibles.">
+        <ui:repeat
+                value="#{publicoBean.partidos}"
+                var="p">
 
-                    <f:facet name="header">
-                        Partidos del torneo
-                    </f:facet>
+            <article class="partido-card">
 
-                    <p:column
-                            headerText="#"
-                            style="width: 60px; text-align: center;">
+                <header class="partido-header">
 
-                        <h:outputText
-                                value="#{p.numeroPartidoFifa}"/>
+                    <div class="partido-header-izquierda">
 
-                    </p:column>
+                        <i class="pi pi-trophy"></i>
 
-                    <p:column
-                            headerText="Fase"
-                            filterBy="#{p.fase}"
-                            filterMatchMode="contains">
+                        <div>
 
-                        <h:outputText value="#{p.fase}"/>
+                            <h3>
+                                #{p.fase == 'GRUPOS'
+                                  ? 'Fase de grupos'
+                                  : p.fase}
+                            </h3>
 
-                    </p:column>
+                            <div class="numero-partido">
+                                Partido #{p.numeroPartidoFifa}
+                            </div>
 
-                    <p:column
-                            headerText="Grupo"
-                            filterBy="#{p.grupo}"
-                            filterMatchMode="exact"
-                            style="text-align: center;">
+                        </div>
 
-                        <h:outputText
-                                value="#{empty p.grupo ? '-' : p.grupo}"/>
+                    </div>
 
-                    </p:column>
+                    <span class="grupo-partido">
 
-                    <p:column
-                            headerText="Local"
-                            filterBy="#{p.seleccionLocal}"
-                            filterMatchMode="contains">
+                        #{empty p.grupo
+                        ? 'Fase eliminatoria'
+                        : 'Grupo '.concat(p.grupo)}
 
-                        <h:outputText
-                                value="#{p.seleccionLocal}"
-                                style="font-weight: bold;"/>
+                    </span>
 
-                    </p:column>
+                </header>
 
-                    <p:column
-                            headerText="Resultado"
-                            style="text-align: center;">
+                <div class="partido-body">
+
+                    <!-- Equipo local -->
+
+                    <div class="equipo">
+
+                        <h:graphicImage
+                                library="images"
+                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaLocal)}.svg"
+                                styleClass="bandera"
+                                alt="Bandera de #{p.seleccionLocal}"
+                                onerror="this.style.display='none';
+                                        this.nextElementSibling.style.display='inline-flex';"/>
+
+                        <span class="bandera-alternativa">
+                            #{p.codigoFifaLocal}
+                        </span>
+
+                        <span class="nombre-equipo">
+                            #{p.seleccionLocal}
+                        </span>
+
+                        <span class="codigo-equipo">
+                            #{p.codigoFifaLocal}
+                        </span>
+
+                    </div>
+
+                    <!-- Marcador -->
+
+                    <div class="resultado">
 
                         <h:outputText
                                 rendered="#{not empty p.golesLocal
                                             and not empty p.golesVisitante}"
-                                value="#{p.golesLocal} - #{p.golesVisitante}"
-                                styleClass="resultado"/>
+                                value="#{p.golesLocal} - #{p.golesVisitante}"/>
 
                         <h:outputText
                                 rendered="#{empty p.golesLocal
                                             or empty p.golesVisitante}"
                                 value="VS"/>
 
-                    </p:column>
+                    </div>
 
-                    <p:column
-                            headerText="Visitante"
-                            filterBy="#{p.seleccionVisitante}"
-                            filterMatchMode="contains">
+                    <!-- Equipo visitante -->
 
-                        <h:outputText
-                                value="#{p.seleccionVisitante}"
-                                style="font-weight: bold;"/>
+                    <div class="equipo">
 
-                    </p:column>
+                        <h:graphicImage
+                                library="images"
+                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaVisitante)}.svg"
+                                styleClass="bandera"
+                                alt="Bandera de #{p.seleccionVisitante}"
+                                onerror="this.style.display='none';
+                                        this.nextElementSibling.style.display='inline-flex';"/>
 
-                    <p:column headerText="Fecha y hora">
+                        <span class="bandera-alternativa">
+                            #{p.codigoFifaVisitante}
+                        </span>
 
-                        <h:outputText value="#{p.fechaHoraEt}"/>
+                        <span class="nombre-equipo">
+                            #{p.seleccionVisitante}
+                        </span>
 
-                    </p:column>
+                        <span class="codigo-equipo">
+                            #{p.codigoFifaVisitante}
+                        </span>
 
-                    <p:column
-                            headerText="Sede"
-                            filterBy="#{p.sede}"
-                            filterMatchMode="contains">
+                    </div>
 
-                        <h:outputText value="#{p.sede}"/>
+                </div>
 
-                        <br/>
+                <footer class="partido-footer">
 
-                        <small>
+                    <div class="info-partido">
+
+                        <i class="pi pi-calendar"></i>
+
+                        <div>
+                            <strong>Fecha y hora</strong>
+                            <br/>
+
+                            <h:outputText
+                                 value="#{publicoBean.formatearFechaHora(p.fechaHoraEt)}"/>
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-partido">
+
+                        <i class="pi pi-map-marker"></i>
+
+                        <div>
+                            <strong>#{p.sede}</strong>
+                            <br/>
                             #{p.ciudad}, #{p.pais}
-                        </small>
+                        </div>
 
-                    </p:column>
+                    </div>
 
-                    <p:column
-                            headerText="Estado"
-                            filterBy="#{p.estado}"
-                            filterMatchMode="exact"
-                            style="text-align: center;">
+                   <span class="estado
+                            #{p.estado == 'FINALIZADO'
+                            ? 'estado-finalizado'
+                            : p.estado == 'EN_JUEGO'
+                            ? 'estado-en-juego'
+                            : 'estado-programado'}">
 
-                        <h:outputText
-                                value="#{p.estado == 'PROGRAMADO'
-                                        ? 'Programado'
-                                        : p.estado == 'FINALIZADO'
-                                        ? 'Finalizado'
-                                        : p.estado == 'EN_JUEGO'
-                                        ? 'En juego'
-                                        : p.estado}"
-                                styleClass="#{p.estado == 'FINALIZADO'
-                                        ? 'estado-finalizado'
-                                        : p.estado == 'EN_JUEGO'
-                                        ? 'estado-en-juego'
-                                        : 'estado-programado'}"/>
+                        #{p.estado == 'PROGRAMADO'
+                        ? 'Programado'
+                        : p.estado == 'FINALIZADO'
+                        ? 'Finalizado'
+                        : p.estado == 'EN_JUEGO'
+                        ? 'En juego'
+                        : p.estado}
 
-                    </p:column>
+                    </span>
 
-                </p:dataTable>
+                </footer>
 
-            </p:card>
+            </article>
+
+        </ui:repeat>
+
+        <h:panelGroup
+                rendered="#{empty publicoBean.partidos}"
+                layout="block"
+                styleClass="sin-partidos">
+
+            <i class="pi pi-info-circle"></i>
+
+        <strong>
+            No existen partidos disponibles.
+        </strong>
+
+    </h:panelGroup>
+
+</h:panelGroup>
 
         </h:form>
 

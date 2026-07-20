@@ -264,8 +264,12 @@ public class ConsultaTorneoService {
     }
 
     private PartidoDTO convertirPartido(
-            Partido partido
-    ) {
+        Partido partido
+        ) {
+
+        if (partido == null) {
+                return null;
+        }
 
         Seleccion local =
                 partido.getSeleccionLocal();
@@ -273,48 +277,145 @@ public class ConsultaTorneoService {
         Seleccion visitante =
                 partido.getSeleccionVisitante();
 
-        return new PartidoDTO(
-                partido.getId(),
-                partido.getNumeroPartidoFifa(),
-                partido.getFase().getCodigo(),
+        PartidoDTO dto =
+                new PartidoDTO();
+
+        dto.setId(
+                partido.getId()
+        );
+
+        dto.setNumeroPartidoFifa(
+                partido.getNumeroPartidoFifa()
+        );
+
+        dto.setFase(
+                partido.getFase() == null
+                        ? null
+                        : partido.getFase().getCodigo()
+        );
+
+        dto.setGrupo(
                 partido.getGrupo() == null
                         ? null
-                        : partido.getGrupo().getCodigo(),
+                        : partido.getGrupo().getCodigo()
+        );
 
-                local == null ? null : local.getId(),
-                local == null ? null : local.getNombre(),
+        /*
+        * Selección local
+        */
+        dto.setSeleccionLocalId(
+                local == null
+                        ? null
+                        : local.getId()
+        );
 
+        dto.setCodigoFifaLocal(
+                local == null
+                        ? null
+                        : local.getCodigoFifa()
+        );
+
+        dto.setSeleccionLocal(
+                local == null
+                        ? null
+                        : local.getNombre()
+        );
+
+        /*
+        * Selección visitante
+        */
+        dto.setSeleccionVisitanteId(
                 visitante == null
                         ? null
-                        : visitante.getId(),
+                        : visitante.getId()
+        );
 
+        dto.setCodigoFifaVisitante(
                 visitante == null
                         ? null
-                        : visitante.getNombre(),
+                        : visitante.getCodigoFifa()
+        );
 
+        dto.setSeleccionVisitante(
+                visitante == null
+                        ? null
+                        : visitante.getNombre()
+        );
+
+        /*
+        * Fechas
+        */
+        dto.setFechaHoraUtc(
                 partido.getFechaHoraUtc() == null
                         ? null
-                        : partido.getFechaHoraUtc().toString(),
+                        : partido.getFechaHoraUtc().toString()
+        );
 
+        dto.setFechaHoraEt(
                 partido.getFechaHoraEt() == null
                         ? null
-                        : partido.getFechaHoraEt().toString(),
+                        : partido.getFechaHoraEt().toString()
+        );
 
-                partido.getSede().getId(),
-                partido.getSede().getNombre(),
-                partido.getSede().getCiudad(),
-                partido.getSede().getPais(),
+        /*
+        * Sede
+        */
+        if (partido.getSede() != null) {
 
-                partido.getEstado().name(),
+                dto.setSedeId(
+                        partido.getSede().getId()
+                );
 
-                partido.getGolesLocal(),
-                partido.getGolesVisitante(),
+                dto.setSede(
+                        partido.getSede().getNombre()
+                );
 
-                partido.getCuotaLocal(),
-                partido.getCuotaEmpate(),
-                partido.getCuotaVisitante(),
+                dto.setCiudad(
+                        partido.getSede().getCiudad()
+                );
 
+                dto.setPais(
+                        partido.getSede().getPais()
+                );
+        }
+
+        /*
+        * Estado y resultado
+        */
+        dto.setEstado(
+                partido.getEstado() == null
+                        ? null
+                        : partido.getEstado().name()
+        );
+
+        dto.setGolesLocal(
+                partido.getGolesLocal()
+        );
+
+        dto.setGolesVisitante(
+                partido.getGolesVisitante()
+        );
+
+        /*
+        * Cuotas
+        */
+        dto.setCuotaLocal(
+                partido.getCuotaLocal()
+        );
+
+        dto.setCuotaEmpate(
+                partido.getCuotaEmpate()
+        );
+
+        dto.setCuotaVisitante(
+                partido.getCuotaVisitante()
+        );
+
+        dto.setResultadoNotificado(
                 partido.isResultadoNotificado()
         );
-    }
+
+        return dto;
+
+        }
 }

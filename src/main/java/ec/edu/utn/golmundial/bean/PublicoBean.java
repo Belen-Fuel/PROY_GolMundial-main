@@ -20,6 +20,10 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 @Named("publicoBean")
 @ViewScoped
 public class PublicoBean implements Serializable {
@@ -365,4 +369,156 @@ public class PublicoBean implements Serializable {
         this.grupoSeleccionado =
                 grupoSeleccionado;
     }
+    public List<PosicionDTO> posicionesPorGrupo(
+        String codigoGrupo
+    ) {
+
+        if (codigoGrupo == null
+                || codigoGrupo.isBlank()
+                || posiciones == null) {
+
+            return new ArrayList<>();
+        }
+
+        return posiciones.stream()
+                .filter(posicion ->
+                        posicion.getGrupo() != null
+                                && posicion.getGrupo()
+                                .equalsIgnoreCase(
+                                        codigoGrupo
+                                )
+                )
+                .sorted(
+                        java.util.Comparator
+                                .comparingInt(
+                                        PosicionDTO::getPosicion
+                                )
+                )
+                .toList();
+    }
+   public String obtenerCodigoBandera(String codigoFifa) {
+
+    if (codigoFifa == null || codigoFifa.isBlank()) {
+        return "un";
+    }
+
+    return switch (codigoFifa.trim().toUpperCase()) {
+        case "CPV" -> "cv";
+        case "CIV" -> "ci";
+        case "JOR" -> "jo";
+        case "COD" -> "cd";
+
+        case "ALG" -> "dz";
+        case "ARG" -> "ar";
+        case "AUS" -> "au";
+        case "AUT" -> "at";
+        case "BEL" -> "be";
+        case "BIH" -> "ba";
+        case "BRA" -> "br";
+        case "CAN" -> "ca";
+        case "CHI" -> "cl";
+        case "CHN" -> "cn";
+        case "CMR" -> "cm";
+        case "COL" -> "co";
+        case "CRC" -> "cr";
+        case "CRO" -> "hr";
+        case "CTA", "CUW" -> "cw";
+        case "CZE" -> "cz";
+        case "DEN" -> "dk";
+        case "ECU" -> "ec";
+        case "EGY" -> "eg";
+        case "ENG" -> "gb-eng";
+        case "ESP" -> "es";
+        case "FRA" -> "fr";
+        case "GER" -> "de";
+        case "GHA" -> "gh";
+        case "HAI" -> "ht";
+        case "HON" -> "hn";
+        case "IRN" -> "ir";
+        case "IRQ" -> "iq";
+        case "ITA" -> "it";
+        case "JPN" -> "jp";
+        case "KOR" -> "kr";
+        case "KSA" -> "sa";
+        case "MAR" -> "ma";
+        case "MEX" -> "mx";
+        case "NED" -> "nl";
+        case "NGA" -> "ng";
+        case "NOR" -> "no";
+        case "NZL" -> "nz";
+        case "PAN" -> "pa";
+        case "PAR" -> "py";
+        case "PER" -> "pe";
+        case "POL" -> "pl";
+        case "POR" -> "pt";
+        case "QAT" -> "qa";
+        case "ROU" -> "ro";
+        case "RSA" -> "za";
+        case "SCO" -> "gb-sct";
+        case "SEN" -> "sn";
+        case "SRB" -> "rs";
+        case "SUI" -> "ch";
+        case "SWE" -> "se";
+        case "TUN" -> "tn";
+        case "TUR" -> "tr";
+        case "URU" -> "uy";
+        case "USA" -> "us";
+        case "UZB" -> "uz";
+        case "VEN" -> "ve";
+        case "WAL" -> "gb-wls";
+
+        default -> "un";
+    };
 }
+    public String obtenerBanderaPorNombre(String seleccion) {
+
+        if (seleccion == null) {
+            return "un";
+        }
+
+        return switch (seleccion.toUpperCase()) {
+
+            case "ECUADOR" -> "ec";
+            case "ARGENTINA" -> "ar";
+            case "BRASIL" -> "br";
+            case "MÉXICO", "MEXICO" -> "mx";
+            case "ESTADOS UNIDOS" -> "us";
+            case "CANADÁ", "CANADA" -> "ca";
+            case "ESPAÑA", "ESPANA" -> "es";
+            case "FRANCIA" -> "fr";
+            case "ALEMANIA" -> "de";
+            case "ITALIA" -> "it";
+            case "PORTUGAL" -> "pt";
+            case "INGLATERRA" -> "gb-eng";
+            case "GALES" -> "gb-wls";
+            case "PAÍSES BAJOS", "PAISES BAJOS" -> "nl";
+            case "JAPÓN", "JAPON" -> "jp";
+            case "COREA DEL SUR" -> "kr";
+            case "MARRUECOS" -> "ma";
+            case "URUGUAY" -> "uy";
+            case "COLOMBIA" -> "co";
+            case "CHILE" -> "cl";
+            case "PARAGUAY" -> "py";
+            case "PERÚ", "PERU" -> "pe";
+
+            default -> "un";
+        };
+    }
+    public String formatearFechaHora(String fechaUtc) {
+
+        if (fechaUtc == null || fechaUtc.isBlank()) {
+            return "";
+        }
+
+        OffsetDateTime fecha = OffsetDateTime.parse(fechaUtc);
+
+        DateTimeFormatter formato =
+                DateTimeFormatter.ofPattern(
+                        "dd/MM/yyyy • HH:mm 'UTC'",
+                        new Locale("es", "EC"));
+
+        return fecha.format(formato);
+    }
+    
+}
+

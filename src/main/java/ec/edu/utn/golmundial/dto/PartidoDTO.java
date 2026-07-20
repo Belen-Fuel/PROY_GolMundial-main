@@ -15,9 +15,11 @@ public class PartidoDTO implements Serializable {
     private String grupo;
 
     private Long seleccionLocalId;
+    private String codigoFifaLocal;
     private String seleccionLocal;
 
     private Long seleccionVisitanteId;
+    private String codigoFifaVisitante;
     private String seleccionVisitante;
 
     private String fechaHoraUtc;
@@ -39,54 +41,74 @@ public class PartidoDTO implements Serializable {
 
     private boolean resultadoNotificado;
 
+
     // Constructor vacío (Requerido por JSF y frameworks de deserialización)
     public PartidoDTO() {
     }
 
     // Constructor completo original (Requerido por ConsultaTorneoService)
     public PartidoDTO(
-            Long id,
-            Integer numeroPartidoFifa,
-            String fase,
-            String grupo,
-            Long seleccionLocalId,
-            String seleccionLocal,
-            Long seleccionVisitanteId,
-            String seleccionVisitante,
-            String fechaHoraUtc,
-            String fechaHoraEt,
-            Long sedeId,
-            String sede,
-            String ciudad,
-            String pais,
-            String estado,
-            Integer golesLocal,
-            Integer golesVisitante,
-            BigDecimal cuotaLocal,
-            BigDecimal cuotaEmpate,
-            BigDecimal cuotaVisitante,
-            boolean resultadoNotificado
+        Long id,
+        Integer numeroPartidoFifa,
+        String fase,
+        String grupo,
+
+        Long seleccionLocalId,
+        String codigoFifaLocal,
+        String seleccionLocal,
+
+        Long seleccionVisitanteId,
+        String codigoFifaVisitante,
+        String seleccionVisitante,
+
+        String fechaHoraUtc,
+        String fechaHoraEt,
+
+        Long sedeId,
+        String sede,
+        String ciudad,
+        String pais,
+
+        String estado,
+
+        Integer golesLocal,
+        Integer golesVisitante,
+
+        BigDecimal cuotaLocal,
+        BigDecimal cuotaEmpate,
+        BigDecimal cuotaVisitante,
+
+        boolean resultadoNotificado
     ) {
         this.id = id;
         this.numeroPartidoFifa = numeroPartidoFifa;
         this.fase = fase;
         this.grupo = grupo;
+
         this.seleccionLocalId = seleccionLocalId;
+        this.codigoFifaLocal = codigoFifaLocal;
         this.seleccionLocal = seleccionLocal;
+
         this.seleccionVisitanteId = seleccionVisitanteId;
+        this.codigoFifaVisitante = codigoFifaVisitante;
         this.seleccionVisitante = seleccionVisitante;
+
         this.fechaHoraUtc = fechaHoraUtc;
         this.fechaHoraEt = fechaHoraEt;
+
         this.sedeId = sedeId;
         this.sede = sede;
         this.ciudad = ciudad;
         this.pais = pais;
+
         this.estado = estado;
         this.golesLocal = golesLocal;
         this.golesVisitante = golesVisitante;
+
         this.cuotaLocal = cuotaLocal;
         this.cuotaEmpate = cuotaEmpate;
         this.cuotaVisitante = cuotaVisitante;
+
         this.resultadoNotificado = resultadoNotificado;
     }
 
@@ -154,4 +176,26 @@ public class PartidoDTO implements Serializable {
 
     public boolean isResultadoNotificado() { return resultadoNotificado; }
     public void setResultadoNotificado(boolean resultadoNotificado) { this.resultadoNotificado = resultadoNotificado; }
+
+   public String getCodigoFifaLocal() {
+        return codigoFifaLocal;
+    }
+
+    public void setCodigoFifaLocal(
+            String codigoFifaLocal
+    ) {
+        this.codigoFifaLocal = codigoFifaLocal;
+    }
+
+    public String getCodigoFifaVisitante() {
+        return codigoFifaVisitante;
+    }
+
+    public void setCodigoFifaVisitante(
+            String codigoFifaVisitante
+    ) {
+        this.codigoFifaVisitante =
+                codigoFifaVisitante;
+    }
+        
 }

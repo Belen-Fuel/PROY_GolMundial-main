@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
 
@@ -144,7 +145,257 @@
             .campo-filtro {
                 width: 100%;
             }
+            .partido-body {
+                grid-template-columns: 1fr;
+            }
+
+            .partido-footer {
+                grid-template-columns: 1fr;
+            }.partido-body {
+                grid-template-columns: 1fr;
+            }
+
+            .partido-footer {
+                grid-template-columns: 1fr;
+            }
         }
+        /* Animaciones para estadísticas */
+
+        .contenido {
+            animation: aparecerPagina 0.55s ease-out;
+        }
+
+        .partido-card {
+            background: #ffffff;
+            border: 1px solid #dbe3ee;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+            animation: aparecerTarjeta 0.55s ease both;
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .partido-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.15);
+            border-color: #93c5fd;
+        }
+
+        .partido-card:nth-child(2n) {
+            animation-delay: 0.06s;
+        }
+
+        .partido-card:nth-child(3n) {
+            animation-delay: 0.12s;
+        }
+
+        .partido-card:hover .resultado {
+            transform: scale(1.05);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+        }
+
+        .resultado {
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .equipo {
+            transition: transform 0.2s ease;
+        }
+
+        .partido-card:hover .equipo {
+            transform: translateY(-2px);
+        }
+
+        .ui-button {
+        transition:
+            transform .18s ease,
+            box-shadow .18s ease,
+            filter .18s ease !important;
+    }
+
+        .ui-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+            filter: brightness(1.05);
+        }
+
+        .encabezado {
+            position: relative;
+            overflow: hidden;
+            animation: aparecerEncabezado 0.55s ease-out;
+        }
+
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes aparecerPagina {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aparecerTarjeta {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes aparecerEncabezado {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+            .bandera {
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+    }
+
+        .equipo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+        }
+
+        .nombre-equipo {
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .partido-body {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 25px;
+            padding: 30px 22px;
+            background: white;
+        }
+        .partido-header {
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            color: white;
+            padding: 14px 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .partido-footer {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr auto;
+            align-items: center;
+            gap: 18px;
+
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .lista-partidos {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            margin-top: 15px;
+        }
+        .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 10px 14px;
+
+            background: #f8fafc;
+
+            border: 1px solid #dbe3ee;
+
+            border-radius: 10px;
+        }
+        .info i{
+            color:#2563eb;
+            font-size:18px;
+        }
+        .estado {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            min-width: 140px;
+            min-height: 52px;
+
+            padding: 12px 18px;
+
+            border-radius: 10px;
+            border: 1px solid #dbe3ee;
+
+            background: #ffffff;
+
+            font-weight: 700;
+
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
+        }
+        .estado-programado {
+
+            color: #2563eb;
+
+            border-color: #93c5fd;
+
+            background: #eff6ff;
+
+        }
+            .estado-en-juego {
+
+                color: #b45309;
+
+                border-color: #facc15;
+
+                background: #fef9c3;
+
+            }
+
+
+
+            .estado-finalizado {
+
+                color: #15803d;
+
+                border-color: #86efac;
+
+                background: #dcfce7;
+
+            }
 
     </style>
 
@@ -354,6 +605,155 @@
                         styleClass="ui-button-success"/>
 
             </div>
+            <div class="lista-partidos">
+
+    <ui:repeat
+            value="#{publicoBean.partidos}"
+            var="p">
+
+        <div class="partido-card">
+
+            <div class="partido-header">
+
+                <h3>
+
+                    🏆 #{p.fase}
+
+                </h3>
+
+                <span class="grupo">
+
+                    #{empty p.grupo ? 'Sin grupo' : 'Grupo '.concat(p.grupo)}
+
+                </span>
+
+            </div>
+
+            <div class="partido-body">
+
+                <!-- LOCAL -->
+
+                <div class="equipo">
+
+                    <h:graphicImage
+                        library="images"
+                        name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaLocal)}.svg"
+                        styleClass="bandera"
+                        style="width:70px !important;
+                            height:48px !important;
+                            max-width:70px !important;
+                            max-height:48px !important;
+                            object-fit:cover;"
+                        alt="Bandera de #{p.seleccionLocal}"/>
+
+                    <span class="nombre-equipo">
+
+                        #{p.seleccionLocal}
+
+                    </span>
+
+                </div>
+
+                <!-- RESULTADO -->
+
+                <div class="resultado">
+
+                    <h:outputText
+
+                            rendered="#{not empty p.golesLocal
+                                    and not empty p.golesVisitante}"
+
+                            value="#{p.golesLocal} - #{p.golesVisitante}"/>
+
+                    <h:outputText
+
+                            rendered="#{empty p.golesLocal
+                                    or empty p.golesVisitante}"
+
+                            value="VS"/>
+
+                </div>
+
+                <!-- VISITANTE -->
+
+                <div class="equipo">
+                    <h:graphicImage
+                        library="images"
+                        name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaVisitante)}.svg"
+                        styleClass="bandera"
+                        style="width:70px !important;
+                            height:48px !important;
+                            max-width:70px !important;
+                            max-height:48px !important;
+                            object-fit:cover;"
+                        alt="Bandera de #{p.seleccionVisitante}"/>
+
+                    <span class="nombre-equipo">
+
+                        #{p.seleccionVisitante}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="partido-footer">
+
+                <div class="info">
+
+                    <i class="pi pi-calendar"></i>
+
+                    #{publicoBean.formatearFechaHora(p.fechaHoraUtc)}
+
+                </div>
+
+                <div class="info">
+
+                    <i class="pi pi-map-marker"></i>
+
+                    <div>
+
+                        <strong>
+
+                            #{p.sede}
+
+                        </strong>
+
+                        <br/>
+
+                        #{p.ciudad}, #{p.pais}
+
+                    </div>
+
+                </div>
+
+                <span
+
+                        class="estado
+                        #{p.estado == 'FINALIZADO'
+                        ? 'estado-finalizado'
+                        : p.estado == 'EN_JUEGO'
+                        ? 'estado-en-juego'
+                        : 'estado-programado'}">
+
+                    #{p.estado == 'PROGRAMADO'
+                    ? 'Programado'
+                    : p.estado == 'FINALIZADO'
+                    ? 'Finalizado'
+                    : p.estado == 'EN_JUEGO'
+                    ? 'En juego'
+                    : p.estado}
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </ui:repeat>
+
+</div>
 
             <p:card>
 
