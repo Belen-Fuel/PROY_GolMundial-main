@@ -1,190 +1,684 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
+
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
-    <title>Administración - Partidos UTNGolMundial 2026</title>
+
+    <title>Partidos - UTN GolMundial 2026</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"/>
+
     <style>
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
             margin: 0;
-            padding: 20px;
+            background-color: #f4f6f9;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1e293b;
         }
-        .header-panel {
-            background-color: #1e293b;
-            color: #ffffff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .barra {
+            background-color: #0f172a;
+            color: white;
+            padding: 16px 24px;
+
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            gap: 15px;
+            flex-wrap: wrap;
         }
-        .header-panel h1 {
+
+        .marca h1 {
             margin: 0;
             font-size: 24px;
         }
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-            text-transform: uppercase;
+
+        .marca small {
+            color: #cbd5e1;
         }
-        .status-programado { background-color: #cbd5e1; color: #1e293b; }
-        .status-enjuego { background-color: #fef08a; color: #854d0e; }
-        .status-finalizado { background-color: #bbf7d0; color: #166534; }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .contenido {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .encabezado {
+            background:
+                    linear-gradient(
+                            135deg,
+                            #0f172a,
+                            #1d4ed8
+                    );
+
+            color: white;
+            padding: 28px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .encabezado h2 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .encabezado p {
+            margin: 0;
+            color: #dbeafe;
+        }
+
+        .acciones {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .estado-programado {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .estado-finalizado {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .estado-en-juego {
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        .resultado {
+            min-width: 100px;
+            padding: 13px 22px;
+            border-radius: 14px;
+            background: linear-gradient(135deg,#1d4ed8,#2563eb);
+            color: white;
+            font-size: 27px;
+            font-weight: 800;
+            text-align: center;
+        }
+        
+
+        .lista-partidos{
+            display:flex;
+            flex-direction:column;
+            gap:25px;
+        }
+
+        .partido-card{
+            background:white;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+            transition:.25s;
+        }
+
+        .partido-card:hover{
+            transform:translateY(-4px);
+            box-shadow:0 14px 30px rgba(0,0,0,.15);
+        }
+
+        .partido-header{
+            background:linear-gradient(135deg,#0f172a,#2563eb);
+            color:white;
+            padding:15px 22px;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .partido-header-izquierda{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+
+        .partido-header h3{
+            margin:0;
+            font-size:18px;
+        }
+
+        .grupo-partido{
+            background:white;
+            color:#2563eb;
+            padding:6px 12px;
+            border-radius:20px;
+            font-weight:bold;
+        }
+
+        .partido-body{
+
+            display:flex;
+            justify-content:space-around;
+            align-items:center;
+
+            padding:35px;
+            gap:25px;
+        }
+
+        .equipo{
+
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+
+            width:220px;
+        }
+
+        .bandera{
+
+            width:70px;
+            height:50px;
+            object-fit:cover;
+            margin-bottom:12px;
+        }
+
+        .nombre-equipo{
+
+            font-size:22px;
+            font-weight:bold;
+            text-align:center;
+        }
+
+        .partido-footer{
+
+            border-top:1px solid #e5e7eb;
+
+            display:flex;
+            justify-content:space-between;
+            flex-wrap:wrap;
+
+            gap:15px;
+
+            padding:18px 22px;
+
+            background:#fafafa;
+        }
+
+        .info-partido{
+
+            display:flex;
+            align-items:center;
+            gap:8px;
+            color:#475569;
+        }
+
+        .estado{
+
+            font-weight:bold;
+            padding:8px 18px;
+            border-radius:20px;
+        }
+
+        .estado-programado{
+
+            background:#dbeafe;
+            color:#2563eb;
+        }
+
+        .estado-finalizado{
+
+            background:#dcfce7;
+            color:#15803d;
+        }
+
+        .estado-en-juego{
+
+            background:#fef3c7;
+            color:#b45309;
+        }
+
+        .pie {
+            background-color: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 24px;
+            margin-top: 35px;
+        }
+
+        .numero-partido{
+            color:#dbeafe;
+            font-size:12px;
+            margin-top:3px;
+        }
+
+        .codigo-equipo{
+
+            color:#64748b;
+            font-size:12px;
+        }
+
+        .bandera-alternativa{
+
+            display:none;
+
+            align-items:center;
+            justify-content:center;
+
+            width:70px;
+            height:50px;
+
+            border-radius:5px;
+
+            background:#e2e8f0;
+
+            color:#334155;
+
+            font-weight:bold;
+        }
+
+       @media (max-width: 900px) {
+
+            .lista-partidos {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .barra {
+                align-items: flex-start;
+            }
+
+            .menu {
+                width: 100%;
+            }
+
+            .contenido {
+                padding: 20px 10px;
+            }
+
+            .partido-body {
+                grid-template-columns: 1fr;
+                padding: 25px 18px;
+            }
+
+            .resultado {
+                font-size: 22px;
+            }
+
+            .partido-footer {
+                grid-template-columns: 1fr;
+            }
+
+            .estado {
+                justify-self: start;
+            }
+
+            .partido-header {
+                align-items: flex-start;
+            }
+        }
+
     </style>
+
 </h:head>
 
 <h:body>
 
-    <!-- Header Principal -->
-    <div class="header-panel">
-        <div>
-            <h1>Panel Administrativo - UTN GolMundial 2026</h1>
-            <small>Gestión del Calendario Oficial y Resultados</small>
+    <div class="barra">
+
+        <div class="marca">
+
+            <h1>UTN GolMundial 2026</h1>
+
+            <small>
+                Portal público del torneo
+            </small>
+
         </div>
-        <!-- Botón para regresar a Sedes -->
-        <p:button href="sedes.xhtml" value="Ver Sedes 🏟️" icon="pi pi-map" styleClass="ui-button-outlined ui-button-flat" style="color: white; border-color: white;"/>
+
+        <h:form id="formMenu">
+
+            <div class="menu">
+
+                <p:button
+                        value="Inicio"
+                        icon="pi pi-home"
+                        href="inicio.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <p:button
+                        value="Partidos"
+                        icon="pi pi-calendar"
+                        href="partidos.xhtml"/>
+
+                <p:button
+                        value="Posiciones"
+                        icon="pi pi-list"
+                        href="posiciones.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <p:button
+                        value="Selecciones"
+                        icon="pi pi-flag"
+                        href="selecciones.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <p:button
+                        value="Estadísticas"
+                        icon="pi pi-chart-bar"
+                        href="estadisticas.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <h:panelGroup
+                        rendered="#{not loginBean.logueado}"
+                        layout="block"
+                        style="display:inline-flex;
+                               align-items:center;
+                               gap:8px;">
+
+                    <p:button
+                            value="Registrarse"
+                            icon="pi pi-user-plus"
+                            href="registro.xhtml"
+                            styleClass="ui-button-warning"/>
+
+                    <p:button
+                            value="Ingresar"
+                            icon="pi pi-sign-in"
+                            href="login.xhtml"
+                            styleClass="ui-button-success"/>
+
+                </h:panelGroup>
+
+                <h:panelGroup
+                        rendered="#{loginBean.usuarioRegistrado}"
+                        layout="block"
+                        style="display:inline-flex;
+                               align-items:center;
+                               gap:8px;">
+
+                    <span class="sesion-usuario">
+
+                        <i class="pi pi-user"></i>
+
+                        #{loginBean.usuario.nombre}
+
+                    </span>
+
+                    <p:commandButton
+                            value="Cerrar sesión"
+                            icon="pi pi-sign-out"
+                            action="#{loginBean.cerrarSesionPublica}"
+                            ajax="false"
+                            styleClass="ui-button-danger"/>
+
+                </h:panelGroup>
+
+            </div>
+
+        </h:form>
+
     </div>
 
-    <h:form id="formPartidos">
-        <!-- Notificaciones flotantes -->
-        <p:growl id="messages" showDetail="true" />
+    <main class="contenido">
 
-        <p:card style="margin-bottom: 2em;">
-            <p:dataTable id="dtPartidos" var="partido" value="#{partidoBean.partidos}" 
-                         widgetVar="wgPartidos" paginator="true" rows="10"
-                         paginatorPosition="bottom"
-                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                         currentPageReportTemplate="{startRecord}-{endRecord} de {totalRecords} partidos"
-                         rowsPerPageTemplate="5,10,20"
-                         emptyMessage="No se encontraron partidos programados.">
+        <div class="encabezado">
 
-                <f:facet name="header">
-                    <div class="flex justify-content-between align-items-center">
-                        <span style="font-weight: bold; font-size: 1.2rem">Calendario de Partidos (104 encuentros)</span>
-                    </div>
-                </f:facet>
+            <h2>Calendario de partidos</h2>
 
-                <!-- ID del Partido -->
-                <p:column headerText="ID" width="50" style="text-align: center;">
-                    <h:outputText value="#{partido.id}" />
-                </p:column>
+            <p>
+                Consulta los encuentros, horarios,
+                sedes y resultados del Mundial 2026.
+            </p>
 
-                <!-- Fase -->
-                <p:column headerText="Fase" filterBy="#{partido.fase}" filterMatchMode="contains">
-                    <h:outputText value="#{partido.fase}" />
-                </p:column>
+        </div>
 
-                <!-- Fecha y Hora -->
-                <p:column headerText="Fecha / Hora">
-                    <h:outputText value="#{partido.fechaHoraEt}" />
-                </p:column>
+        <h:form id="formPartidos">
 
-                <!-- Sede / Estadio -->
-                <p:column headerText="Estadio / Ciudad">
-                    <h:outputText value="#{partido.sede} - #{partido.ciudad}" />
-                </p:column>
+            <p:growl
+                    id="mensajes"
+                    showDetail="true"
+                    life="5000"/>
 
-                <!-- Enfrentamiento -->
-                <p:column headerText="Enfrentamiento" style="text-align: center; font-weight: bold;">
-                    <h:outputText value="#{partido.seleccionLocal} " />
-                    <span style="color: #64748b;">vs</span>
-                    <h:outputText value=" #{partido.seleccionVisitante}" />
-                </p:column>
+            <div class="acciones">
 
-                <!-- Marcador -->
-                <p:column headerText="Marcador" style="text-align: center; font-size: 1.1rem;">
-                    <h:outputText value="#{partido.golesLocal != null ? partido.golesLocal : '-'}" style="font-weight: bold;" />
-                    <span style="margin: 0 5px;">:</span>
-                    <h:outputText value="#{partido.golesVisitante != null ? partido.golesVisitante : '-'}" style="font-weight: bold;" />
-                </p:column>
+               <p:button
+                        value="Volver al panel"
+                        icon="pi pi-home"
+                        href="dashboard.xhtml"
+                        styleClass="ui-button-secondary"/>
 
-                <!-- Estado -->
-                <p:column headerText="Estado" style="text-align: center;">
-                    <span class="status-badge status-#{partido.estado.toLowerCase().replace('_', '')}">
-                        #{partido.estado}
-                    </span>
-                </p:column>
+               <p:commandButton
+                        value="Actualizar"
+                        icon="pi pi-refresh"
+                        actionListener="#{publicoBean.cargarPartidos}"
+                        process="@this"
+                        update=":formPartidos:panelPartidos
+                                :formPartidos:mensajes"
+                        styleClass="ui-button-success"/>
 
-                <!-- Acciones (Editar Marcador) -->
-                <p:column headerText="Acciones" style="text-align: center;" width="120">
-                    <p:commandButton icon="pi pi-pencil" 
-                                     update="@widgetVar(dlgMarcador)" 
-                                     oncomplete="PF('dlgMarcador').show()"
-                                     styleClass="edit-button rounded-button ui-button-success" 
-                                     process="@this"
-                                     title="Registrar Marcador">
-                        <f:setPropertyActionListener value="#{partido}" target="#{partidoBean.partidoSeleccionado}" />
-                    </p:commandButton>
-                </p:column>
-
-            </p:dataTable>
-        </p:card>
-    </h:form>
-
-    <!-- Modal para Registrar Marcador Oficial -->
-    <p:dialog id="dialogRegistrarMarcador" header="Registrar Resultado Oficial" 
-              widgetVar="dlgMarcador" modal="true" responsive="true" 
-              showEffect="fade" hideEffect="fade" width="450"
-              appendTo="@(body)">
-        
-        <h:form id="formDialogInterno">
-            <p:outputPanel id="panelMarcador" class="ui-fluid" style="margin-top: 10px;">
-                <!-- Detalles del partido -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <span style="font-size: 14px; color: #64748b; font-weight: bold; text-transform: uppercase;">
-                        #{partidoBean.partidoSeleccionado.fase}
-                    </span>
-                    <h3 style="margin: 5px 0;">
-                        #{partidoBean.partidoSeleccionado.seleccionLocal} vs #{partidoBean.partidoSeleccionado.seleccionVisitante}
-                    </h3>
-                    <small>#{partidoBean.partidoSeleccionado.sede} - #{partidoBean.partidoSeleccionado.ciudad}</small>
-                </div>
-
-                <!-- Entrada de Goles Local -->
-		<div class="p-field" style="margin-bottom: 15px;">
-    		    <p:outputLabel for="golesL" value="Goles #{partidoBean.partidoSeleccionado.seleccionLocal}" style="font-weight: bold;"/>
-    		    <p:spinner id="golesL" value="#{partidoBean.partidoSeleccionado.golesLocal}" min="0" max="20" required="true"
-               		disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
-		</div>
-                <!-- Entrada de Goles Visitante -->
-		<div class="p-field" style="margin-bottom: 15px;">
-    		    <p:outputLabel for="golesV" value="Goles #{partidoBean.partidoSeleccionado.seleccionVisitante}" style="font-weight: bold;"/>
-    		    <p:spinner id="golesV" value="#{partidoBean.partidoSeleccionado.golesVisitante}" min="0" max="20" required="true"
-               		disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
-		</div>
-                <!-- Cambio de Estado -->
-                <div class="p-field" style="margin-bottom: 20px;">
-                    <p:outputLabel for="estadoPart" value="Estado del Partido" style="font-weight: bold; display: block; margin-bottom: 5px;"/>
-                    <p:selectOneMenu id="estadoPart" value="#{partidoBean.partidoSeleccionado.estado}">
-                        <f:selectItem itemLabel="PROGRAMADO" itemValue="PROGRAMADO" />
-                        <f:selectItem itemLabel="EN JUEGO" itemValue="EN_JUEGO" />
-                        <f:selectItem itemLabel="FINALIZADO (Liquidar apuestas)" itemValue="FINALIZADO" />
-                    </p:selectOneMenu>
-                </div>
-            </p:outputPanel>
-
-            <!-- Botones de Acción del Modal -->
-		<div style="text-align: right; margin-top: 15px;">
-                    <p:commandButton value="Guardar Resultado" icon="pi pi-check"
-                                     actionListener="#{partidoBean.guardarResultado}"
-                                     update=":formPartidos:messages @(.ui-datatable)"
-                                     oncomplete="if (!args.validationFailed) { PF('dlgMarcador').hide(); }"
-                                     styleClass="ui-button-primary" style="margin-right: 5px;"
-                                     disabled="#{partidoBean.partidoSeleccionado.estado == 'FINALIZADO'}" />
-                    <p:commandButton value="Cancelar" icon="pi pi-times" 
-                                     onclick="PF('dlgMarcador').hide()" 
-                                     class="ui-button-secondary" type="button"/>
             </div>
+
+            <h:panelGroup
+            id="panelPartidos"
+            layout="block"
+            styleClass="lista-partidos">
+
+        <ui:repeat
+                value="#{publicoBean.partidos}"
+                var="p">
+
+            <article class="partido-card">
+
+                <header class="partido-header">
+
+                    <div class="partido-header-izquierda">
+
+                        <i class="pi pi-trophy"></i>
+
+                        <div>
+
+                            <h3>
+                                #{p.fase == 'GRUPOS'
+                                ? 'Fase de grupos'
+                                : p.fase}
+                            </h3>
+
+                            <div class="numero-partido">
+                                Partido #{p.numeroPartidoFifa}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <span class="grupo-partido">
+
+                        #{empty p.grupo
+                        ? 'Fase eliminatoria'
+                        : 'Grupo '.concat(p.grupo)}
+
+                    </span>
+
+                </header>
+
+                <div class="partido-body">
+
+                    <!-- Equipo local -->
+
+                    <div class="equipo">
+
+                        <h:graphicImage
+                                library="images"
+                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaLocal)}.svg"
+                                styleClass="bandera"
+                                alt="Bandera de #{p.seleccionLocal}"
+                                onerror="this.style.display='none';
+                                        this.nextElementSibling.style.display='inline-flex';"/>
+
+                        <span class="bandera-alternativa">
+                            #{p.codigoFifaLocal}
+                        </span>
+
+                        <span class="nombre-equipo">
+                            #{p.seleccionLocal}
+                        </span>
+
+                        <span class="codigo-equipo">
+                            #{p.codigoFifaLocal}
+                        </span>
+
+                    </div>
+
+                    <!-- Marcador -->
+
+                    <div class="resultado">
+
+                        <h:outputText
+                                rendered="#{not empty p.golesLocal
+                                            and not empty p.golesVisitante}"
+                                value="#{p.golesLocal} - #{p.golesVisitante}"/>
+
+                        <h:outputText
+                                rendered="#{empty p.golesLocal
+                                            or empty p.golesVisitante}"
+                                value="VS"/>
+
+                    </div>
+
+                    <!-- Equipo visitante -->
+
+                    <div class="equipo">
+
+                        <h:graphicImage
+                                library="images"
+                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaVisitante)}.svg"
+                                styleClass="bandera"
+                                alt="Bandera de #{p.seleccionVisitante}"
+                                onerror="this.style.display='none';
+                                        this.nextElementSibling.style.display='inline-flex';"/>
+
+                        <span class="bandera-alternativa">
+                            #{p.codigoFifaVisitante}
+                        </span>
+
+                        <span class="nombre-equipo">
+                            #{p.seleccionVisitante}
+                        </span>
+
+                        <span class="codigo-equipo">
+                            #{p.codigoFifaVisitante}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <footer class="partido-footer">
+
+                    <div class="info-partido">
+
+                        <i class="pi pi-calendar"></i>
+
+                        <div>
+                            <strong>Fecha y hora</strong>
+                            <br/>
+
+                            <h:outputText
+                                    value="#{p.fechaHoraEt
+                                            .replace('T', ' ')
+                                            .replace('Z', '')}"/>
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-partido">
+
+                        <i class="pi pi-map-marker"></i>
+
+                        <div>
+                            <strong>#{p.sede}</strong>
+                            <br/>
+                            #{p.ciudad}, #{p.pais}
+                        </div>
+
+                    </div>
+
+                   <span class="estado
+                            #{p.estado == 'FINALIZADO'
+                            ? 'estado-finalizado'
+                            : p.estado == 'EN_JUEGO'
+                            ? 'estado-en-juego'
+                            : 'estado-programado'}">
+
+                        #{p.estado == 'PROGRAMADO'
+                        ? 'Programado'
+                        : p.estado == 'FINALIZADO'
+                        ? 'Finalizado'
+                        : p.estado == 'EN_JUEGO'
+                        ? 'En juego'
+                        : p.estado}
+
+                    </span>
+
+                </footer>
+
+            </article>
+
+        </ui:repeat>
+
+        <h:panelGroup
+                rendered="#{empty publicoBean.partidos}"
+                layout="block"
+                styleClass="sin-partidos">
+
+            <i class="pi pi-info-circle"></i>
+
+        <strong>
+            No existen partidos disponibles.
+        </strong>
+
+    </h:panelGroup>
+
+</h:panelGroup>
+
         </h:form>
-    </p:dialog>
+
+    </main>
+
+    <footer class="pie">
+
+        <h3>UTN GolMundial 2026</h3>
+
+        <p>
+            Proyecto Integrador · Ingeniería en Software
+        </p>
+
+        <small>
+            © 2026 Todos los derechos reservados
+        </small>
+
+    </footer>
 
 </h:body>
+
 </html>
