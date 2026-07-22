@@ -31,8 +31,6 @@ public class ReporteBean implements Serializable {
     private static final String URL_ESTADISTICAS =
             "http://localhost:8080/golmundial-estadisticas/api/estadisticas/selecciones";
 
-    @Inject
-    private LoginBean loginBean;
 
     private String torneo;
     private Long roles = 0L;
@@ -228,10 +226,6 @@ public class ReporteBean implements Serializable {
                 "Error",
                 detalle
         );
-    }
-
-    private boolean sesionValida() {
-        return true;
     }
 
     private void redirigirAlLogin() {

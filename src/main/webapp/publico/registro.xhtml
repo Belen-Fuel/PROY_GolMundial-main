@@ -170,19 +170,19 @@
             <p:button
                     value="Inicio"
                     icon="pi pi-home"
-                    href="inicio.xhtml"
+                    href="#{request.contextPath}/publico/inicio.xhtml"
                     styleClass="ui-button-outlined"/>
 
             <p:button
                     value="Partidos"
                     icon="pi pi-calendar"
-                    href="partidos.xhtml"
+                    href="#{request.contextPath}/publico/partidos.xhtml"
                     styleClass="ui-button-outlined"/>
 
             <p:button
                     value="Ingresar"
                     icon="pi pi-sign-in"
-                    href="login.xhtml"
+                    href="#{request.contextPath}/publico/login.xhtml"
                     styleClass="ui-button-success"/>
 
         </div>
@@ -305,7 +305,6 @@
                             icon="pi pi-check"
                             action="#{registroPublicoBean.registrar}"
                             process="@form"
-                            update="@form"
                             ajax="false"
                             styleClass="ui-button-success"/>
 

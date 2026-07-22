@@ -17,39 +17,120 @@
 
         body {
             margin: 0;
-            padding: 20px;
             font-family: "Segoe UI", Arial, sans-serif;
             background-color: #f4f6f9;
             color: #1e293b;
         }
 
+        .barra {
+            background-color: #0f172a;
+            color: white;
+            padding: 18px 14px;
+        }
+
+        .marca h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .marca small {
+            color: #cbd5e1;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+       .form-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-fila {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: white;
+            font-weight: bold;
+        }
+
         .contenedor {
             max-width: 1350px;
             margin: 0 auto;
+            padding: 30px 20px;
         }
 
-        .encabezado {
-            background-color: #1e293b;
+       .encabezado {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
             color: white;
-            padding: 20px 22px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 30px 28px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -80px;
+            top: -95px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
         }
 
         .encabezado h1 {
             margin: 0;
-            font-size: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .encabezado p {
-            margin: 6px 0 0;
-            color: #cbd5e1;
+            margin: 12px 0 0;
+            font-size: 14px;
+            color: #dbeafe;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        .acciones{
+            background:#fff;
+            border-radius:14px;
+            padding:16px 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:22px;
+            box-shadow:0 4px 15px rgba(0,0,0,.08);
         }
 
         .resumen {
@@ -134,10 +215,6 @@
 
         @media (max-width: 700px) {
 
-            body {
-                padding: 10px;
-            }
-
             .encabezado {
                 align-items: flex-start;
             }
@@ -154,8 +231,85 @@
     </style>
 
 </h:head>
-
 <h:body>
+
+<div class="barra">
+
+    <div class="marca">
+        <h1>UTN GolMundial 2026</h1>
+        <small>Panel administrativo del torneo</small>
+    </div>
+
+   <h:form id="formMenu" styleClass="form-menu">
+
+    <div class="menu">
+
+        <p:button
+                value="Panel"
+                icon="pi pi-home"
+                href="#{request.contextPath}/dashboard.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Partidos"
+                icon="pi pi-calendar"
+                href="#{request.contextPath}/partidos.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Selecciones"
+                icon="pi pi-flag"
+                href="#{request.contextPath}/selecciones.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Sedes"
+                icon="pi pi-map-marker"
+                href="#{request.contextPath}/sedes.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Usuarios"
+                icon="pi pi-users"
+                href="#{request.contextPath}/usuarios.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Auditoría"
+                icon="pi pi-history"
+                href="#{request.contextPath}/auditoria.xhtml"
+                styleClass="ui-button-outlined"/>
+
+        <p:button
+                value="Reportes"
+                icon="pi pi-chart-bar"
+                href="#{request.contextPath}/reportes.xhtml"/>
+
+    </div>
+
+
+   <div class="sesion-fila">
+
+        <span class="sesion-usuario">
+            <i class="pi pi-user"></i>
+            <h:outputText
+                    value="#{empty loginBean.usuario.nombre
+                    ? 'Administrador del Torneo'
+                    : loginBean.usuario.nombre}"/>
+        </span>
+
+        <p:commandButton
+                value="Cerrar sesión"
+                icon="pi pi-sign-out"
+                action="#{loginBean.cerrarSesion}"
+                ajax="false"
+                styleClass="ui-button-danger"/>
+
+    </div>
+
+</h:form>
+
+</div>
 
 <div class="contenedor">
 
@@ -163,10 +317,13 @@
 
         <div>
 
-            <h1>Reportes básicos</h1>
+            <h1>
+                <i class="pi pi-chart-bar"></i>
+                Reportes básicos
+            </h1>
 
             <p>
-                #{reporteBean.torneo}
+                Consulta estadísticas y datos generales de la Copa Mundial de la FIFA 2026.
             </p>
 
         </div>
@@ -321,10 +478,10 @@
             </div>
 
             <p:button
-                        value="Volver al panel"
-                        icon="pi pi-home"
-                        href="dashboard.xhtml"
-                        styleClass="ui-button-secondary"/>
+                    value="Volver al panel"
+                    icon="pi pi-home"
+                    href="#{request.contextPath}/dashboard.xhtml"
+                    styleClass="ui-button-secondary"/>
 
             <p:commandButton
                     value="Aplicar filtro"

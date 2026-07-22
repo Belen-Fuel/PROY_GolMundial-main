@@ -14,29 +14,206 @@
             background-color: #f4f6f9;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
-        .header-title {
-            text-align: center;
-            color: #1e3c72;
-            margin-bottom: 30px;
+
+        .barra {
+            background-color: #0f172a;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .marca h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .marca small {
+            color: #cbd5e1;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: bold;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+       .encabezado {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 30px 28px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -80px;
+            top: -95px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .encabezado p {
+            margin: 12px 0 0;
+            font-size: 14px;
+            color: #dbeafe;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        .acciones{
+            background:#fff;
+            border-radius:14px;
+            padding:16px 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:22px;
+            box-shadow:0 4px 15px rgba(0,0,0,.08);
         }
     </style>
 </h:head>
 
 <h:body>
-    <div class="container">
-        <!-- Título Principal -->
-        <div class="header-title">
-            <h1>🏟️ Sedes del Mundial 2026</h1>
-            <p>Consulta los estadios oficiales de Estados Unidos, México y Canadá</p>
+
+    <div class="barra">
+
+    <div class="marca">
+        <h1>UTN GolMundial 2026</h1>
+
+        <small>
+            Panel administrativo del torneo
+        </small>
+    </div>
+
+    <h:form id="formMenu">
+
+        <div class="menu">
+
+            <p:button
+                    value="Panel"
+                    icon="pi pi-home"
+                    href="#{request.contextPath}/dashboard.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Partidos"
+                    icon="pi pi-calendar"
+                    href="#{request.contextPath}/partidos.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Selecciones"
+                    icon="pi pi-flag"
+                    href="#{request.contextPath}/selecciones.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Sedes"
+                    icon="pi pi-map-marker"
+                    href="#{request.contextPath}/sedes.xhtml"/>
+
+            <p:button
+                    value="Usuarios"
+                    icon="pi pi-users"
+                    href="#{request.contextPath}/usuarios.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Auditoría"
+                    icon="pi pi-search"
+                    href="#{request.contextPath}/auditoria.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Reportes"
+                    icon="pi pi-chart-bar"
+                    href="#{request.contextPath}/reportes.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <h:panelGroup
+                    rendered="#{loginBean.logueado and loginBean.administrador}"
+                    layout="block"
+                    style="display:inline-flex;
+                           align-items:center;
+                           gap:8px;">
+
+                <span class="sesion-usuario">
+                    <i class="pi pi-user"></i>
+                    #{loginBean.usuario.nombre}
+                </span>
+
+                <p:commandButton
+                        value="Cerrar sesión"
+                        icon="pi pi-sign-out"
+                        action="#{loginBean.cerrarSesion}"
+                        ajax="false"
+                        styleClass="ui-button-danger"/>
+
+            </h:panelGroup>
+
         </div>
 
-        <h:form id="formSedes">
+    </h:form>
+
+</div>
+    <div class="container">
+
+    <div class="encabezado">
+
+        <div>
+            <h1>
+                <i class="pi pi-map-marker"></i>
+                🏟️ Sedes del Mundial 2026
+            </h1>
+
+            <p>
+                Consulta los estadios oficiales de Estados Unidos, México y Canadá.
+            </p>
+        </div>
+
+    </div>
+
+    <h:form id="formSedes">
+
             <!-- Mensajes globales para validar si falta algún campo al guardar -->
             <p:growl id="msjs" showDetail="true" keepAlive="false" />
 
@@ -52,7 +229,7 @@
                     <p:button
                             value="Volver al panel"
                             icon="pi pi-home"
-                            href="dashboard.xhtml"
+                            href="#{request.contextPath}/dashboard.xhtml"
                             styleClass="ui-button-secondary"/>
 
                     <p:commandButton
@@ -126,11 +303,12 @@
                                  requiredMessage="El país es obligatorio" />
 
                     <p:outputLabel for="capacidad" value="Capacidad:" />
-                    <p:inputNumber id="capacidad" 
-                                   value="#{sedeBean.nuevaSede.capacidadAprox}" 
-                                   decimalPlaces="0" 
-                                   required="true" 
-                                   requiredMessage="La capacidad es obligatoria" />
+                    <p:inputNumber id="capacidad"
+                                value="#{sedeBean.nuevaSede.capacidadAprox}"
+                                decimalPlaces="0"
+                                minValue="1"
+                                required="true"
+                                requiredMessage="La capacidad es obligatoria" />
                                    
                 </p:panelGrid>
 

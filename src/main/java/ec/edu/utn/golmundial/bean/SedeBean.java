@@ -13,6 +13,11 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
 
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+
 @Named("sedeBean")
 @ViewScoped // Se crea y destruye en cada petición HTTP
 public class SedeBean implements Serializable {
@@ -51,36 +56,208 @@ public class SedeBean implements Serializable {
             }
         }
     }
+
+    private boolean validarNuevaSede() {
+
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        if (nuevaSede == null) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_ERROR,
+                            "Datos inválidos",
+                            "No se recibieron los datos de la sede."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        String nombre = nuevaSede.getNombre();
+        String ciudad = nuevaSede.getCiudad();
+        String pais = nuevaSede.getPais();
+        Integer capacidad = nuevaSede.getCapacidadAprox();
+
+        if (nombre == null || nombre.isBlank()) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_WARN,
+                            "Nombre obligatorio",
+                            "Ingrese el nombre de la sede."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        final String nombreNormalizado = nombre.trim();
+
+        if (nombreNormalizado.length() < 3) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_WARN,
+                            "Nombre inválido",
+                            "El nombre de la sede debe tener al menos 3 caracteres."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        if (ciudad == null || ciudad.isBlank()) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_WARN,
+                            "Ciudad obligatoria",
+                            "Ingrese la ciudad de la sede."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        final String ciudadNormalizada = ciudad.trim();
+
+        if (pais == null || pais.isBlank()) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_WARN,
+                            "País obligatorio",
+                            "Ingrese el país de la sede."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        final String paisNormalizado = pais.trim();
+
+        if (capacidad == null) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_WARN,
+                            "Capacidad obligatoria",
+                            "Ingrese la capacidad aproximada."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        if (capacidad <= 0) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_ERROR,
+                            "Capacidad inválida",
+                            "La capacidad debe ser mayor que cero."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        boolean sedeDuplicada = sedes.stream()
+                .anyMatch(sede ->
+                        sede.getNombre() != null
+                                && sede.getCiudad() != null
+                                && sede.getNombre().trim()
+                                .equalsIgnoreCase(nombreNormalizado)
+                                && sede.getCiudad().trim()
+                                .equalsIgnoreCase(ciudadNormalizada)
+                );
+
+        if (sedeDuplicada) {
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_ERROR,
+                            "Sede duplicada",
+                            "Ya existe una sede con ese nombre en la misma ciudad."
+                    ));
+
+            contexto.validationFailed();
+            return false;
+        }
+
+        nuevaSede.setNombre(nombreNormalizado);
+        nuevaSede.setCiudad(ciudadNormalizada);
+        nuevaSede.setPais(paisNormalizado);
+
+        return true;
+    }
     
     // Método para guardar una nueva sede mediante la API (POST)
     public void guardarSede() {
-        Client cliente = null;
-        try {
-            cliente = ClientBuilder.newClient();
-            // Enviamos la nueva sede usando un POST por HTTP REST
-            jakarta.ws.rs.core.Response respuesta = cliente.target(API_URL)
+
+        if (!validarNuevaSede()) {
+            return;
+        }
+
+        FacesContext contexto = FacesContext.getCurrentInstance();
+
+        try (Client cliente = ClientBuilder.newClient();
+            Response respuesta = cliente
+                    .target(API_URL)
                     .request(MediaType.APPLICATION_JSON)
-                    .post(jakarta.ws.rs.client.Entity.entity(nuevaSede, MediaType.APPLICATION_JSON));
-            
-            if (respuesta.getStatus() == 201 || respuesta.getStatus() == 200) {
-                // Si se guardó con éxito, recargamos la lista y limpiamos el objeto
+                    .post(
+                            Entity.entity(
+                                    nuevaSede,
+                                    MediaType.APPLICATION_JSON
+                            )
+                    )) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.CREATED.getStatusCode()
+                    || respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
+
                 cargarSedesDesdeApi();
-                this.nuevaSede = new SedeDTO();
-                // Añadimos mensaje de éxito para el p:growl
-                jakarta.faces.context.FacesContext.getCurrentInstance().addMessage(null, 
-                    new jakarta.faces.application.FacesMessage(
-                        jakarta.faces.application.FacesMessage.SEVERITY_INFO, 
-                        "¡Éxito!", "Sede registrada correctamente."));
-            } else {
-                System.err.println("Error en la API al guardar. Status: " + respuesta.getStatus());
+
+                nuevaSede = new SedeDTO();
+
+                contexto.addMessage(null,
+                        new FacesMessage(
+                                FacesMessage.SEVERITY_INFO,
+                                "Éxito",
+                                "Sede registrada correctamente."
+                        ));
+
+                return;
             }
+
+            String detalle = "El backend rechazó el registro de la sede.";
+
+            if (respuesta.hasEntity()) {
+                detalle = respuesta.readEntity(String.class);
+            }
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_ERROR,
+                            "No se pudo registrar",
+                            detalle
+                    ));
+
+            contexto.validationFailed();
+
         } catch (Exception e) {
-            System.err.println("Error al conectar con la API para guardar: " + e.getMessage());
+
+            contexto.addMessage(null,
+                    new FacesMessage(
+                            FacesMessage.SEVERITY_ERROR,
+                            "Error de comunicación",
+                            "No fue posible conectarse con la API de sedes."
+                    ));
+
+            contexto.validationFailed();
             e.printStackTrace();
-        } finally {
-            if (cliente != null) {
-                cliente.close();
-            }
         }
     }
 

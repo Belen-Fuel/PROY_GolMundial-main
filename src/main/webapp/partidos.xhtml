@@ -7,6 +7,10 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:ui="jakarta.faces.facelets">
 
+<f:metadata>
+    <f:viewAction action="#{partidoBean.verificarAcceso}"/>
+</f:metadata>
+
 <h:head>
 
     <title>Partidos - UTN GolMundial 2026</title>
@@ -67,35 +71,56 @@
         }
 
         .encabezado {
-            background:
-                    linear-gradient(
-                            135deg,
-                            #0f172a,
-                            #1d4ed8
-                    );
-
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
             color: white;
-            padding: 28px;
-            border-radius: 12px;
-            margin-bottom: 22px;
+            border-radius: 16px;
+            padding: 30px 28px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+            position: relative;
+            overflow: hidden;
         }
 
-        .encabezado h2 {
-            margin: 0 0 8px;
-            font-size: 30px;
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -80px;
+            top: -95px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .encabezado p {
-            margin: 0;
+            margin: 12px 0 0;
+            font-size: 14px;
             color: #dbeafe;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
         }
-
-        .acciones {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
+       .acciones{
+            background:#fff;
+            border-radius:14px;
+            padding:16px 20px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:22px;
+            box-shadow:0 4px 15px rgba(0,0,0,.08);
         }
-
         .estado-programado {
             color: #2563eb;
             font-weight: bold;
@@ -348,8 +373,8 @@
 
             <h1>UTN GolMundial 2026</h1>
 
-            <small>
-                Portal público del torneo
+           <small>
+                Panel administrativo del torneo
             </small>
 
         </div>
@@ -359,74 +384,64 @@
             <div class="menu">
 
                 <p:button
-                        value="Inicio"
+                        value="Panel"
                         icon="pi pi-home"
-                        href="#{request.contextPath}/publico/inicio.xhtml"
+                        href="#{request.contextPath}/dashboard.xhtml"
                         styleClass="ui-button-outlined"/>
 
                 <p:button
                         value="Partidos"
                         icon="pi pi-calendar"
-                        href="partidos.xhtml"/>
-
-                <p:button
-                        value="Posiciones"
-                        icon="pi pi-list"
-                        href="posiciones.xhtml"
-                        styleClass="ui-button-outlined"/>
+                        href="#{request.contextPath}/partidos.xhtml"/>
 
                 <p:button
                         value="Selecciones"
                         icon="pi pi-flag"
-                        href="selecciones.xhtml"
+                        href="#{request.contextPath}/selecciones.xhtml"
                         styleClass="ui-button-outlined"/>
 
                 <p:button
-                        value="Estadísticas"
-                        icon="pi pi-chart-bar"
-                        href="estadisticas.xhtml"
+                        value="Sedes"
+                        icon="pi pi-map-marker"
+                        href="#{request.contextPath}/sedes.xhtml"
                         styleClass="ui-button-outlined"/>
 
+                <p:button
+                        value="Usuarios"
+                        icon="pi pi-users"
+                        href="#{request.contextPath}/usuarios.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <p:button
+                        value="Auditoría"
+                        icon="pi pi-search"
+                        href="#{request.contextPath}/auditoria.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+                <p:button
+                        value="Reportes"
+                        icon="pi pi-chart-bar"
+                        href="#{request.contextPath}/reportes.xhtml"
+                        styleClass="ui-button-outlined"/>
+
+               
+
                 <h:panelGroup
-                        rendered="#{not loginBean.logueado}"
+                        rendered="#{loginBean.logueado and loginBean.administrador}"
                         layout="block"
                         style="display:inline-flex;
-                               align-items:center;
-                               gap:8px;">
-
-                    <p:button
-                            value="Registrarse"
-                            icon="pi pi-user-plus"
-                            href="registro.xhtml"
-                            styleClass="ui-button-warning"/>
-
-                    <p:button
-                            value="Ingresar"
-                            icon="pi pi-sign-in"
-                            href="login.xhtml"
-                            styleClass="ui-button-success"/>
-
-                </h:panelGroup>
-
-                <h:panelGroup
-                        rendered="#{loginBean.usuarioRegistrado}"
-                        layout="block"
-                        style="display:inline-flex;
-                               align-items:center;
-                               gap:8px;">
+                            align-items:center;
+                            gap:8px;">
 
                     <span class="sesion-usuario">
-
                         <i class="pi pi-user"></i>
-
                         #{loginBean.usuario.nombre}
-
                     </span>
 
                     <p:commandButton
                             value="Cerrar sesión"
                             icon="pi pi-sign-out"
-                            action="#{loginBean.cerrarSesionPublica}"
+                            action="#{loginBean.cerrarSesion}"
                             ajax="false"
                             styleClass="ui-button-danger"/>
 
@@ -440,13 +455,16 @@
 
     <main class="contenido">
 
-        <div class="encabezado">
+       <div class="encabezado">
 
-            <h2>Calendario de partidos</h2>
+            <h1>
+                <i class="pi pi-chart-bar"
+                style="margin-right:10px;"></i>
+                Reportes básicos de los Partidos
+            </h1>
 
             <p>
-                Consulta los encuentros, horarios,
-                sedes y resultados del Mundial 2026.
+                Copa Mundial de la FIFA 2026
             </p>
 
         </div>
@@ -463,13 +481,13 @@
                <p:button
                         value="Volver al panel"
                         icon="pi pi-home"
-                        href="dashboard.xhtml"
+                        href="#{request.contextPath}/dashboard.xhtml"
                         styleClass="ui-button-secondary"/>
 
                <p:commandButton
                         value="Actualizar"
                         icon="pi pi-refresh"
-                        actionListener="#{publicoBean.cargarPartidos}"
+                        actionListener="#{partidoBean.cargarPartidos}"
                         process="@this"
                         update=":formPartidos:panelPartidos
                                 :formPartidos:mensajes"
@@ -483,7 +501,7 @@
             styleClass="lista-partidos">
 
         <ui:repeat
-                value="#{publicoBean.partidos}"
+                value="#{partidoBean.partidos}"
                 var="p">
 
             <article class="partido-card">
@@ -528,7 +546,7 @@
 
                         <h:graphicImage
                                 library="images"
-                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaLocal)}.svg"
+                                name="banderas/#{partidoBean.obtenerCodigoBandera(p.codigoFifaLocal)}.svg"
                                 styleClass="bandera"
                                 alt="Bandera de #{p.seleccionLocal}"
                                 onerror="this.style.display='none';
@@ -570,7 +588,7 @@
 
                         <h:graphicImage
                                 library="images"
-                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifaVisitante)}.svg"
+                                name="banderas/#{partidoBean.obtenerCodigoBandera(p.codigoFifaVisitante)}.svg"
                                 styleClass="bandera"
                                 alt="Bandera de #{p.seleccionVisitante}"
                                 onerror="this.style.display='none';
@@ -640,28 +658,134 @@
 
                     </span>
 
+                    <p:commandButton
+                            rendered="#{loginBean.logueado and loginBean.administrador}"
+                            value="Editar resultado"
+                            icon="pi pi-pencil"
+                            process="@this"
+                            update=":formResultado"
+                            oncomplete="
+                            if (!args.validationFailed) {
+                                PF('dialogoResultado').show();
+                            }"
+                            styleClass="ui-button-warning">
+
+                        <f:setPropertyActionListener
+                                target="#{partidoBean.partidoSeleccionado}"
+                                value="#{p}"/>
+
+                    </p:commandButton>
+
                 </footer>
 
             </article>
 
         </ui:repeat>
 
-        <h:panelGroup
-                rendered="#{empty publicoBean.partidos}"
-                layout="block"
-                styleClass="sin-partidos">
+                <h:panelGroup
+                        rendered="#{empty partidoBean.partidos}"
+                        layout="block"
+                        styleClass="sin-partidos">
 
-            <i class="pi pi-info-circle"></i>
+                    <i class="pi pi-info-circle"></i>
 
-        <strong>
-            No existen partidos disponibles.
-        </strong>
+                    <strong>
+                        No existen partidos disponibles.
+                    </strong>
 
-    </h:panelGroup>
+                </h:panelGroup>
 
-</h:panelGroup>
+            </h:panelGroup>
 
         </h:form>
+
+        <p:dialog
+                header="Registrar resultado"
+                widgetVar="dialogoResultado"
+                modal="true"
+                responsive="true"
+                closable="true"
+                width="450">
+
+            <h:form id="formResultado">
+
+                <p:messages
+                        id="mensajesResultado"
+                        showDetail="true"/>
+
+                <h:panelGrid
+                        columns="2"
+                        cellpadding="10"
+                        style="width:100%">
+
+                    <h:outputText value="Equipo local:"/>
+
+                    <h:outputText
+                            value="#{partidoBean.partidoSeleccionado.seleccionLocal}"
+                            style="font-weight:bold"/>
+
+                    <h:outputLabel
+                            for="golesLocal"
+                            value="Goles local:"/>
+                    //Goles equipo LOcal
+                    <p:inputNumber
+                            id="golesLocal"
+                            value="#{partidoBean.partidoSeleccionado.golesLocal}"
+                            minValue="0"
+                            decimalPlaces="0"
+                            required="true"
+                            requiredMessage="Ingrese los goles del equipo local"/>
+
+                    <h:outputText value="Equipo visitante:"/>
+
+                    <h:outputText
+                            value="#{partidoBean.partidoSeleccionado.seleccionVisitante}"
+                            style="font-weight:bold"/>
+
+                    <h:outputLabel
+                            for="golesVisitante"
+                            value="Goles visitante:"/>
+                    //Goles equipo Visitante
+                    <p:inputNumber
+                            id="golesVisitante"
+                            value="#{partidoBean.partidoSeleccionado.golesVisitante}"
+                            minValue="0"
+                            decimalPlaces="0"
+                            required="true"
+                            requiredMessage="Ingrese los goles del equipo visitante"/>
+
+                </h:panelGrid>
+
+                <div style="display:flex;
+                            justify-content:flex-end;
+                            gap:10px;
+                            margin-top:20px">
+
+                    <p:commandButton
+                            value="Cancelar"
+                            type="button"
+                            icon="pi pi-times"
+                            onclick="PF('dialogoResultado').hide()"
+                            styleClass="ui-button-secondary"/>
+
+                    <p:commandButton
+                            value="Guardar resultado"
+                            icon="pi pi-save"
+                            action="#{partidoBean.guardarResultado}"
+                            process="@form"
+                            update=":formPartidos:panelPartidos
+                                    :formPartidos:mensajes
+                                    mensajesResultado"
+                            oncomplete="if (!args.validationFailed) {
+                                PF('dialogoResultado').hide();
+                            }"
+                            styleClass="ui-button-success"/>
+
+                </div>
+
+            </h:form>
+
+        </p:dialog>
 
     </main>
 

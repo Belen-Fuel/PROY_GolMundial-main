@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import jakarta.inject.Inject;
+
 @Named("loginBean")
 @SessionScoped
 public class LoginBean implements Serializable {
@@ -30,6 +32,9 @@ public class LoginBean implements Serializable {
 
     private String token;
     private UsuarioSesionDTO usuario;
+
+    @Inject
+        private LoginBean loginBean;
 
     /**
      * Inicia sesión y redirige según el rol.
@@ -159,8 +164,7 @@ public class LoginBean implements Serializable {
 
             if ("ADMINISTRADOR".equalsIgnoreCase(rol)) {
 
-                return "/dashboard.xhtml"
-                        + "?faces-redirect=true";
+                return "/dashboard.xhtml?faces-redirect=true";
             }
 
             return "/publico/inicio.xhtml"

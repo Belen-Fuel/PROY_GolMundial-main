@@ -15,40 +15,103 @@
 
     <style>
 
-        body {
+       body {
             margin: 0;
-            padding: 20px;
             font-family: "Segoe UI", Arial, sans-serif;
             background-color: #f4f6f9;
             color: #1e293b;
         }
 
+       .barra {
+            background: #0f172a;
+            color: white;
+            padding: 18px 22px;
+        }
+
+        .marca h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .marca small {
+            display: block;
+            margin-top: 3px;
+            color: #cbd5e1;
+        }
+
+        .form-menu {
+            margin-top: 16px;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .sesion-fila {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: white;
+            font-weight: 600;
+        }
+
         .contenedor {
             max-width: 1250px;
             margin: 0 auto;
+            padding: 30px 20px;
         }
 
-        .encabezado {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            background-color: #1e293b;
+      .encabezado {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
             color: white;
-            padding: 20px 22px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            padding: 30px 28px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            right: -80px;
+            top: -95px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
         }
 
         .encabezado h1 {
             margin: 0;
-            font-size: 25px;
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .encabezado p {
-            margin: 6px 0 0;
-            color: #cbd5e1;
+            margin: 12px 0 0;
+            font-size: 14px;
+            color: #dbeafe;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
         }
 
         .acciones-superiores {
@@ -90,6 +153,14 @@
             text-align: right;
             margin-top: 20px;
         }
+       .acciones {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
 
         @media (max-width: 700px) {
 
@@ -108,29 +179,119 @@
 
 <h:body>
 
-<div class="contenedor">
+<div class="barra">
 
-    <div class="encabezado">
+    <div class="marca">
+        <h1>UTN GolMundial 2026</h1>
+        <small>Panel administrativo del torneo</small>
+    </div>
 
-        <div>
+    <h:form id="formMenu" styleClass="form-menu">
 
-            <h1>Gestión de Usuarios</h1>
+        <div class="menu">
 
-            <p>
-                Administración de cuentas,
-                roles y estados del sistema
-            </p>
+            <p:button
+                    value="Panel"
+                    icon="pi pi-home"
+                    href="#{request.contextPath}/dashboard.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Partidos"
+                    icon="pi pi-calendar"
+                    href="#{request.contextPath}/partidos.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Selecciones"
+                    icon="pi pi-flag"
+                    href="#{request.contextPath}/selecciones.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Sedes"
+                    icon="pi pi-map-marker"
+                    href="#{request.contextPath}/sedes.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Usuarios"
+                    icon="pi pi-users"
+                    href="#{request.contextPath}/usuarios.xhtml"/>
+
+            <p:button
+                    value="Auditoría"
+                    icon="pi pi-search"
+                    href="#{request.contextPath}/auditoria.xhtml"
+                    styleClass="ui-button-outlined"/>
+
+            <p:button
+                    value="Reportes"
+                    icon="pi pi-chart-bar"
+                    href="#{request.contextPath}/reportes.xhtml"
+                    styleClass="ui-button-outlined"/>
 
         </div>
+
+            <h:panelGroup
+                    rendered="#{loginBean.logueado and loginBean.administrador}"
+                    layout="block"
+                    style="display:inline-flex;align-items:center;gap:8px;">
+
+                <span class="sesion-usuario">
+                    <i class="pi pi-user"></i>
+                    #{loginBean.usuario.nombre}
+                </span>
+
+                <p:commandButton
+                        value="Cerrar sesión"
+                        icon="pi pi-sign-out"
+                        action="#{loginBean.cerrarSesion}"
+                        ajax="false"
+                        styleClass="ui-button-danger"/>
+
+            </h:panelGroup>
+
+    </h:form>
+
+</div>
+
+<div class="contenedor">
+
+<div class="encabezado">
+
+    <div>
+        <h1>Gestión de Usuarios</h1>
+        <p>Administración de cuentas, roles y estados del sistema</p>
+    </div>
+
+</div>
+
+<div class="acciones">
+
+    <div class="acciones-izquierda">
 
         <p:button
                 value="Volver al panel"
                 icon="pi pi-home"
-                href="dashboard.xhtml"
-                styleClass="ui-button-outlined"
-                style="color: white; border-color: white;"/>
+                href="#{request.contextPath}/dashboard.xhtml"
+                styleClass="ui-button-secondary"/>
 
     </div>
+
+    <div class="acciones-derecha">
+
+        <p:commandButton
+                value="Actualizar todo"
+                icon="pi pi-refresh"
+                actionListener="#{usuarioBean.cargarUsuarios}"
+                process="@this"
+                update=":formUsuarios"
+                styleClass="ui-button-success"/>
+
+    </div>
+
+</div>
 
     <h:form id="formUsuarios">
 
@@ -139,31 +300,6 @@
                 showDetail="true"
                 life="5000"/>
 
-        <div class="acciones-superiores">
-
-            <p:button
-                    value="Volver al panel"
-                    icon="pi pi-home"
-                    href="dashboard.xhtml"
-                    styleClass="ui-button-secondary"/>
-
-
-            <p:commandButton
-                    value="Nuevo usuario"
-                    icon="pi pi-user-plus"
-                    type="button"
-                    onclick="PF('dlgNuevoUsuario').show()"
-                    styleClass="ui-button-success"/>
-
-            <p:commandButton
-                    value="Actualizar lista"
-                    icon="pi pi-refresh"
-                    actionListener="#{usuarioBean.cargarUsuarios}"
-                    process="@this"
-                    update=":formUsuarios:tablaUsuarios
-                            :formUsuarios:mensajes"/>
-
-        </div>
 
         <p:card>
 
