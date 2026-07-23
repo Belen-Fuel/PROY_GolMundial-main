@@ -13,287 +13,944 @@
     </f:metadata>
 
 <h:head>
-
     <title>Panel Administrativo - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
 
+        html,
         body {
             margin: 0;
-            background-color: #f4f6f9;
+            min-height: 100%;
+            background: #f4f7fb;
             font-family: "Segoe UI", Arial, sans-serif;
-            color: #1e293b;
+            color: #172033;
         }
 
-        .barra-superior {
-            background-color: #1e293b;
-            color: white;
-            padding: 16px 24px;
+        body .ui-button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
 
+        .aplicacion {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .barra-lateral {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px 18px;
+            background: linear-gradient(180deg, #0b1732 0%, #132752 100%);
+            color: #ffffff;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .marca {
+            display: flex;
             align-items: center;
-
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 13px;
+            padding: 4px 8px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         }
 
-        .barra-superior h1 {
+        .marca-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #2f80ed, #1fd1a5);
+            box-shadow: 0 10px 24px rgba(24, 144, 255, 0.28);
+            font-size: 23px;
+        }
+
+        .marca h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .usuario {
+        .marca span {
+            display: block;
+            margin-top: 4px;
+            color: #a9b8d6;
+            font-size: 12px;
+        }
+
+        .titulo-menu {
+            margin: 24px 10px 10px;
+            color: #8094bc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: grid;
+            gap: 7px;
+        }
+
+        .menu-item {
+            min-height: 46px;
+            padding: 0 14px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
             gap: 12px;
+            color: #dce5f5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.18s ease;
         }
 
-        .contenido {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
         }
 
-        .bienvenida {
-            margin-bottom: 25px;
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            transform: translateX(2px);
         }
 
-        .bienvenida h2 {
-            margin-bottom: 6px;
+        .menu-item.activo {
+            background: linear-gradient(90deg, #2c7df0, #365fdb);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 103, 226, 0.26);
         }
 
-        .bienvenida p {
-            margin-top: 0;
-            color: #64748b;
+        .pie-lateral {
+            margin-top: auto;
+            padding: 18px 10px 2px;
+            color: #8295ba;
+            font-size: 12px;
+            line-height: 1.5;
         }
 
-        .tarjetas {
-            display: grid;
-
-            grid-template-columns:
-                    repeat(auto-fit, minmax(240px, 1fr));
-
-            gap: 20px;
+        .area-principal {
+            min-width: 0;
         }
 
-        .tarjeta {
-            background-color: white;
+        .barra-superior {
+            min-height: 76px;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #e5eaf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+        }
+
+        .encabezado-pagina h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .encabezado-pagina p {
+            margin: 5px 0 0;
+            color: #758198;
+            font-size: 13px;
+        }
+
+        .acciones-superiores {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .usuario-conectado {
+            min-height: 43px;
+            padding: 7px 12px 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
             border-radius: 10px;
-            padding: 24px;
-
-            box-shadow:
-                    0 4px 12px rgba(0, 0, 0, 0.08);
-
-            transition: transform 0.2s ease;
-        }
-
-        .tarjeta:hover {
-            transform: translateY(-3px);
-        }
-
-        .tarjeta i {
-            display: block;
-            font-size: 32px;
-            margin-bottom: 15px;
+            display: grid;
+            place-items: center;
+            background: #e8f1ff;
             color: #2563eb;
         }
 
-        .tarjeta h3 {
-            margin: 0 0 8px;
+        .usuario-datos strong,
+        .usuario-datos small {
+            display: block;
         }
 
-        .tarjeta p {
-            color: #64748b;
-            min-height: 45px;
+        .usuario-datos strong {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
         }
 
-        @media (max-width: 600px) {
+        .usuario-datos small {
+            margin-top: 2px;
+            color: #8792a6;
+            font-size: 11px;
+        }
+
+        .contenido {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 30px 40px;
+        }
+
+        .bienvenida {
+            position: relative;
+            overflow: hidden;
+            min-height: 190px;
+            padding: 30px;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #102759 0%, #1e4fbb 58%, #2577ec 100%);
+            color: #ffffff;
+            box-shadow: 0 15px 38px rgba(19, 67, 154, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .bienvenida::before,
+        .bienvenida::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .bienvenida::before {
+            width: 250px;
+            height: 250px;
+            right: -70px;
+            top: -105px;
+        }
+
+        .bienvenida::after {
+            width: 150px;
+            height: 150px;
+            right: 170px;
+            bottom: -105px;
+        }
+
+        .bienvenida-texto,
+        .bienvenida-estado {
+            position: relative;
+            z-index: 1;
+        }
+
+        .bienvenida-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.13);
+            color: #eaf2ff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .bienvenida h3 {
+            margin: 16px 0 8px;
+            font-size: clamp(25px, 3vw, 36px);
+            line-height: 1.15;
+        }
+
+        .bienvenida p {
+            max-width: 670px;
+            margin: 0;
+            color: #dbe7ff;
+            line-height: 1.6;
+        }
+
+        .bienvenida-estado {
+            min-width: 185px;
+            padding: 19px;
+            border: 1px solid rgba(255, 255, 255, 0.19);
+            border-radius: 17px;
+            background: rgba(6, 22, 58, 0.23);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .bienvenida-estado i {
+            display: block;
+            margin-bottom: 9px;
+            color: #6ef0c7;
+            font-size: 29px;
+        }
+
+        .bienvenida-estado strong,
+        .bienvenida-estado span {
+            display: block;
+        }
+
+        .bienvenida-estado strong {
+            font-size: 17px;
+        }
+
+        .bienvenida-estado span {
+            margin-top: 5px;
+            color: #cbd9f5;
+            font-size: 12px;
+        }
+
+        .seccion-cabecera {
+            margin: 30px 0 15px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .seccion-cabecera h3 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .seccion-cabecera p {
+            margin: 5px 0 0;
+            color: #7c879b;
+            font-size: 13px;
+        }
+
+        .metricas {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .metrica {
+            min-width: 0;
+            padding: 20px;
+            border: 1px solid #e6ebf3;
+            border-radius: 17px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(25, 45, 82, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .metrica-icono {
+            flex: 0 0 auto;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 21px;
+        }
+
+        .metrica.azul .metrica-icono {
+            color: #2563eb;
+            background: #e9f1ff;
+        }
+
+        .metrica.verde .metrica-icono {
+            color: #059669;
+            background: #e6faf3;
+        }
+
+        .metrica.violeta .metrica-icono {
+            color: #7c3aed;
+            background: #f0eafe;
+        }
+
+        .metrica.naranja .metrica-icono {
+            color: #e16a13;
+            background: #fff1e4;
+        }
+
+        .metrica.datos-secundarios .metrica-icono {
+            color: #52647d;
+            background: #edf1f6;
+        }
+
+        .metrica-contenido {
+            min-width: 0;
+        }
+
+        .metrica strong {
+            display: block;
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .metrica span {
+            display: block;
+            margin-top: 7px;
+            color: #748097;
+            font-size: 13px;
+        }
+
+        .modulos {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .modulo {
+            min-height: 230px;
+            padding: 22px;
+            border: 1px solid #e5eaf2;
+            border-radius: 19px;
+            background: #ffffff;
+            box-shadow: 0 8px 25px rgba(26, 45, 78, 0.06);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .modulo:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 34px rgba(26, 45, 78, 0.11);
+        }
+
+        .modulo-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            color: #2364dc;
+            background: linear-gradient(135deg, #e6efff, #f3f7ff);
+            font-size: 22px;
+        }
+
+        .modulo h4 {
+            margin: 18px 0 8px;
+            font-size: 17px;
+        }
+
+        .modulo p {
+            flex: 1;
+            margin: 0 0 18px;
+            color: #748097;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .modulo .ui-button {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .estado-sistema {
+            margin-top: 18px;
+            padding: 18px 20px;
+            border: 1px solid #dce6f3;
+            border-radius: 16px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .estado-sistema-info {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .estado-sistema-icono {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            color: #059669;
+            background: #e7faf3;
+            font-size: 18px;
+        }
+
+        .estado-sistema strong,
+        .estado-sistema span {
+            display: block;
+        }
+
+        .estado-sistema span {
+            margin-top: 4px;
+            color: #77839a;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1180px) {
+            .metricas {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .modulos {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .aplicacion {
+                display: block;
+            }
+
+            .barra-lateral {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 16px;
+            }
+
+            .marca {
+                padding-bottom: 16px;
+            }
+
+            .titulo-menu,
+            .pie-lateral {
+                display: none;
+            }
+
+            .menu {
+                margin-top: 14px;
+                grid-template-columns: repeat(4, minmax(135px, 1fr));
+                overflow-x: auto;
+                padding-bottom: 4px;
+            }
+
+            .menu-item {
+                justify-content: center;
+            }
 
             .barra-superior {
-                align-items: flex-start;
+                position: relative;
+                padding: 14px 20px;
             }
 
-            .usuario {
-                width: 100%;
-                justify-content: space-between;
+            .contenido {
+                padding: 22px 20px 34px;
             }
         }
 
-    </style>
+        @media (max-width: 650px) {
+            .barra-superior {
+                align-items: flex-start;
+                flex-direction: column;
+            }
 
+            .acciones-superiores {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .usuario-conectado {
+                flex: 1;
+            }
+
+            .bienvenida {
+                padding: 24px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .bienvenida-estado {
+                width: 100%;
+            }
+
+            .metricas,
+            .modulos {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion-cabecera,
+            .estado-sistema {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .estado-sistema .ui-button {
+                width: 100%;
+            }
+        }
+    </style>
 </h:head>
 
 <h:body>
+    <div class="aplicacion">
 
-    <div class="barra-superior">
+        <aside class="barra-lateral">
+            <div class="marca">
+                <div class="marca-icono">
+                    <i class="pi pi-chart-bar"></i>
+                </div>
 
-        <div>
-
-            <h1>Panel Administrativo</h1>
-
-            <small>
-                UTN GolMundial 2026
-            </small>
-
-        </div>
-
-        <h:form id="formSesion">
-
-            <div class="usuario">
-
-                <span>
-
-                    <i class="pi pi-user"></i>
-
-                    #{loginBean.usuario.nombre}
-
-                </span>
-
-                <p:commandButton
-                        value="Cerrar sesión"
-                        icon="pi pi-sign-out"
-                        action="#{loginBean.cerrarSesion}"
-                        ajax="false"
-                        styleClass="ui-button-danger"/>
-
+                <div>
+                    <h1>UTN GolMundial</h1>
+                    <span>Administración 2026</span>
+                </div>
             </div>
 
-        </h:form>
+            <div class="titulo-menu">Menú principal</div>
 
+            <nav class="menu">
+                <h:link outcome="/dashboard.xhtml"
+                        styleClass="menu-item activo">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:link>
+
+                <h:link outcome="/partidos.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Partidos</span>
+                </h:link>
+
+                <h:link outcome="/selecciones.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-flag"></i>
+                    <span>Selecciones</span>
+                </h:link>
+
+                <h:link outcome="/sedes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-map-marker"></i>
+                    <span>Sedes</span>
+                </h:link>
+
+                <h:link outcome="/usuarios.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-users"></i>
+                    <span>Usuarios</span>
+                </h:link>
+
+                <h:link outcome="/reportes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Reportes</span>
+                </h:link>
+
+                <h:link outcome="/auditoria.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-book"></i>
+                    <span>Auditoría</span>
+                </h:link>
+
+                <h:link outcome="/publico/inicio.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-globe"></i>
+                    <span>Portal público</span>
+                </h:link>
+            </nav>
+
+            <div class="pie-lateral">
+                Sistema de estadísticas y administración del torneo mundialista.
+            </div>
+        </aside>
+
+        <main class="area-principal">
+            <header class="barra-superior">
+                <div class="encabezado-pagina">
+                    <h2>Panel administrativo</h2>
+                    <p>Resumen general y acceso a los módulos del sistema.</p>
+                </div>
+
+                <div class="acciones-superiores">
+                    <div class="usuario-conectado">
+                        <div class="avatar">
+                            <i class="pi pi-user"></i>
+                        </div>
+
+                        <div class="usuario-datos">
+                            <strong>#{loginBean.usuario.nombre}</strong>
+                            <small>#{loginBean.usuario.rol}</small>
+                        </div>
+                    </div>
+
+                    <p:button value="Ver portal"
+                              icon="pi pi-external-link"
+                              outcome="/publico/inicio.xhtml"
+                              styleClass="ui-button-outlined"/>
+
+                    <h:form id="formSesion">
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+                    </h:form>
+                </div>
+            </header>
+
+            <div class="contenido">
+                <h:form id="formDashboard">
+                    <p:growl id="mensajes"
+                             showDetail="true"
+                             life="4000"/>
+
+                    <section class="bienvenida">
+                        <div class="bienvenida-texto">
+                            <span class="bienvenida-etiqueta">
+                                <i class="pi pi-shield"></i>
+                                Área administrativa
+                            </span>
+
+                            <h3>Bienvenido, #{loginBean.usuario.nombre}</h3>
+
+                            <p>
+                                Administre la información del torneo, revise el resumen
+                                general y acceda rápidamente a cada módulo del sistema.
+                            </p>
+                        </div>
+
+                        <div class="bienvenida-estado">
+                            <i class="pi pi-check-circle"></i>
+                            <strong>#{reporteBean.estado}</strong>
+                            <span>Estado actual del servicio</span>
+                        </div>
+                    </section>
+
+                    <div class="seccion-cabecera">
+                        <div>
+                            <h3>Resumen del torneo</h3>
+                            <p>Datos registrados actualmente en el sistema.</p>
+                        </div>
+
+                        <p:commandButton value="Actualizar"
+                                         icon="pi pi-refresh"
+                                         action="#{reporteBean.cargarReportes}"
+                                         update="metricas estadoSistema mensajes"
+                                         styleClass="ui-button-success"/>
+                    </div>
+
+                    <h:panelGroup id="metricas"
+                                  layout="block"
+                                  styleClass="metricas">
+                        <div class="metrica azul">
+                            <div class="metrica-icono">
+                                <i class="pi pi-calendar"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.partidos}</strong>
+                                <span>Partidos registrados</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica verde">
+                            <div class="metrica-icono">
+                                <i class="pi pi-flag"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.selecciones}</strong>
+                                <span>Selecciones participantes</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica violeta">
+                            <div class="metrica-icono">
+                                <i class="pi pi-map-marker"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.sedes}</strong>
+                                <span>Sedes registradas</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica naranja">
+                            <div class="metrica-icono">
+                                <i class="pi pi-users"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.usuarios}</strong>
+                                <span>Usuarios del sistema</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica datos-secundarios">
+                            <div class="metrica-icono">
+                                <i class="pi pi-sitemap"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.grupos}</strong>
+                                <span>Grupos del torneo</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica datos-secundarios">
+                            <div class="metrica-icono">
+                                <i class="pi pi-directions-alt"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.fases}</strong>
+                                <span>Fases configuradas</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica datos-secundarios">
+                            <div class="metrica-icono">
+                                <i class="pi pi-id-card"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>#{reporteBean.roles}</strong>
+                                <span>Roles disponibles</span>
+                            </div>
+                        </div>
+
+                        <div class="metrica datos-secundarios">
+                            <div class="metrica-icono">
+                                <i class="pi pi-trophy"></i>
+                            </div>
+                            <div class="metrica-contenido">
+                                <strong>2026</strong>
+                                <span>Edición del torneo</span>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="seccion-cabecera">
+                        <div>
+                            <h3>Módulos administrativos</h3>
+                            <p>Seleccione el área que desea gestionar.</p>
+                        </div>
+                    </div>
+
+                    <section class="modulos">
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-calendar"></i>
+                            </div>
+                            <h4>Gestión de partidos</h4>
+                            <p>
+                                Consulte los encuentros programados y registre los
+                                resultados oficiales del torneo.
+                            </p>
+                            <p:button value="Abrir partidos"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/partidos.xhtml"/>
+                        </article>
+
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-flag"></i>
+                            </div>
+                            <h4>Gestión de selecciones</h4>
+                            <p>
+                                Consulte, registre y actualice la información de las
+                                selecciones participantes.
+                            </p>
+                            <p:button value="Abrir selecciones"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/selecciones.xhtml"/>
+                        </article>
+
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-map-marker"></i>
+                            </div>
+                            <h4>Sedes y estadios</h4>
+                            <p>
+                                Revise las ciudades sede y los estadios configurados
+                                para los encuentros.
+                            </p>
+                            <p:button value="Abrir sedes"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/sedes.xhtml"/>
+                        </article>
+
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-users"></i>
+                            </div>
+                            <h4>Gestión de usuarios</h4>
+                            <p>
+                                Administre cuentas, roles y estados de acceso de los
+                                usuarios del sistema.
+                            </p>
+                            <p:button value="Abrir usuarios"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/usuarios.xhtml"/>
+                        </article>
+
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-chart-line"></i>
+                            </div>
+                            <h4>Reportes</h4>
+                            <p>
+                                Visualice el resumen de información y las estadísticas
+                                disponibles de las selecciones.
+                            </p>
+                            <p:button value="Abrir reportes"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/reportes.xhtml"/>
+                        </article>
+
+                        <article class="modulo">
+                            <div class="modulo-icono">
+                                <i class="pi pi-book"></i>
+                            </div>
+                            <h4>Auditoría</h4>
+                            <p>
+                                Consulte las acciones administrativas registradas
+                                para el control y seguimiento del sistema.
+                            </p>
+                            <p:button value="Abrir auditoría"
+                                      icon="pi pi-arrow-right"
+                                      outcome="/auditoria.xhtml"/>
+                        </article>
+                    </section>
+
+                    <h:panelGroup id="estadoSistema"
+                                  layout="block"
+                                  styleClass="estado-sistema">
+                        <div class="estado-sistema-info">
+                            <div class="estado-sistema-icono">
+                                <i class="pi pi-database"></i>
+                            </div>
+
+                            <div>
+                                <strong>#{reporteBean.torneo}</strong>
+                                <span>
+                                    Servicio conectado. Estado: #{reporteBean.estado}
+                                </span>
+                            </div>
+                        </div>
+
+                        <p:button value="Ir al portal público"
+                                  icon="pi pi-globe"
+                                  outcome="/publico/inicio.xhtml"
+                                  styleClass="ui-button-outlined"/>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </main>
     </div>
-
-    <div class="contenido">
-
-        <div class="bienvenida">
-
-            <h2>
-                Bienvenido, #{loginBean.usuario.nombre}
-            </h2>
-
-            <p>
-                Seleccione uno de los módulos administrativos.
-            </p>
-
-        </div>
-
-        <div class="tarjetas">
-
-            <div class="tarjeta">
-
-                <i class="pi pi-calendar"></i>
-
-                <h3>Gestión de partidos</h3>
-
-                <p>
-                    Consulte los encuentros y registre
-                    los resultados oficiales.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="partidos.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-            <div class="tarjeta">
-
-                <i class="pi pi-flag"></i>
-
-                <h3>Gestión de selecciones</h3>
-
-                <p>
-                    Consulte, registre y actualice
-                    las selecciones participantes.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="selecciones.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-            <div class="tarjeta">
-
-                <i class="pi pi-map-marker"></i>
-
-                <h3>Sedes</h3>
-
-                <p>
-                    Consulte las sedes y estadios
-                    del torneo.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="sedes.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-            <div class="tarjeta">
-
-                <i class="pi pi-users"></i>
-
-                <h3>Gestión de usuarios</h3>
-
-                <p>
-                    Administración de cuentas,
-                    estados y roles del sistema.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="usuarios.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-            <div class="tarjeta">
-
-                <i class="pi pi-book"></i>
-
-                <h3>Auditoría</h3>
-
-                <p>
-                    Consulta de acciones administrativas
-                    realizadas en el sistema.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="auditoria.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-            <div class="tarjeta">
-
-                <i class="pi pi-chart-bar"></i>
-
-                <h3>Reportes</h3>
-
-                <p>
-                    Visualización del resumen de datos
-                    y estadísticas de selecciones.
-                </p>
-
-                <p:button
-                        value="Abrir módulo"
-                        href="reportes.xhtml"
-                        icon="pi pi-arrow-right"/>
-
-            </div>
-
-        </div>
-
-    </div>
-
 </h:body>
 
 </html>

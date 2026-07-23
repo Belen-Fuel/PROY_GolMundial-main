@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UTN GolMundial 2026</title>
+
+    <style>
+        :root {
+            --azul-oscuro: #0f172a;
+            --azul: #1d4ed8;
+            --azul-claro: #38bdf8;
+            --blanco: #ffffff;
+            --texto-suave: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            color: var(--blanco);
+            background:
+                radial-gradient(circle at 12% 15%, rgba(56, 189, 248, .25), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(37, 99, 235, .32), transparent 32%),
+                linear-gradient(145deg, #020617 0%, #0f172a 48%, #1e3a8a 100%);
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, .10);
+            pointer-events: none;
+        }
+
+        body::before {
+            width: 520px;
+            height: 520px;
+            top: -250px;
+            right: -180px;
+        }
+
+        body::after {
+            width: 360px;
+            height: 360px;
+            bottom: -190px;
+            left: -140px;
+        }
+
+        .contenedor {
+            position: relative;
+            z-index: 1;
+            width: min(980px, 100%);
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, .14);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, .08);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
+            backdrop-filter: blur(16px);
+        }
+
+        .presentacion {
+            padding: 58px;
+        }
+
+        .marca {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 38px;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            box-shadow: 0 12px 30px rgba(14, 165, 233, .28);
+            font-size: 26px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 8px 13px;
+            border-radius: 999px;
+            color: #bae6fd;
+            background: rgba(56, 189, 248, .13);
+            border: 1px solid rgba(125, 211, 252, .2);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        h1 {
+            max-width: 600px;
+            margin: 0;
+            font-size: clamp(42px, 6vw, 68px);
+            line-height: .98;
+            letter-spacing: -2px;
+        }
+
+        .descripcion {
+            max-width: 570px;
+            margin: 24px 0 0;
+            color: var(--texto-suave);
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .accesos {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 18px;
+            padding: 42px;
+            background: rgba(2, 6, 23, .28);
+            border-left: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .accesos h2 {
+            margin: 0 0 4px;
+            font-size: 25px;
+        }
+
+        .accesos > p {
+            margin: 0 0 10px;
+            color: var(--texto-suave);
+            line-height: 1.55;
+        }
+
+        .tarjeta {
+            display: block;
+            padding: 22px;
+            color: white;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, .13);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, .08);
+            transition: transform .2s ease, border-color .2s ease, background .2s ease;
+        }
+
+        .tarjeta:hover {
+            transform: translateY(-3px);
+            border-color: rgba(125, 211, 252, .55);
+            background: rgba(255, 255, 255, .13);
+        }
+
+        .tarjeta-principal {
+            background: linear-gradient(135deg, rgba(37, 99, 235, .92), rgba(14, 165, 233, .78));
+            border-color: rgba(125, 211, 252, .42);
+        }
+
+        .tarjeta strong {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 18px;
+        }
+
+        .tarjeta span {
+            color: #dbeafe;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .pie {
+            margin-top: 10px;
+            color: #94a3b8;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Corrige el recorte en pantallas con poca altura, como VirtualBox */
+        @media (max-height: 760px) and (min-width: 801px) {
+            body {
+                align-items: flex-start;
+                padding: 14px;
+            }
+
+            .contenedor {
+                margin: auto 0;
+            }
+
+            .presentacion {
+                padding: 34px 38px;
+            }
+
+            .marca {
+                margin-bottom: 22px;
+            }
+
+            .etiqueta {
+                margin-bottom: 13px;
+                padding: 7px 12px;
+            }
+
+            h1 {
+                font-size: clamp(38px, 5vw, 54px);
+                line-height: 1;
+            }
+
+            .descripcion {
+                margin-top: 16px;
+                font-size: 15px;
+                line-height: 1.55;
+            }
+
+            .accesos {
+                gap: 12px;
+                padding: 28px 32px;
+            }
+
+            .accesos h2 {
+                font-size: 22px;
+            }
+
+            .accesos > p {
+                margin-bottom: 3px;
+                font-size: 14px;
+            }
+
+            .tarjeta {
+                padding: 16px 18px;
+            }
+
+            .tarjeta strong {
+                margin-bottom: 5px;
+                font-size: 17px;
+            }
+
+            .tarjeta span {
+                font-size: 13px;
+            }
+
+            .pie {
+                margin-top: 3px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            body {
+                align-items: flex-start;
+                overflow-y: auto;
+            }
+
+            .contenedor {
+                grid-template-columns: 1fr;
+                margin: auto 0;
+            }
+
+            .presentacion {
+                padding: 42px 30px 30px;
+            }
+
+            .accesos {
+                padding: 30px;
+                border-left: 0;
+                border-top: 1px solid rgba(255, 255, 255, .1);
+            }
+
+            h1 {
+                font-size: 45px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px;
+            }
+
+            .presentacion,
+            .accesos {
+                padding: 26px 20px;
+            }
+
+            h1 {
+                font-size: 37px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="contenedor">
+
+        <section class="presentacion">
+            <div class="marca">
+                <div class="logo">⚽</div>
+                <span>UTN GolMundial 2026</span>
+            </div>
+
+            <div class="etiqueta">Plataforma oficial del torneo</div>
+
+            <h1>Todo el Mundial, en un solo lugar.</h1>
+
+            <p class="descripcion">
+                Consulte partidos, posiciones, selecciones y estadísticas,
+                o ingrese al panel administrativo para gestionar la información oficial.
+            </p>
+        </section>
+
+        <section class="accesos">
+            <h2>Seleccione una opción</h2>
+            <p>Elija el tipo de acceso que necesita.</p>
+
+            <a class="tarjeta tarjeta-principal" href="publico/inicio.xhtml">
+                <strong>🌐 Portal público</strong>
+                <span>Partidos, posiciones, selecciones y estadísticas.</span>
+            </a>
+
+            <a class="tarjeta" href="login.xhtml">
+                <strong>🔐 Panel administrativo</strong>
+                <span>Gestión segura de la información del torneo.</span>
+            </a>
+
+            <div class="pie">
+                UTN GolMundial 2026 · Jakarta EE 10 · WildFly
+            </div>
+        </section>
+
+    </main>
+</body>
+</html>

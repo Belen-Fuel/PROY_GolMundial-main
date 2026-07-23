@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Selecciones - UTN GolMundial 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .barra {
+            background: #0f172a;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .marca h1 { margin: 0; font-size: 24px; }
+        .marca small { color: #cbd5e1; }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sesion-usuario {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .contenido {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .encabezado {
+            background: linear-gradient(135deg, #0f172a, #1d4ed8);
+            color: white;
+            padding: 28px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+        }
+
+        .encabezado h2 { margin: 0 0 8px; font-size: 30px; }
+        .encabezado p { margin: 0; color: #dbeafe; }
+
+        .acciones {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .selecciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 22px;
+        }
+
+        .seleccion-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 7px 20px rgba(15, 23, 42, 0.08);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .seleccion-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+        }
+
+        .seleccion-cabecera {
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            color: white;
+            padding: 13px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .codigo-fifa {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: .8px;
+        }
+
+        .grupo {
+            background: white;
+            color: #1d4ed8;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .seleccion-cuerpo {
+            padding: 24px 20px 20px;
+            text-align: center;
+        }
+
+        .bandera {
+            width: 86px;
+            height: 58px;
+            object-fit: cover;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-shadow: 0 3px 10px rgba(15, 23, 42, .18);
+            margin-bottom: 14px;
+        }
+
+        .bandera-alternativa {
+            display: none;
+            width: 86px;
+            height: 58px;
+            margin: 0 auto 14px;
+            align-items: center;
+            justify-content: center;
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #334155;
+            font-weight: 800;
+        }
+
+        .seleccion-nombre {
+            margin: 0 0 16px;
+            font-size: 21px;
+            color: #0f172a;
+        }
+
+        .datos {
+            display: grid;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .dato {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            padding: 10px 11px;
+            border-radius: 9px;
+            background: #f8fafc;
+            color: #475569;
+            line-height: 1.35;
+        }
+
+        .dato i { margin-top: 2px; color: #2563eb; }
+        .dato strong { color: #1e293b; }
+
+        .anfitrion {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 15px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .sin-selecciones {
+            grid-column: 1 / -1;
+            padding: 40px 20px;
+            border-radius: 14px;
+            background: white;
+            color: #64748b;
+            text-align: center;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, .08);
+        }
+
+        .pie {
+            background: #0f172a;
+            color: #cbd5e1;
+            text-align: center;
+            padding: 24px;
+            margin-top: 35px;
+        }
+
+        @media (max-width: 650px) {
+            .barra { align-items: flex-start; }
+            .menu { width: 100%; }
+            .contenido { padding: 20px 10px; }
+            .acciones { align-items: stretch; }
+        }
+        .contenido {
+            animation: aparecerPagina 0.55s ease-out;
+        }
+
+        .seleccion-card {
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 5px 15px rgba(15,23,42,.08);
+            transition:
+                transform .25s ease,
+                box-shadow .25s ease,
+                border-color .25s ease;
+        }
+
+        .seleccion-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(15,23,42,.16);
+            border-color: #93c5fd;
+        }
+
+        .seleccion-card:hover .bandera {
+            transform: scale(1.08);
+        }
+
+        .bandera {
+            transition: transform .25s ease;
+        }
+
+        .seleccion-card:nth-child(2n) {
+            animation-delay: 0.06s;
+        }
+
+        .seleccion-card:nth-child(3n) {
+            animation-delay: 0.12s;
+        }
+
+        .bandera {
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .ui-button {
+                transition:
+                    transform .18s ease,
+                    box-shadow .18s ease,
+                    filter .18s ease !important;
+            }
+
+        .ui-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(15,23,42,.18);
+            filter: brightness(1.05);
+        }
+
+        .encabezado {
+            position: relative;
+            overflow: hidden;
+            animation: aparecerEncabezado 0.55s ease-out;
+        }
+
+        .encabezado::after {
+            content: "";
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @keyframes aparecerPagina {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes aparecerTarjeta {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes aparecerEncabezado {
+            from {
+                opacity: 0;
+                transform: translateY(-12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+    <div class="barra">
+        <div class="marca">
+            <h1>UTN GolMundial 2026</h1>
+            <small>Portal público del torneo</small>
+        </div>
+
+        <h:form id="formMenu">
+            <div class="menu">
+
+                <p:button value="Inicio" icon="pi pi-home"
+                          href="inicio.xhtml" styleClass="ui-button-outlined"/>
+
+                <p:button value="Partidos" icon="pi pi-calendar"
+                          href="partidos.xhtml" styleClass="ui-button-outlined"/>
+
+                <p:button value="Posiciones" icon="pi pi-list"
+                          href="posiciones.xhtml" styleClass="ui-button-outlined"/>
+
+                <p:button value="Selecciones" icon="pi pi-flag"
+                          href="selecciones.xhtml"/>
+
+                <p:button value="Estadísticas" icon="pi pi-chart-bar"
+                          href="estadisticas.xhtml" styleClass="ui-button-outlined"/>
+
+                <h:panelGroup rendered="#{not loginBean.logueado}"
+                              layout="block"
+                              style="display:inline-flex;align-items:center;gap:8px;">
+
+                    <p:button value="Registrarse" icon="pi pi-user-plus"
+                              href="registro.xhtml" styleClass="ui-button-warning"/>
+
+                    <p:button value="Ingresar" icon="pi pi-sign-in"
+                              href="login.xhtml" styleClass="ui-button-success"/>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{loginBean.usuarioRegistrado}"
+                              layout="block"
+                              style="display:inline-flex;align-items:center;gap:8px;">
+
+                    <span class="sesion-usuario">
+                        <i class="pi pi-user"></i>
+                        #{empty loginBean.usuario.nombre
+                        ? loginBean.usuario.username
+                        : loginBean.usuario.nombre}
+                    </span>
+
+                    <p:commandButton value="Cerrar sesión"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginBean.cerrarSesionPublica}"
+                                     ajax="false"
+                                     styleClass="ui-button-danger"/>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{loginBean.administrador}"
+                              layout="block"
+                              style="display:inline-flex;align-items:center;gap:8px;">
+
+                    <span class="sesion-usuario">
+                        <i class="pi pi-shield"></i>
+                        #{loginBean.usuario.username}
+                    </span>
+
+                    <p:button value="Panel administrativo"
+                              icon="pi pi-cog"
+                              href="../dashboard.xhtml"
+                              styleClass="ui-button-warning"/>
+
+                    <p:commandButton value="Cerrar sesión"
+                                     icon="pi pi-sign-out"
+                                     action="#{loginBean.cerrarSesion}"
+                                     ajax="false"
+                                     styleClass="ui-button-danger"/>
+                </h:panelGroup>
+
+            </div>
+        </h:form>
+    </div>
+
+    <main class="contenido">
+
+        <div class="encabezado">
+            <h2>Selecciones participantes</h2>
+            <p>Consulta los equipos clasificados, sus grupos y confederaciones.</p>
+        </div>
+
+        <h:form id="formSelecciones">
+
+            <p:growl id="mensajes" showDetail="true" life="5000"/>
+
+            <div class="acciones">
+
+                <p:button value="Volver al inicio"
+                          icon="pi pi-home"
+                          href="inicio.xhtml"
+                          styleClass="ui-button-secondary"/>
+
+                <p:commandButton value="Actualizar"
+                                 icon="pi pi-refresh"
+                                 actionListener="#{publicoBean.cargarSelecciones}"
+                                 process="@this"
+                                 update="panelSelecciones mensajes"
+                                 styleClass="ui-button-success"/>
+            </div>
+
+            <h:panelGroup id="panelSelecciones"
+                          layout="block"
+                          styleClass="selecciones-grid">
+
+                <ui:repeat value="#{publicoBean.selecciones}" var="s">
+
+                    <article class="seleccion-card">
+
+                        <header class="seleccion-cabecera">
+                            <span class="codigo-fifa">#{s.codigoFifa}</span>
+                            <span class="grupo">Grupo #{s.grupo}</span>
+                        </header>
+
+                        <div class="seleccion-cuerpo">
+
+                            <h:graphicImage
+                                    library="images"
+                                    name="banderas/#{publicoBean.obtenerCodigoBandera(s.codigoFifa)}.svg"
+                                    styleClass="bandera"
+                                    alt="Bandera de #{s.nombre}"
+                                    onerror="this.style.display='none';
+                                             this.nextElementSibling.style.display='flex';"/>
+
+                            <span class="bandera-alternativa">
+                                #{s.codigoFifa}
+                            </span>
+
+                            <h3 class="seleccion-nombre">#{s.nombre}</h3>
+
+                            <div class="datos">
+
+                                <div class="dato">
+                                    <i class="pi pi-globe"></i>
+                                    <div>
+                                        <strong>Confederación</strong><br/>
+                                        #{s.confederacion}
+                                    </div>
+                                </div>
+
+                                <div class="dato">
+                                    <i class="pi pi-check-circle"></i>
+                                    <div>
+                                        <strong>Clasificación</strong><br/>
+                                        #{s.clasificacion}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <h:panelGroup rendered="#{s.anfitrion}" layout="block">
+                                <span class="anfitrion">
+                                    <i class="pi pi-star-fill"></i>
+                                    Selección anfitriona
+                                </span>
+                            </h:panelGroup>
+
+                        </div>
+                    </article>
+
+                </ui:repeat>
+
+                <h:panelGroup rendered="#{empty publicoBean.selecciones}"
+                              layout="block"
+                              styleClass="sin-selecciones">
+                    <i class="pi pi-info-circle"></i>
+                    <strong>No existen selecciones disponibles.</strong>
+                </h:panelGroup>
+
+            </h:panelGroup>
+        </h:form>
+    </main>
+
+    <footer class="pie">
+        <h3>UTN GolMundial 2026</h3>
+        <p>Proyecto Integrador · Ingeniería en Software</p>
+        <small>© 2026 Todos los derechos reservados</small>
+    </footer>
+
+</h:body>
+</html>

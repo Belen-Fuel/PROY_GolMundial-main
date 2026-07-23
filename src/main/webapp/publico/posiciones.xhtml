@@ -16,617 +16,675 @@
 
     <style>
 
+        :root {
+            --azul-noche: #07152f;
+            --azul-profundo: #0b2455;
+            --azul: #1769ff;
+            --azul-claro: #eaf2ff;
+            --celeste: #1cc8e5;
+            --dorado: #f6c84c;
+            --texto: #17233a;
+            --texto-suave: #6f7f99;
+            --borde: #dce5f2;
+            --fondo: #f4f7fb;
+            --blanco: #ffffff;
+            --verde: #18a66a;
+            --rojo: #dc3545;
+            --sombra: 0 16px 45px rgba(7, 21, 47, 0.10);
+        }
+
         * {
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             margin: 0;
-            background-color: #f1f5f9;
+            background: var(--fondo);
+            color: var(--texto);
             font-family: "Segoe UI", Arial, sans-serif;
-            color: #1e293b;
         }
 
-        /* Barra superior */
-
-        .barra {
-            background-color: #0f172a;
-            color: white;
-            padding: 16px 24px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            gap: 15px;
-            flex-wrap: wrap;
-
-            box-shadow:
-                    0 4px 14px rgba(15, 23, 42, 0.28);
+        .barra-publica {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(7, 21, 47, 0.97);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+            backdrop-filter: blur(14px);
         }
 
-        .marca h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .marca small {
-            color: #cbd5e1;
-        }
-
-        .menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .sesion-usuario {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-
-            color: white;
-            font-weight: bold;
-            padding: 0 6px;
-        }
-
-        /* Contenido */
-
-        .contenido {
-            max-width: 1450px;
+        .barra-contenido {
+            max-width: 1320px;
+            min-height: 78px;
             margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .encabezado {
-            background:
-                    linear-gradient(
-                            135deg,
-                            #0f172a,
-                            #1d4ed8
-                    );
-
-            color: white;
-            padding: 32px;
-            border-radius: 16px;
-            margin-bottom: 22px;
-
-            box-shadow:
-                    0 10px 28px rgba(30, 64, 175, 0.22);
-        }
-
-        .encabezado-contenido {
+            padding: 12px 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-
-            gap: 25px;
-            flex-wrap: wrap;
+            gap: 18px;
         }
 
-        .encabezado h2 {
-            margin: 0 0 8px;
-            font-size: 34px;
-        }
-
-        .encabezado p {
-            margin: 0;
-            color: #dbeafe;
-            line-height: 1.6;
-        }
-
-        .encabezado-icono {
-            font-size: 75px;
-            opacity: 0.9;
-        }
-
-        /* Controles */
-
-        .controles {
-            background-color: white;
-            border-radius: 14px;
-            padding: 18px;
-            margin-bottom: 24px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            gap: 14px;
-            flex-wrap: wrap;
-
-            box-shadow:
-                    0 5px 18px rgba(15, 23, 42, 0.08);
-        }
-
-        .controles-texto h3 {
-            margin: 0 0 4px;
-            font-size: 18px;
-        }
-
-        .controles-texto p {
-            margin: 0;
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .controles-botones {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        /* Leyenda */
-
-        .leyenda {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-
-            background-color: white;
-            padding: 14px 18px;
-            margin-bottom: 24px;
-
-            border-radius: 12px;
-            box-shadow:
-                    0 4px 14px rgba(15, 23, 42, 0.07);
-        }
-
-        .leyenda-item {
+        .marca-publica {
+            min-width: 235px;
             display: flex;
             align-items: center;
-            gap: 8px;
-
-            color: #475569;
-            font-size: 14px;
-        }
-
-        .leyenda-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-        }
-
-        .color-clasificado {
-            background-color: #bbf7d0;
-            border: 1px solid #22c55e;
-        }
-
-        .color-eliminado {
-            background-color: #f8fafc;
-            border: 1px solid #cbd5e1;
-        }
-
-        /* Grupos */
-
-        .grupos-grid {
-            display: grid;
-            grid-template-columns:
-                    repeat(auto-fit, minmax(580px, 1fr));
-
-            gap: 24px;
-        }
-
-        .grupo-card {
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 5px 15px rgba(15,23,42,.08);
-            transition:
-                transform .25s ease,
-                box-shadow .25s ease,
-                border-color .25s ease;
-        }
-
-        .grupo-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 32px rgba(15,23,42,.16);
-            border-color: #93c5fd;
-        }
-
-        .grupo-cabecera {
-            background:
-                    linear-gradient(
-                            135deg,
-                            #1e3a8a,
-                            #2563eb
-                    );
-
-            color: white;
-            padding: 17px 20px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
             gap: 12px;
+            color: white;
+            text-decoration: none;
         }
 
-        .grupo-titulo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .marca-icono {
+            width: 47px;
+            height: 47px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--azul), var(--celeste));
+            box-shadow: 0 10px 28px rgba(23, 105, 255, 0.35);
         }
 
-        .grupo-titulo i {
-            font-size: 22px;
-        }
-
-        .grupo-titulo h3 {
-            margin: 0;
+        .marca-icono i {
             font-size: 21px;
         }
 
-        .grupo-etiqueta {
-            background-color: rgba(255, 255, 255, 0.18);
-            padding: 5px 10px;
-            border-radius: 999px;
-
-            font-size: 12px;
-            font-weight: bold;
+        .marca-texto strong {
+            display: block;
+            font-size: 18px;
+            letter-spacing: 0.2px;
         }
 
-        /* Tabla personalizada */
+        .marca-texto small {
+            color: #aebbd2;
+            font-size: 12px;
+        }
 
-        .tabla-grupo {
+        .menu-publico {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .menu-publico .ui-button {
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            color: #d7e1f2 !important;
+            box-shadow: none !important;
+            border-radius: 10px !important;
+            padding: 0.70rem 0.82rem !important;
+        }
+
+        .menu-publico .ui-button:hover,
+        .menu-publico .menu-activo {
+            background: rgba(255, 255, 255, 0.10) !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: white !important;
+        }
+
+        .acciones-sesion {
+            min-width: 235px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .usuario-publico {
+            max-width: 155px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .acciones-sesion .ui-button {
+            border-radius: 10px !important;
+        }
+
+        .hero-posiciones {
+            position: relative;
+            overflow: hidden;
+            color: white;
+            background:
+                    radial-gradient(circle at 88% 22%, rgba(28, 200, 229, 0.30), transparent 25%),
+                    radial-gradient(circle at 10% 100%, rgba(246, 200, 76, 0.20), transparent 30%),
+                    linear-gradient(135deg, #07152f 0%, #0b2d70 58%, #1769ff 100%);
+        }
+
+        .hero-posiciones::after {
+            content: "";
+            position: absolute;
+            width: 410px;
+            height: 410px;
+            right: -155px;
+            top: -205px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+        }
+
+        .hero-contenido {
+            position: relative;
+            z-index: 2;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 54px 22px 48px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 34px;
+            align-items: end;
+        }
+
+        .hero-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 13px;
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            background: rgba(255, 255, 255, 0.10);
+            border-radius: 999px;
+            color: #dce9ff;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero-titulo {
+            margin: 0;
+            font-size: clamp(38px, 5vw, 62px);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .hero-descripcion {
+            max-width: 720px;
+            margin: 18px 0 0;
+            color: #d2def1;
+            font-size: 17px;
+            line-height: 1.65;
+        }
+
+        .resumen-posiciones {
+            min-width: 410px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(110px, 1fr));
+            gap: 10px;
+        }
+
+        .dato-posicion {
+            min-height: 92px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.17);
+            background: rgba(255, 255, 255, 0.10);
+            border-radius: 17px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dato-posicion strong {
+            display: block;
+            font-size: 27px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .dato-posicion span {
+            color: #d4e1f5;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .contenido-publico {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 30px 22px 55px;
+        }
+
+        .barra-herramientas {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding: 15px;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            box-shadow: 0 8px 24px rgba(7, 21, 47, 0.06);
+        }
+
+        .filtro-grupo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-grupo label {
+            color: var(--texto-suave);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .filtro-grupo .ui-selectonemenu {
+            min-width: 210px;
+            border-radius: 11px !important;
+        }
+
+        .acciones-filtro {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .acciones-filtro .ui-button {
+            border-radius: 10px !important;
+        }
+
+        .leyenda {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            color: var(--texto-suave);
+            background: #edf3fb;
+            border: 1px solid #dce7f5;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .leyenda-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .punto-leyenda {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--verde);
+        }
+
+        .grupos-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            align-items: start;
+        }
+
+        .grupo-card {
+            overflow: hidden;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 20px;
+            box-shadow: var(--sombra);
+        }
+
+        .grupo-card[open] {
+            animation: aparecer 0.22s ease;
+        }
+
+        .grupo-cabecera {
+            list-style: none;
+            cursor: pointer;
+            padding: 0;
+            color: white;
+            background: linear-gradient(135deg, #0b2455, #1d57bd);
+        }
+
+        .grupo-cabecera::-webkit-details-marker {
+            display: none;
+        }
+
+        .grupo-cabecera-contenido {
+            min-height: 76px;
+            padding: 15px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .grupo-identidad {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .grupo-letra {
+            width: 44px;
+            height: 44px;
+            flex: 0 0 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.20);
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .grupo-identidad strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        .grupo-identidad small {
+            display: block;
+            margin-top: 4px;
+            color: #cbd9ef;
+            font-size: 12px;
+        }
+
+        .grupo-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #e7effd;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .grupo-toggle i {
+            transition: transform 0.20s ease;
+        }
+
+        .grupo-card[open] .grupo-toggle i {
+            transform: rotate(180deg);
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        .tabla-posiciones {
             width: 100%;
+            min-width: 730px;
             border-collapse: collapse;
         }
 
-        .tabla-grupo thead {
-            background-color: #eff6ff;
-            color: #1e3a8a;
-        }
-
-        .tabla-grupo th {
-            padding: 12px 8px;
+        .tabla-posiciones th {
+            padding: 12px 9px;
+            color: #63718a;
+            background: #f5f8fc;
+            border-bottom: 1px solid var(--borde);
+            font-size: 11px;
+            font-weight: 900;
             text-align: center;
-
-            font-size: 12px;
-            font-weight: 800;
-
-            border-bottom: 1px solid #dbeafe;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
 
-        .tabla-grupo th.seleccion-col {
+        .tabla-posiciones th:nth-child(2) {
             text-align: left;
         }
 
-        .tabla-grupo td {
-            padding: 12px 8px;
+        .tabla-posiciones td {
+            height: 68px;
+            padding: 10px 9px;
+            border-bottom: 1px solid #e7edf5;
+            color: #405069;
+            font-size: 13px;
             text-align: center;
-
-            border-bottom: 1px solid #eef2f7;
-            font-size: 14px;
         }
 
-        .tabla-grupo tbody tr:last-child td {
-            border-bottom: none;
+        .tabla-posiciones tbody tr:last-child td {
+            border-bottom: 0;
         }
 
-       .tabla-grupo tbody tr {
-            transition:
-                transform .18s ease,
-                background-color .18s ease;
+        .tabla-posiciones tbody tr {
+            transition: background 0.18s ease;
         }
 
-        .tabla-grupo tbody tr:hover {
-            transform: scale(1.01);
-            background-color: #eff6ff;
+        .tabla-posiciones tbody tr:hover {
+            background: #f7faff;
         }
 
         .fila-clasificada {
-            background-color: #f0fdf4;
+            background: linear-gradient(90deg, rgba(24, 166, 106, 0.08), transparent 56%);
         }
 
-        .fila-clasificada:hover {
-            background-color: #dcfce7 !important;
+        .fila-clasificada td:first-child {
+            border-left: 4px solid var(--verde);
         }
 
-        .posicion {
-            width: 34px;
-            height: 34px;
-
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-
-            border-radius: 50%;
-            background-color: #e2e8f0;
-
-            color: #334155;
-            font-weight: 800;
+        .numero-posicion {
+            width: 30px;
+            height: 30px;
+            display: inline-grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #edf3fc;
+            color: #315282;
+            font-weight: 900;
         }
 
-        .fila-clasificada .posicion {
-            background-color: #16a34a;
-            color: white;
+        .fila-clasificada .numero-posicion {
+            color: #0b7d4d;
+            background: #dcf6e9;
         }
 
-        .seleccion-contenido {
+        .seleccion-celda {
             display: flex;
             align-items: center;
-
-            gap: 10px;
-            min-width: 185px;
+            gap: 11px;
+            text-align: left;
         }
 
-        .bandera {
-            width: 34px;
-            height: 23px;
-
+        .bandera-posicion {
+            width: 44px;
+            height: 31px;
+            flex: 0 0 44px;
             object-fit: cover;
-            border-radius: 3px;
-
-            border: 1px solid #cbd5e1;
-
-            box-shadow:
-                    0 1px 4px rgba(15, 23, 42, 0.15);
+            border-radius: 7px;
+            border: 1px solid #d9e2ef;
+            box-shadow: 0 5px 12px rgba(7, 21, 47, 0.12);
+            background: #f2f5f9;
         }
 
         .bandera-alternativa {
-            width: 34px;
-            height: 23px;
-
-            display: inline-flex;
-            justify-content: center;
+            width: 44px;
+            height: 31px;
+            flex: 0 0 44px;
+            display: none;
             align-items: center;
-
-            border-radius: 4px;
-            background-color: #e2e8f0;
-
-            color: #334155;
-            font-size: 9px;
-            font-weight: bold;
-
-            border: 1px solid #cbd5e1;
-        }
-
-        .seleccion-datos {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .seleccion-nombre {
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .seleccion-codigo {
-            color: #64748b;
-            font-size: 11px;
-        }
-
-        .puntos {
-            display: inline-flex;
             justify-content: center;
-            align-items: center;
+            border-radius: 7px;
+            color: var(--azul);
+            background: var(--azul-claro);
+            font-size: 10px;
+            font-weight: 900;
+        }
 
-            min-width: 36px;
-            height: 30px;
+        .seleccion-info strong {
+            display: block;
+            color: var(--texto);
+            font-size: 13px;
+        }
 
-            border-radius: 8px;
-            background-color: #dbeafe;
-
-            color: #1d4ed8;
-            font-size: 15px;
+        .seleccion-info small {
+            display: block;
+            margin-top: 3px;
+            color: #8897ac;
+            font-size: 10px;
             font-weight: 800;
         }
 
-        .positivo {
-            color: #15803d;
-            font-weight: bold;
+        .diferencia-positiva {
+            color: var(--verde);
+            font-weight: 900;
         }
 
-        .negativo {
-            color: #b91c1c;
-            font-weight: bold;
+        .diferencia-negativa {
+            color: var(--rojo);
+            font-weight: 900;
         }
 
-        .neutro {
-            color: #475569;
-            font-weight: bold;
+        .diferencia-neutra {
+            color: #66768d;
+            font-weight: 900;
         }
 
-        .grupo-vacio {
-            padding: 28px;
+        .puntos {
+            min-width: 34px;
+            display: inline-grid;
+            place-items: center;
+            padding: 7px 9px;
+            border-radius: 10px;
+            color: white;
+            background: var(--azul-profundo);
+            font-weight: 900;
+        }
+
+        .grupo-vacio,
+        .estado-vacio {
+            padding: 38px 22px;
+            color: var(--texto-suave);
             text-align: center;
-            color: #64748b;
         }
 
-        .grupo-vacio i {
+        .grupo-vacio i,
+        .estado-vacio i {
             display: block;
             margin-bottom: 10px;
-            font-size: 30px;
-            color: #94a3b8;
+            color: #a0afc3;
+            font-size: 28px;
         }
 
-        /* Pie */
+        .estado-vacio {
+            grid-column: 1 / -1;
+            background: white;
+            border: 1px dashed #cdd9e8;
+            border-radius: 18px;
+        }
 
-        .pie {
-            background-color: #0f172a;
-            color: #cbd5e1;
-
+        .pie-publico {
+            padding: 30px 22px;
+            color: #aebbd2;
+            background: var(--azul-noche);
             text-align: center;
-            padding: 26px;
-            margin-top: 40px;
         }
 
-        .pie h3 {
+        .pie-publico strong {
+            display: block;
+            margin-bottom: 7px;
             color: white;
-            margin: 0 0 8px;
         }
 
-        /* Responsive */
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1100px) {
+
+            .barra-contenido {
+                flex-wrap: wrap;
+            }
+
+            .marca-publica,
+            .acciones-sesion {
+                min-width: auto;
+            }
+
+            .menu-publico {
+                order: 3;
+                width: 100%;
+            }
+
+            .hero-contenido {
+                grid-template-columns: 1fr;
+            }
+
+            .resumen-posiciones {
+                min-width: 0;
+                width: 100%;
+            }
 
             .grupos-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        @media (max-width: 650px) {
+        @media (max-width: 720px) {
 
-            .barra {
-                align-items: flex-start;
+            .barra-contenido,
+            .hero-contenido,
+            .contenido-publico {
+                padding-left: 14px;
+                padding-right: 14px;
             }
 
-            .menu {
-                width: 100%;
-            }
-
-            .contenido {
-                padding: 20px 10px;
-            }
-
-            .encabezado {
-                padding: 24px 20px;
-            }
-
-            .encabezado h2 {
-                font-size: 28px;
-            }
-
-            .encabezado-icono {
+            .marca-texto small,
+            .usuario-publico,
+            .menu-publico .ui-button-text {
                 display: none;
             }
 
-            .controles {
+            .menu-publico .ui-button {
+                min-width: 42px !important;
+            }
+
+            .acciones-sesion {
+                margin-left: auto;
+            }
+
+            .hero-contenido {
+                padding-top: 40px;
+                padding-bottom: 36px;
+            }
+
+            .hero-titulo {
+                letter-spacing: -1px;
+            }
+
+            .resumen-posiciones {
+                grid-template-columns: 1fr;
+            }
+
+            .barra-herramientas {
                 align-items: stretch;
             }
 
-            .controles-botones {
+            .filtro-grupo,
+            .acciones-filtro {
                 width: 100%;
             }
 
-            .tabla-contenedor {
-                overflow-x: auto;
+            .filtro-grupo .ui-selectonemenu {
+                width: 100% !important;
             }
 
-            .tabla-grupo {
-                min-width: 610px;
+            .acciones-filtro .ui-button {
+                flex: 1;
             }
 
-            .grupo-cabecera {
-                padding: 15px;
+            .grupo-toggle span {
+                display: none;
             }
         }
-        /* Animaciones para tarjetas de posiciones */
-
-            .contenido {
-                animation: aparecerPagina 0.55s ease-out;
-            }
-
-            .grupo-card {
-                animation: aparecerTarjeta 0.55s ease both;
-                transition:
-                    transform 0.25s ease,
-                    box-shadow 0.25s ease,
-                    border-color 0.25s ease;
-            }
-
-            .grupo-card:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16);
-                border-color: #93c5fd;
-            }
-
-            .grupo-card:nth-child(2n) {
-                animation-delay: 0.06s;
-            }
-
-            .grupo-card:nth-child(3n) {
-                animation-delay: 0.12s;
-            }
-
-            .grupo-card:hover .bandera {
-                transform: scale(1.08);
-                box-shadow: 0 7px 16px rgba(15, 23, 42, 0.22);
-            }
-
-            .bandera {
-                transition:
-                    transform 0.25s ease,
-                    box-shadow 0.25s ease;
-            }
-
-            .tabla-grupo tbody tr {
-                transition:
-                    transform 0.18s ease,
-                    background-color 0.18s ease;
-            }
-
-            .tabla-grupo tbody tr:hover {
-                transform: scale(1.01);
-                background-color: #eff6ff;
-            }
-
-            .ui-button {
-                transition:
-                    transform .18s ease,
-                    box-shadow .18s ease,
-                    filter .18s ease !important;
-            }
-
-            .ui-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 14px rgba(15,23,42,.18);
-                filter: brightness(1.05);
-            }
-
-            .encabezado {
-                position: relative;
-                overflow: hidden;
-                animation: aparecerEncabezado 0.55s ease-out;
-            }
-
-            .encabezado::after {
-                content: "";
-                position: absolute;
-                top: -80px;
-                right: -60px;
-                width: 220px;
-                height: 220px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.08);
-            }
-
-            @keyframes aparecerPagina {
-                from {
-                    opacity: 0;
-                    transform: translateY(12px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            @keyframes aparecerTarjeta {
-                from {
-                    opacity: 0;
-                    transform: translateY(18px) scale(0.98);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-
-            @keyframes aparecerEncabezado {
-                from {
-                    opacity: 0;
-                    transform: translateY(-12px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
 
     </style>
 
@@ -634,428 +692,401 @@
 
 <h:body>
 
-    <!-- Barra de navegación -->
+    <header class="barra-publica">
 
-    <div class="barra">
+        <div class="barra-contenido">
 
-        <div class="marca">
+            <a class="marca-publica"
+               href="#{request.contextPath}/publico/inicio.xhtml">
 
-            <h1>UTN GolMundial 2026</h1>
+                <span class="marca-icono">
+                    <i class="pi pi-chart-bar"></i>
+                </span>
 
-            <small>
-                Portal público del torneo
-            </small>
+                <span class="marca-texto">
+                    <strong>UTN GolMundial</strong>
+                    <small>Portal oficial del torneo 2026</small>
+                </span>
+
+            </a>
+
+            <h:form id="formMenu">
+
+                <nav class="menu-publico">
+
+                    <p:button value="Inicio"
+                              icon="pi pi-home"
+                              outcome="/publico/inicio.xhtml"/>
+
+                    <p:button value="Partidos"
+                              icon="pi pi-calendar"
+                              outcome="/publico/partidos.xhtml"/>
+
+                    <p:button value="Posiciones"
+                              icon="pi pi-list"
+                              outcome="/publico/posiciones.xhtml"
+                              styleClass="menu-activo"/>
+
+                    <p:button value="Selecciones"
+                              icon="pi pi-flag"
+                              outcome="/publico/selecciones.xhtml"/>
+
+                    <p:button value="Estadísticas"
+                              icon="pi pi-chart-bar"
+                              outcome="/publico/estadisticas.xhtml"/>
+
+                </nav>
+
+            </h:form>
+
+            <h:form id="formSesion">
+
+                <div class="acciones-sesion">
+
+                    <h:panelGroup rendered="#{not loginBean.logueado}"
+                                  layout="block"
+                                  style="display: inline-flex; gap: 8px;">
+
+                        <p:button value="Registro"
+                                  icon="pi pi-user-plus"
+                                  outcome="/publico/registro.xhtml"
+                                  styleClass="ui-button-warning ui-button-outlined"/>
+
+                        <p:button value="Ingresar"
+                                  icon="pi pi-sign-in"
+                                  outcome="/publico/login.xhtml"/>
+
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{loginBean.usuarioRegistrado}"
+                                  layout="block"
+                                  style="display: inline-flex; align-items: center; gap: 8px;">
+
+                        <span class="usuario-publico">
+                            <i class="pi pi-user"></i>
+                            #{loginBean.usuario.nombre}
+                        </span>
+
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesionPublica}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{loginBean.administrador}"
+                                  layout="block"
+                                  style="display: inline-flex; align-items: center; gap: 8px;">
+
+                        <span class="usuario-publico">
+                            <i class="pi pi-shield"></i>
+                            #{loginBean.usuario.nombre}
+                        </span>
+
+                        <p:button value="Panel"
+                                  icon="pi pi-cog"
+                                  outcome="/dashboard.xhtml"
+                                  styleClass="ui-button-warning"/>
+
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+
+                    </h:panelGroup>
+
+                </div>
+
+            </h:form>
 
         </div>
 
-        <h:form id="formMenu">
+    </header>
 
-            <div class="menu">
+    <section class="hero-posiciones">
 
-                <p:button
-                        value="Inicio"
-                        icon="pi pi-home"
-                        href="inicio.xhtml"
-                        styleClass="ui-button-outlined"/>
+        <div class="hero-contenido">
 
-                <p:button
-                        value="Partidos"
-                        icon="pi pi-calendar"
-                        href="partidos.xhtml"
-                        styleClass="ui-button-outlined"/>
+            <div>
 
-                <p:button
-                        value="Posiciones"
-                        icon="pi pi-list"
-                        href="posiciones.xhtml"/>
-
-                <p:button
-                        value="Selecciones"
-                        icon="pi pi-flag"
-                        href="selecciones.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Estadísticas"
-                        icon="pi pi-chart-bar"
-                        href="estadisticas.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <!-- Invitado -->
-
-                <h:panelGroup
-                        rendered="#{not loginBean.logueado}"
-                        layout="block"
-                        style="display:inline-flex;
-                               align-items:center;
-                               gap:8px;">
-
-                    <p:button
-                            value="Registrarse"
-                            icon="pi pi-user-plus"
-                            href="registro.xhtml"
-                            styleClass="ui-button-warning"/>
-
-                    <p:button
-                            value="Ingresar"
-                            icon="pi pi-sign-in"
-                            href="login.xhtml"
-                            styleClass="ui-button-success"/>
-
-                </h:panelGroup>
-
-                <!-- Usuario registrado -->
-
-                <h:panelGroup
-                        rendered="#{loginBean.usuarioRegistrado}"
-                        layout="block"
-                        style="display:inline-flex;
-                               align-items:center;
-                               gap:8px;">
-
-                    <span class="sesion-usuario">
-
-                        <i class="pi pi-user"></i>
-
-                        #{empty loginBean.usuario.nombre
-                        ? loginBean.usuario.username
-                        : loginBean.usuario.nombre}
-
-                    </span>
-
-                    <p:commandButton
-                            value="Cerrar sesión"
-                            icon="pi pi-sign-out"
-                            action="#{loginBean.cerrarSesionPublica}"
-                            ajax="false"
-                            styleClass="ui-button-danger"/>
-
-                </h:panelGroup>
-
-                <!-- Administrador -->
-
-                <h:panelGroup
-                        rendered="#{loginBean.administrador}"
-                        layout="block"
-                        style="display:inline-flex;
-                               align-items:center;
-                               gap:8px;">
-
-                    <span class="sesion-usuario">
-
-                        <i class="pi pi-shield"></i>
-
-                        #{loginBean.usuario.nombre}
-
-                    </span>
-
-                    <p:button
-                            value="Panel administrativo"
-                            icon="pi pi-cog"
-                            href="../dashboard.xhtml"
-                            styleClass="ui-button-warning"/>
-
-                    <p:commandButton
-                            value="Cerrar sesión"
-                            icon="pi pi-sign-out"
-                            action="#{loginBean.cerrarSesion}"
-                            ajax="false"
-                            styleClass="ui-button-danger"/>
-
-                </h:panelGroup>
-
-            </div>
-
-        </h:form>
-
-    </div>
-
-    <main class="contenido">
-
-        <!-- Encabezado -->
-
-        <section class="encabezado">
-
-            <div class="encabezado-contenido">
-
-                <div>
-
-                    <h2>Tablas de posiciones</h2>
-
-                    <p>
-                        Consulta la clasificación de las selecciones
-                        organizada por cada grupo del Mundial 2026.
-                    </p>
-
+                <div class="hero-etiqueta">
+                    <i class="pi pi-trophy"></i>
+                    Clasificación oficial · Mundial 2026
                 </div>
 
-                <i class="pi pi-chart-bar encabezado-icono"></i>
+                <h1 class="hero-titulo">
+                    Posiciones organizadas
+                    grupo por grupo.
+                </h1>
+
+                <p class="hero-descripcion">
+                    Consulta puntos, partidos jugados, goles y diferencia
+                    de cada selección. Los dos primeros puestos aparecen
+                    destacados como clasificados.
+                </p>
 
             </div>
 
-        </section>
+            <div class="resumen-posiciones">
+
+                <div class="dato-posicion">
+                    <strong>#{publicoBean.totalGrupos}</strong>
+                    <span>Grupos</span>
+                </div>
+
+                <div class="dato-posicion">
+                    <strong>#{publicoBean.totalSelecciones}</strong>
+                    <span>Selecciones</span>
+                </div>
+
+                <div class="dato-posicion">
+                    <strong>#{publicoBean.partidosFinalizados}</strong>
+                    <span>Finalizados</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <main class="contenido-publico">
 
         <h:form id="formPosiciones">
 
-            <p:growl
-                    id="mensajes"
-                    showDetail="true"
-                    life="5000"/>
+            <p:growl id="mensajes"
+                     showDetail="true"
+                     life="5000"/>
 
-            <!-- Controles -->
+            <section class="barra-herramientas">
 
-            <section class="controles">
+                <div class="filtro-grupo">
 
-                <div class="controles-texto">
+                    <label for="grupoFiltro">
+                        <i class="pi pi-filter"></i>
+                        Mostrar grupo
+                    </label>
 
-                    <h3>Clasificación por grupos</h3>
+                    <p:selectOneMenu id="grupoFiltro"
+                                     value="#{publicoBean.grupoSeleccionado}">
 
-                    <p>
-                        Los dos primeros equipos de cada grupo
-                        aparecen resaltados como clasificados.
-                    </p>
+                        <f:selectItem itemLabel="Todos los grupos"
+                                      itemValue="#{null}"/>
+
+                        <f:selectItems value="#{publicoBean.grupos}"
+                                       var="grupoOpcion"
+                                       itemLabel="Grupo #{grupoOpcion.codigo}"
+                                       itemValue="#{grupoOpcion.codigo}"/>
+
+                        <p:ajax event="change"
+                                listener="#{publicoBean.filtrarPosiciones}"
+                                process="@this"
+                                update=":formPosiciones:panelGrupos :formPosiciones:mensajes"/>
+
+                    </p:selectOneMenu>
 
                 </div>
 
-                <div class="controles-botones">
+                <div class="acciones-filtro">
 
-                    <p:button
-                            value="Volver al inicio"
-                            icon="pi pi-home"
-                            href="inicio.xhtml"
-                            styleClass="ui-button-secondary"/>
+                    <p:commandButton value="Todos"
+                                     icon="pi pi-times"
+                                     actionListener="#{publicoBean.limpiarFiltroGrupo}"
+                                     process="@this"
+                                     update=":formPosiciones:grupoFiltro :formPosiciones:panelGrupos :formPosiciones:mensajes"
+                                     styleClass="ui-button-secondary ui-button-outlined"/>
 
-                    <p:commandButton
-                            value="Actualizar posiciones"
-                            icon="pi pi-refresh"
-                            actionListener="#{publicoBean.cargarPosiciones}"
-                            process="@this"
-                            update="panelGrupos mensajes"
-                            styleClass="ui-button-success"/>
+                    <p:commandButton value="Actualizar"
+                                     icon="pi pi-refresh"
+                                     actionListener="#{publicoBean.cargarPosiciones}"
+                                     process="@this"
+                                     update=":formPosiciones:panelGrupos :formPosiciones:mensajes"
+                                     styleClass="ui-button-outlined"/>
 
                 </div>
 
             </section>
-
-            <!-- Leyenda -->
 
             <section class="leyenda">
 
-                <div class="leyenda-item">
+                <span class="leyenda-item">
+                    <span class="punto-leyenda"></span>
+                    Puestos 1 y 2: clasificación
+                </span>
 
-                    <span class="leyenda-color color-clasificado"></span>
-
-                    Clasificado a la siguiente fase
-
-                </div>
-
-                <div class="leyenda-item">
-
-                    <span class="leyenda-color color-eliminado"></span>
-
-                    Posición restante
-
-                </div>
-
-                <div class="leyenda-item">
-
+                <span class="leyenda-item">
                     <i class="pi pi-info-circle"></i>
+                    PJ: jugados · PG: ganados · PE: empatados · PP: perdidos
+                </span>
 
-                    PJ: jugados · PG: ganados · PE: empatados ·
-                    PP: perdidos · DG: diferencia de goles
-
-                </div>
+                <span class="leyenda-item">
+                    GF: favor · GC: contra · DG: diferencia · PTS: puntos
+                </span>
 
             </section>
 
-            <!-- Grupos -->
+            <h:panelGroup id="panelGrupos"
+                          layout="block"
+                          styleClass="grupos-grid">
 
-            <h:panelGroup
-                    id="panelGrupos"
-                    layout="block"
-                    styleClass="grupos-grid">
+                <ui:repeat value="#{publicoBean.grupos}"
+                           var="grupo">
 
-                <ui:repeat
-                        value="#{publicoBean.grupos}"
-                        var="grupo">
+                    <h:panelGroup rendered="#{empty publicoBean.grupoSeleccionado or publicoBean.grupoSeleccionado eq grupo.codigo}"
+                                  layout="block">
 
-                    <article class="grupo-card">
+                        <details class="grupo-card"
+                                 open="open">
 
-                        <header class="grupo-cabecera">
+                            <summary class="grupo-cabecera">
 
-                            <div class="grupo-titulo">
+                                <div class="grupo-cabecera-contenido">
 
-                                <i class="pi pi-trophy"></i>
+                                    <div class="grupo-identidad">
 
-                                <h3>
-                                    #{grupo.nombre}
-                                </h3>
+                                        <span class="grupo-letra">
+                                            #{grupo.codigo}
+                                        </span>
 
-                            </div>
+                                        <span>
+                                            <strong>Grupo #{grupo.codigo}</strong>
+                                            <small>Tabla de posiciones oficial</small>
+                                        </span>
 
-                            <span class="grupo-etiqueta">
+                                    </div>
 
-                                Grupo #{grupo.codigo}
+                                    <span class="grupo-toggle">
+                                        <span>Mostrar u ocultar</span>
+                                        <i class="pi pi-chevron-down"></i>
+                                    </span>
 
-                            </span>
+                                </div>
 
-                        </header>
+                            </summary>
 
-                        <div class="tabla-contenedor">
+                            <div class="tabla-contenedor">
 
-                            <h:panelGroup
-                                    rendered="#{not empty publicoBean.posicionesPorGrupo(grupo.codigo)}">
+                                <h:panelGroup rendered="#{not empty publicoBean.posicionesPorGrupo(grupo.codigo)}">
 
-                                <table class="tabla-grupo">
+                                    <table class="tabla-posiciones">
 
-                                    <thead>
+                                        <thead>
+                                            <tr>
+                                                <th>Pos.</th>
+                                                <th>Selección</th>
+                                                <th>PJ</th>
+                                                <th>PG</th>
+                                                <th>PE</th>
+                                                <th>PP</th>
+                                                <th>GF</th>
+                                                <th>GC</th>
+                                                <th>DG</th>
+                                                <th>PTS</th>
+                                            </tr>
+                                        </thead>
 
-                                        <tr>
+                                        <tbody>
 
-                                            <th>Pos.</th>
+                                            <ui:repeat value="#{publicoBean.posicionesPorGrupo(grupo.codigo)}"
+                                                       var="posicion">
 
-                                            <th class="seleccion-col">
-                                                Selección
-                                            </th>
+                                                <tr class="#{posicion.posicion le 2 ? 'fila-clasificada' : ''}">
 
-                                            <th>PJ</th>
-                                            <th>PG</th>
-                                            <th>PE</th>
-                                            <th>PP</th>
-                                            <th>GF</th>
-                                            <th>GC</th>
-                                            <th>DG</th>
-                                            <th>PTS</th>
-
-                                        </tr>
-
-                                    </thead>
-
-                                    <tbody>
-
-                                        <ui:repeat
-                                                value="#{publicoBean.posicionesPorGrupo(grupo.codigo)}"
-                                                var="p">
-
-                                            <tr class="#{p.posicion le 2
-                                                        ? 'fila-clasificada'
-                                                        : ''}">
-
-                                                <td>
-
-                                                    <span class="posicion">
-                                                        #{p.posicion}
-                                                    </span>
-
-                                                </td>
-
-                                                <td>
-
-                                                    <div class="seleccion-contenido">
-
-                                                        <!--
-                                                        La imagen debe estar en:
-                                                        src/main/webapp/resources/images/banderas/CODIGO.png
-                                                        Ejemplo: MEX.png, CAN.png
-                                                        -->
-
-                                                        <h:graphicImage
-                                                                library="images"
-                                                                name="banderas/#{publicoBean.obtenerCodigoBandera(p.codigoFifa)}.svg"
-                                                                styleClass="bandera"
-                                                                alt="Bandera de #{p.seleccion}"
-                                                                onerror="this.style.display='none';
-                                                                        this.nextElementSibling.style.display='inline-flex';"/>
-
-                                                        <span class="bandera-alternativa"
-                                                              style="display:none;">
-
-                                                            #{p.codigoFifa}
-
+                                                    <td>
+                                                        <span class="numero-posicion">
+                                                            #{posicion.posicion}
                                                         </span>
+                                                    </td>
 
-                                                        <div class="seleccion-datos">
+                                                    <td>
 
-                                                            <span class="seleccion-nombre">
+                                                        <div class="seleccion-celda">
 
-                                                                #{p.seleccion}
+                                                            <h:graphicImage library="images"
+                                                                            name="banderas/#{publicoBean.obtenerCodigoBandera(posicion.codigoFifa)}.svg"
+                                                                            styleClass="bandera-posicion"
+                                                                            alt="Bandera de #{posicion.seleccion}"
+                                                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"/>
 
+                                                            <span class="bandera-alternativa">
+                                                                #{posicion.codigoFifa}
                                                             </span>
 
-                                                            <span class="seleccion-codigo">
-
-                                                                #{p.codigoFifa}
-
+                                                            <span class="seleccion-info">
+                                                                <strong>#{posicion.seleccion}</strong>
+                                                                <small>#{posicion.codigoFifa}</small>
                                                             </span>
 
                                                         </div>
 
-                                                    </div>
+                                                    </td>
 
-                                                </td>
+                                                    <td>#{posicion.jugados}</td>
+                                                    <td>#{posicion.ganados}</td>
+                                                    <td>#{posicion.empatados}</td>
+                                                    <td>#{posicion.perdidos}</td>
+                                                    <td>#{posicion.golesFavor}</td>
+                                                    <td>#{posicion.golesContra}</td>
 
-                                                <td>#{p.jugados}</td>
-                                                <td>#{p.ganados}</td>
-                                                <td>#{p.empatados}</td>
-                                                <td>#{p.perdidos}</td>
-                                                <td>#{p.golesFavor}</td>
-                                                <td>#{p.golesContra}</td>
+                                                    <td>
 
-                                                <td>
+                                                        <span class="#{posicion.diferenciaGoles gt 0
+                                                                       ? 'diferencia-positiva'
+                                                                       : posicion.diferenciaGoles lt 0
+                                                                       ? 'diferencia-negativa'
+                                                                       : 'diferencia-neutra'}">
 
-                                                    <span class="#{p.diferenciaGoles gt 0
-                                                                    ? 'positivo'
-                                                                    : p.diferenciaGoles lt 0
-                                                                    ? 'negativo'
-                                                                    : 'neutro'}">
+                                                            #{posicion.diferenciaGoles gt 0
+                                                              ? '+'.concat(posicion.diferenciaGoles)
+                                                              : posicion.diferenciaGoles}
 
-                                                        #{p.diferenciaGoles gt 0
-                                                          ? '+'.concat(p.diferenciaGoles)
-                                                          : p.diferenciaGoles}
+                                                        </span>
 
-                                                    </span>
+                                                    </td>
 
-                                                </td>
+                                                    <td>
+                                                        <span class="puntos">
+                                                            #{posicion.puntos}
+                                                        </span>
+                                                    </td>
 
-                                                <td>
+                                                </tr>
 
-                                                    <span class="puntos">
+                                            </ui:repeat>
 
-                                                        #{p.puntos}
+                                        </tbody>
 
-                                                    </span>
+                                    </table>
 
-                                                </td>
+                                </h:panelGroup>
 
-                                            </tr>
+                                <h:panelGroup rendered="#{empty publicoBean.posicionesPorGrupo(grupo.codigo)}">
 
-                                        </ui:repeat>
+                                    <div class="grupo-vacio">
+                                        <i class="pi pi-info-circle"></i>
+                                        No existen posiciones disponibles para este grupo.
+                                    </div>
 
-                                    </tbody>
+                                </h:panelGroup>
 
-                                </table>
+                            </div>
 
-                            </h:panelGroup>
+                        </details>
 
-                            <h:panelGroup
-                                    rendered="#{empty publicoBean.posicionesPorGrupo(grupo.codigo)}">
-
-                                <div class="grupo-vacio">
-
-                                    <i class="pi pi-info-circle"></i>
-
-                                    No existen posiciones disponibles
-                                    para este grupo.
-
-                                </div>
-
-                            </h:panelGroup>
-
-                        </div>
-
-                    </article>
+                    </h:panelGroup>
 
                 </ui:repeat>
+
+                <h:panelGroup rendered="#{empty publicoBean.grupos}"
+                              layout="block"
+                              styleClass="estado-vacio">
+
+                    <i class="pi pi-inbox"></i>
+                    No existen grupos disponibles para mostrar.
+
+                </h:panelGroup>
 
             </h:panelGroup>
 
@@ -1063,18 +1094,9 @@
 
     </main>
 
-    <footer class="pie">
-
-        <h3>UTN GolMundial 2026</h3>
-
-        <p>
-            Proyecto Integrador · Ingeniería en Software
-        </p>
-
-        <small>
-            © 2026 Todos los derechos reservados
-        </small>
-
+    <footer class="pie-publico">
+        <strong>UTN GolMundial 2026</strong>
+        Proyecto Integrador · Portal público oficial del torneo
     </footer>
 
 </h:body>

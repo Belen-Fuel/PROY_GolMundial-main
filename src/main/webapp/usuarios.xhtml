@@ -6,683 +6,1251 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
-    <f:metadata>
-        <f:viewAction
-                action="#{loginBean.verificarAccesoAdministrador}"
-                onPostback="false"/>
-</f:metadata>
-
 <h:head>
-
     <title>Gestión de Usuarios - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
     <style>
-
-       body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #1e293b;
+        * {
+            box-sizing: border-box;
         }
 
-       .barra {
-            background: #0f172a;
-            color: white;
-            padding: 18px 22px;
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #172033;
+        }
+
+        body .ui-button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        body .ui-inputfield,
+        body .ui-password,
+        body .ui-password-input,
+        body .ui-selectonemenu {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .aplicacion {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .barra-lateral {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px 18px;
+            background: linear-gradient(180deg, #0b1732 0%, #132752 100%);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 4px 8px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .marca-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #2f80ed, #1fd1a5);
+            box-shadow: 0 10px 24px rgba(24, 144, 255, 0.28);
+            font-size: 23px;
         }
 
         .marca h1 {
             margin: 0;
-            font-size: 22px;
+            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .marca small {
+        .marca span {
             display: block;
-            margin-top: 3px;
-            color: #cbd5e1;
+            margin-top: 4px;
+            color: #a9b8d6;
+            font-size: 12px;
         }
 
-        .form-menu {
-            margin-top: 16px;
+        .titulo-menu {
+            margin: 24px 10px 10px;
+            color: #8094bc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
         .menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-
-        .sesion-fila {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            flex-wrap: wrap;
-        }
-
-        .sesion-usuario {
-            display: inline-flex;
-            align-items: center;
+            display: grid;
             gap: 7px;
-            color: white;
-            font-weight: 600;
         }
 
-        .contenedor {
-            max-width: 1250px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-      .encabezado {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 30px 28px;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .encabezado::after {
-            content: "";
-            position: absolute;
-            width: 230px;
-            height: 230px;
-            right: -80px;
-            top: -95px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .encabezado h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
+        .menu-item {
+            min-height: 46px;
+            padding: 0 14px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
+            gap: 12px;
+            color: #dce5f5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.18s ease;
         }
 
-        .encabezado p {
-            margin: 12px 0 0;
-            font-size: 14px;
-            color: #dbeafe;
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+
+        .menu-item.activo {
+            background: linear-gradient(90deg, #2c7df0, #365fdb);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 103, 226, 0.26);
+        }
+
+        .pie-lateral {
+            margin-top: auto;
+            padding: 18px 10px 2px;
+            color: #8295ba;
+            font-size: 12px;
             line-height: 1.5;
-            position: relative;
-            z-index: 1;
+        }
+
+        .area-principal {
+            min-width: 0;
+        }
+
+        .barra-superior {
+            min-height: 76px;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #e5eaf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+        }
+
+        .encabezado-pagina h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .encabezado-pagina p {
+            margin: 5px 0 0;
+            color: #758198;
+            font-size: 13px;
         }
 
         .acciones-superiores {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: flex-end;
             gap: 10px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
         }
 
-        .activo {
-            color: #15803d;
-            font-weight: bold;
+        .usuario-conectado {
+            min-height: 43px;
+            padding: 7px 12px 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .inactivo {
-            color: #b91c1c;
-            font-weight: bold;
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #e8f1ff;
+            color: #2563eb;
         }
 
-        .pendiente {
-            color: #b45309;
-            font-weight: bold;
+        .usuario-datos strong,
+        .usuario-datos small {
+            display: block;
         }
 
-        .campo {
-            margin-bottom: 15px;
+        .usuario-datos strong {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .usuario-datos small {
+            margin-top: 2px;
+            color: #8792a6;
+            font-size: 11px;
+        }
+
+        .contenido {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 30px 40px;
+        }
+
+        .resumen-usuarios {
+            position: relative;
+            overflow: hidden;
+            padding: 28px 30px;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #102759 0%, #1e4fbb 58%, #2577ec 100%);
+            color: #ffffff;
+            box-shadow: 0 15px 38px rgba(19, 67, 154, 0.2);
+        }
+
+        .resumen-usuarios::before,
+        .resumen-usuarios::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .resumen-usuarios::before {
+            width: 230px;
+            height: 230px;
+            right: -65px;
+            top: -110px;
+        }
+
+        .resumen-usuarios::after {
+            width: 120px;
+            height: 120px;
+            right: 190px;
+            bottom: -75px;
+        }
+
+        .resumen-principal,
+        .resumen-indicadores {
+            position: relative;
+            z-index: 1;
+        }
+
+        .resumen-etiqueta {
+            width: max-content;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .resumen-texto h3 {
+            margin: 14px 0 7px;
+            font-size: 27px;
+        }
+
+        .resumen-texto p {
+            max-width: 720px;
+            margin: 0;
+            color: #d9e5ff;
+            line-height: 1.55;
+        }
+
+        .resumen-indicadores {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .indicador {
+            min-height: 102px;
+            padding: 15px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(7px);
+        }
+
+        .indicador span,
+        .indicador strong {
+            display: block;
+        }
+
+        .indicador > span:first-child {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #d8e5ff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .indicador strong {
+            margin: 8px 0 5px;
+            font-size: 27px;
+        }
+
+        .indicador > span:last-child {
+            color: #c9d9f8;
+            font-size: 11px;
+        }
+
+        .barra-herramientas {
+            margin: 22px 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .buscador {
+            width: min(500px, 100%);
+            position: relative;
+        }
+
+        .buscador > i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            z-index: 2;
+            transform: translateY(-50%);
+            color: #8592a8;
+        }
+
+        .buscador .ui-inputfield {
+            min-height: 44px;
+            padding-left: 42px;
+            background: #ffffff;
+            border-color: #dfe5ee;
+            box-shadow: 0 6px 18px rgba(15, 34, 70, 0.05);
+        }
+
+        .herramientas-acciones {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .panel-tabla {
+            overflow: hidden;
+            border: 1px solid #e4e9f1;
+            border-radius: 17px;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(20, 42, 82, 0.07);
+        }
+
+        .panel-tabla-cabecera {
+            min-height: 80px;
+            padding: 18px 21px;
+            border-bottom: 1px solid #e7ebf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .panel-tabla-cabecera h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .panel-tabla-cabecera p {
+            margin: 5px 0 0;
+            color: #7a879d;
+            font-size: 12px;
+        }
+
+        .contador-registros {
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #edf4ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tabla-usuarios .ui-datatable-header {
+            display: none;
+        }
+
+        .tabla-usuarios .ui-datatable-tablewrapper {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .tabla-usuarios table {
+            width: 100%;
+            min-width: 1120px;
+            table-layout: auto;
+        }
+
+        .tabla-usuarios .ui-column-filter {
+            width: 100%;
+            min-width: 78px;
+        }
+
+        .tabla-usuarios .ui-datatable-thead > tr > th {
+            padding: 13px 14px;
+            background: #f8fafc;
+            color: #526078;
+            border-color: #e7ebf2;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tabla-usuarios .ui-datatable-tbody > tr > td {
+            padding: 13px 14px;
+            border-color: #edf0f5;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .cuenta-identidad {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        .cuenta-icono {
+            flex: 0 0 auto;
+            width: 39px;
+            height: 39px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #e6efff, #d9e8ff);
+            color: #2563eb;
+            font-size: 17px;
+        }
+
+        .cuenta-identidad strong,
+        .cuenta-identidad small {
+            display: block;
+        }
+
+        .cuenta-identidad strong {
+            font-size: 13px;
+        }
+
+        .cuenta-identidad small {
+            margin-top: 3px;
+            color: #8a95a8;
+            font-size: 11px;
+        }
+
+        .nombre-usuario strong,
+        .nombre-usuario small {
+            display: block;
+        }
+
+        .nombre-usuario strong {
+            font-size: 13px;
+        }
+
+        .nombre-usuario small {
+            margin-top: 3px;
+            color: #8995a9;
+            font-size: 11px;
+        }
+
+        .seguridad-cuenta {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 9px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .seguridad-cuenta.pendiente {
+            background: #fff5dd;
+            color: #a75d00;
+        }
+
+        .seguridad-cuenta.correcta {
+            background: #eaf8ef;
+            color: #167644;
+        }
+
+        .fecha-creacion {
+            display: inline-block;
+            max-width: 155px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+            color: #526078;
+            font-size: 12px;
+        }
+
+        .acciones-tabla {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+
+        .acciones-tabla .ui-button {
+            width: 34px;
+            height: 34px;
+        }
+
+        .formulario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .campo.completo {
+            grid-column: 1 / -1;
         }
 
         .campo label {
             display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-            color: #334155;
+            margin-bottom: 7px;
+            color: #35425a;
+            font-size: 13px;
+            font-weight: 700;
         }
 
-        .botones-dialogo {
-            text-align: right;
-            margin-top: 20px;
+        .campo-ayuda {
+            display: block;
+            margin-top: 6px;
+            color: #8994a7;
+            font-size: 11px;
+            line-height: 1.45;
         }
-       .acciones {
+
+        .estado-nuevo {
+            min-height: 45px;
+            padding: 11px 13px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
+            gap: 9px;
         }
 
-        @media (max-width: 700px) {
+        .acciones-dialogo {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 9px;
+        }
 
-            body {
-                padding: 10px;
+        .usuario-dialogo {
+            margin-bottom: 18px;
+            padding: 13px 14px;
+            border-radius: 12px;
+            background: #f4f7fb;
+            border: 1px solid #e3e8f0;
+        }
+
+        .usuario-dialogo strong,
+        .usuario-dialogo span {
+            display: block;
+        }
+
+        .usuario-dialogo span {
+            margin-top: 3px;
+            color: #7a879c;
+            font-size: 12px;
+        }
+
+        @media (max-width: 1180px) {
+            .resumen-indicadores {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .aplicacion {
+                display: block;
             }
 
-            .encabezado {
+            .barra-lateral {
+                position: relative;
+                height: auto;
+                padding: 16px;
+            }
+
+            .marca {
+                padding-bottom: 16px;
+            }
+
+            .titulo-menu,
+            .pie-lateral {
+                display: none;
+            }
+
+            .menu {
+                margin-top: 14px;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .menu-item {
+                min-height: 42px;
+                padding: 0 9px;
+                justify-content: center;
+            }
+
+            .menu-item span {
+                display: none;
+            }
+
+            .barra-superior {
+                position: relative;
+                padding: 14px 18px;
+            }
+
+            .contenido {
+                padding: 20px 18px 32px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .barra-superior {
                 align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .acciones-superiores {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .usuario-conectado {
+                flex: 1;
+            }
+
+            .resumen-usuarios {
+                padding: 23px 20px;
+            }
+
+            .resumen-texto h3 {
+                font-size: 23px;
+            }
+
+            .resumen-indicadores {
+                grid-template-columns: 1fr;
+            }
+
+            .barra-herramientas,
+            .herramientas-acciones,
+            .herramientas-acciones .ui-button {
+                width: 100%;
+            }
+
+            .panel-tabla-cabecera {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .formulario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .campo.completo {
+                grid-column: auto;
+            }
+
+            .acciones-dialogo {
+                flex-direction: column-reverse;
+            }
+
+            .acciones-dialogo .ui-button {
+                width: 100%;
             }
         }
-
     </style>
-
 </h:head>
 
 <h:body>
+    <div class="aplicacion">
+        <aside class="barra-lateral">
+            <div class="marca">
+                <div class="marca-icono">
+                    <i class="pi pi-chart-bar"></i>
+                </div>
 
-<div class="barra">
+                <div>
+                    <h1>UTN GolMundial</h1>
+                    <span>Administración 2026</span>
+                </div>
+            </div>
 
-    <div class="marca">
-        <h1>UTN GolMundial 2026</h1>
-        <small>Panel administrativo del torneo</small>
+            <div class="titulo-menu">Menú principal</div>
+
+            <nav class="menu">
+                <h:link outcome="/dashboard.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:link>
+
+                <h:link outcome="/partidos.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Partidos</span>
+                </h:link>
+
+                <h:link outcome="/selecciones.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-flag"></i>
+                    <span>Selecciones</span>
+                </h:link>
+
+                <h:link outcome="/sedes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-map-marker"></i>
+                    <span>Sedes</span>
+                </h:link>
+
+                <h:link outcome="/usuarios.xhtml"
+                        styleClass="menu-item activo">
+                    <i class="pi pi-users"></i>
+                    <span>Usuarios</span>
+                </h:link>
+
+                <h:link outcome="/reportes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Reportes</span>
+                </h:link>
+
+                <h:link outcome="/auditoria.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-book"></i>
+                    <span>Auditoría</span>
+                </h:link>
+
+                <h:link outcome="/publico/inicio.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-globe"></i>
+                    <span>Portal público</span>
+                </h:link>
+            </nav>
+
+            <div class="pie-lateral">
+                Administración de cuentas, permisos y acceso al sistema.
+            </div>
+        </aside>
+
+        <main class="area-principal">
+            <header class="barra-superior">
+                <div class="encabezado-pagina">
+                    <h2>Gestión de usuarios</h2>
+                    <p>Administre las cuentas, roles y estados del sistema.</p>
+                </div>
+
+                <div class="acciones-superiores">
+                    <div class="usuario-conectado">
+                        <div class="avatar">
+                            <i class="pi pi-user"></i>
+                        </div>
+
+                        <div class="usuario-datos">
+                            <strong>#{loginBean.usuario.nombre}</strong>
+                            <small>#{loginBean.usuario.rol}</small>
+                        </div>
+                    </div>
+
+                    <p:button value="Ver portal"
+                              icon="pi pi-external-link"
+                              outcome="/publico/inicio.xhtml"
+                              styleClass="ui-button-outlined"/>
+
+                    <h:form id="formSesion">
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+                    </h:form>
+                </div>
+            </header>
+
+            <div class="contenido">
+                <h:form id="formUsuarios">
+                    <p:growl id="mensajes"
+                             showDetail="true"
+                             life="5000"/>
+
+                    <section class="resumen-usuarios">
+                        <div class="resumen-principal">
+                            <div class="resumen-texto">
+                                <span class="resumen-etiqueta">
+                                    <i class="pi pi-shield"></i>
+                                    Seguridad y accesos
+                                </span>
+
+                                <h3>Cuentas del sistema</h3>
+
+                                <p>
+                                    Registre usuarios, controle el acceso y administre
+                                    los roles disponibles sin exponer información sensible.
+                                </p>
+                            </div>
+                        </div>
+
+                        <h:panelGroup id="panelResumen"
+                                      layout="block"
+                                      styleClass="resumen-indicadores">
+                            <div class="indicador">
+                                <span><i class="pi pi-users"></i>Total</span>
+                                <strong>#{usuarioBean.cantidadUsuarios}</strong>
+                                <span>Cuentas administrables</span>
+                            </div>
+
+                            <div class="indicador">
+                                <span><i class="pi pi-check-circle"></i>Activos</span>
+                                <strong>#{usuarioBean.cantidadActivos}</strong>
+                                <span>Con acceso habilitado</span>
+                            </div>
+
+                            <div class="indicador">
+                                <span><i class="pi pi-ban"></i>Inactivos</span>
+                                <strong>#{usuarioBean.cantidadInactivos}</strong>
+                                <span>Sin acceso al sistema</span>
+                            </div>
+
+                            <div class="indicador">
+                                <span><i class="pi pi-key"></i>Cambio pendiente</span>
+                                <strong>#{usuarioBean.cantidadCambioPendiente}</strong>
+                                <span>Contraseña temporal activa</span>
+                            </div>
+                        </h:panelGroup>
+                    </section>
+
+                    <section class="barra-herramientas">
+                        <div class="buscador">
+                            <i class="pi pi-search"></i>
+                            <p:inputText id="busquedaGlobal"
+                                         placeholder="Buscar por usuario, nombre o rol..."
+                                         onkeyup="document.getElementById('formUsuarios:tablaUsuarios:globalFilter').value=this.value; PF('tablaUsuarios').filter()"/>
+                        </div>
+
+                        <div class="herramientas-acciones">
+                            <p:commandButton value="Actualizar"
+                                             icon="pi pi-refresh"
+                                             action="#{usuarioBean.cargarUsuarios}"
+                                             process="@this"
+                                             update=":formUsuarios:panelTabla :formUsuarios:panelResumen :formUsuarios:mensajes"
+                                             styleClass="ui-button-outlined"/>
+
+                            <p:commandButton value="Nuevo usuario"
+                                             icon="pi pi-user-plus"
+                                             action="#{usuarioBean.prepararNuevoUsuario}"
+                                             process="@this"
+                                             update=":formNuevoUsuario:panelNuevo"
+                                             oncomplete="PF('dlgNuevoUsuario').show()"/>
+                        </div>
+                    </section>
+
+                    <h:panelGroup id="panelTabla"
+                                  layout="block"
+                                  styleClass="panel-tabla">
+                        <div class="panel-tabla-cabecera">
+                            <div>
+                                <h3>Listado de usuarios</h3>
+                                <p>
+                                    Usuarios: #{usuarioBean.cantidadUsuariosRegistrados}
+                                    · Invitados: #{usuarioBean.cantidadInvitados}
+                                </p>
+                            </div>
+
+                            <span class="contador-registros">
+                                #{usuarioBean.cantidadUsuarios} cuentas
+                            </span>
+                        </div>
+
+                        <p:dataTable id="tablaUsuarios"
+                                     widgetVar="tablaUsuarios"
+                                     value="#{usuarioBean.usuarios}"
+                                     var="u"
+                                     rowKey="#{u.id}"
+                                     paginator="true"
+                                     rows="10"
+                                     rowsPerPageTemplate="5,10,15,20"
+                                     paginatorPosition="bottom"
+                                     responsiveLayout="scroll"
+                                     emptyMessage="No existen usuarios registrados."
+                                     styleClass="tabla-usuarios">
+
+                            <f:facet name="header">
+                                <p:inputText id="globalFilter"
+                                             style="display:none;"/>
+                            </f:facet>
+
+                            <p:column headerText="Cuenta"
+                                      filterBy="#{u.username}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{u.username}"
+                                      style="width:190px;min-width:190px;">
+                                <div class="cuenta-identidad">
+                                    <div class="cuenta-icono">
+                                        <i class="pi pi-user"></i>
+                                    </div>
+
+                                    <div>
+                                        <strong>#{u.username}</strong>
+                                        <small>ID del registro: #{u.id}</small>
+                                    </div>
+                                </div>
+                            </p:column>
+
+                            <p:column headerText="Nombre"
+                                      filterBy="#{u.nombre}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{u.nombre}"
+                                      style="width:220px;min-width:220px;">
+                                <div class="nombre-usuario">
+                                    <strong>#{u.nombre}</strong>
+                                    <small>Cuenta del portal UTN GolMundial</small>
+                                </div>
+                            </p:column>
+
+                            <p:column headerText="Rol"
+                                      filterBy="#{u.rol}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{u.rol}"
+                                      style="width:135px;min-width:135px;text-align:center;">
+                                <p:tag value="#{u.rol}"
+                                       icon="#{u.rol eq 'USUARIO' ? 'pi pi-user' : 'pi pi-eye'}"
+                                       severity="#{u.rol eq 'USUARIO' ? 'success' : 'info'}"/>
+                            </p:column>
+
+                            <p:column headerText="Estado"
+                                      sortBy="#{u.activo}"
+                                      style="width:120px;min-width:120px;text-align:center;">
+                                <p:tag value="#{u.activo ? 'Activo' : 'Inactivo'}"
+                                       icon="#{u.activo ? 'pi pi-check-circle' : 'pi pi-ban'}"
+                                       severity="#{u.activo ? 'success' : 'danger'}"/>
+                            </p:column>
+
+                            <p:column headerText="Seguridad"
+                                      sortBy="#{u.cambioPasswordObligatorio}"
+                                      style="width:180px;min-width:180px;text-align:center;">
+                                <span class="seguridad-cuenta #{u.cambioPasswordObligatorio ? 'pendiente' : 'correcta'}">
+                                    <i class="#{u.cambioPasswordObligatorio ? 'pi pi-exclamation-triangle' : 'pi pi-verified'}"></i>
+                                    #{u.cambioPasswordObligatorio ? 'Debe cambiar clave' : 'Contraseña vigente'}
+                                </span>
+                            </p:column>
+
+                            <p:column headerText="Creación"
+                                      sortBy="#{u.fechaCreacionUtc}"
+                                      style="width:170px;min-width:170px;">
+                                <span class="fecha-creacion">#{u.fechaCreacionUtc}</span>
+                            </p:column>
+
+                            <p:column headerText="Acciones"
+                                      exportable="false"
+                                      style="width:150px;min-width:150px;text-align:center;">
+                                <div class="acciones-tabla">
+                                    <p:commandButton icon="pi pi-id-card"
+                                                     title="Cambiar rol"
+                                                     actionListener="#{usuarioBean.prepararCambioRol(u)}"
+                                                     process="@this"
+                                                     update=":formCambiarRol:panelRol"
+                                                     oncomplete="PF('dlgCambiarRol').show()"
+                                                     styleClass="ui-button-info ui-button-outlined"/>
+
+                                    <p:commandButton icon="pi pi-key"
+                                                     title="Restablecer contraseña"
+                                                     actionListener="#{usuarioBean.prepararCambioPassword(u)}"
+                                                     process="@this"
+                                                     update=":formPassword:panelPassword"
+                                                     oncomplete="PF('dlgPassword').show()"
+                                                     styleClass="ui-button-warning ui-button-outlined"/>
+
+                                    <p:commandButton icon="#{u.activo ? 'pi pi-user-minus' : 'pi pi-user-plus'}"
+                                                     title="#{u.activo ? 'Desactivar usuario' : 'Activar usuario'}"
+                                                     actionListener="#{usuarioBean.cambiarEstado(u)}"
+                                                     process="@this"
+                                                     update=":formUsuarios:panelTabla :formUsuarios:panelResumen :formUsuarios:mensajes"
+                                                     styleClass="#{u.activo ? 'ui-button-danger ui-button-outlined' : 'ui-button-success ui-button-outlined'}">
+                                        <p:confirm header="Confirmar cambio de estado"
+                                                   message="#{u.activo ? '¿Desea desactivar la cuenta de '.concat(u.username).concat('?') : '¿Desea activar la cuenta de '.concat(u.username).concat('?')}"
+                                                   icon="pi pi-exclamation-triangle"/>
+                                    </p:commandButton>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
+
+                    <p:confirmDialog global="true"
+                                     responsive="true"
+                                     width="440"
+                                     showEffect="fade"
+                                     hideEffect="fade"
+                                     yesButtonLabel="Confirmar"
+                                     noButtonLabel="Cancelar"
+                                     yesButtonClass="ui-button-danger"
+                                     noButtonClass="ui-button-outlined"/>
+                </h:form>
+            </div>
+        </main>
     </div>
 
-    <h:form id="formMenu" styleClass="form-menu">
-
-        <div class="menu">
-
-            <p:button
-                    value="Panel"
-                    icon="pi pi-home"
-                    href="#{request.contextPath}/dashboard.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Partidos"
-                    icon="pi pi-calendar"
-                    href="#{request.contextPath}/partidos.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Selecciones"
-                    icon="pi pi-flag"
-                    href="#{request.contextPath}/selecciones.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Sedes"
-                    icon="pi pi-map-marker"
-                    href="#{request.contextPath}/sedes.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Usuarios"
-                    icon="pi pi-users"
-                    href="#{request.contextPath}/usuarios.xhtml"/>
-
-            <p:button
-                    value="Auditoría"
-                    icon="pi pi-search"
-                    href="#{request.contextPath}/auditoria.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Reportes"
-                    icon="pi pi-chart-bar"
-                    href="#{request.contextPath}/reportes.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-        </div>
-
-            <h:panelGroup
-                    rendered="#{loginBean.logueado and loginBean.administrador}"
-                    layout="block"
-                    style="display:inline-flex;align-items:center;gap:8px;">
-
-                <span class="sesion-usuario">
-                    <i class="pi pi-user"></i>
-                    #{loginBean.usuario.nombre}
-                </span>
-
-                <p:commandButton
-                        value="Cerrar sesión"
-                        icon="pi pi-sign-out"
-                        action="#{loginBean.cerrarSesion}"
-                        ajax="false"
-                        styleClass="ui-button-danger"/>
-
-            </h:panelGroup>
-
-    </h:form>
-
-</div>
-
-<div class="contenedor">
-
-<div class="encabezado">
-
-    <div>
-        <h1>Gestión de Usuarios</h1>
-        <p>Administración de cuentas, roles y estados del sistema</p>
-    </div>
-
-</div>
-
-<div class="acciones">
-
-    <div class="acciones-izquierda">
-
-        <p:button
-                value="Volver al panel"
-                icon="pi pi-home"
-                href="#{request.contextPath}/dashboard.xhtml"
-                styleClass="ui-button-secondary"/>
-
-    </div>
-
-    <div class="acciones-derecha">
-
-        <p:commandButton
-                value="Actualizar todo"
-                icon="pi pi-refresh"
-                actionListener="#{usuarioBean.cargarUsuarios}"
-                process="@this"
-                update=":formUsuarios"
-                styleClass="ui-button-success"/>
-
-    </div>
-
-</div>
-
-    <h:form id="formUsuarios">
-
-        <p:growl
-                id="mensajes"
-                showDetail="true"
-                life="5000"/>
-
-
-        <p:card>
-
-            <p:dataTable
-                    id="tablaUsuarios"
-                    value="#{usuarioBean.usuarios}"
-                    var="u"
-                    paginator="true"
-                    rows="10"
-                    reflow="true"
-                    paginatorPosition="bottom"
-                    rowsPerPageTemplate="5,10,20"
-                    emptyMessage="No existen usuarios registrados.">
-
-                <f:facet name="header">
-                    Usuarios registrados
-                </f:facet>
-
-                <p:column
-                        headerText="ID"
-                        style="width: 55px; text-align: center;">
-
-                    <h:outputText value="#{u.id}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Usuario"
-                        filterBy="#{u.username}"
-                        filterMatchMode="contains">
-
-                    <h:outputText
-                            value="#{u.username}"
-                            style="font-weight: bold;"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Nombre"
-                        filterBy="#{u.nombre}"
-                        filterMatchMode="contains">
-
-                    <h:outputText value="#{u.nombre}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Rol"
-                        filterBy="#{u.rol}"
-                        filterMatchMode="exact"
-                        style="text-align: center;">
-
-                    <h:outputText value="#{u.rol}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Estado"
-                        style="text-align: center;">
-
-                    <h:outputText
-                            value="#{u.activo ? 'Activo' : 'Inactivo'}"
-                            styleClass="#{u.activo ? 'activo' : 'inactivo'}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Cambio de contraseña"
-                        style="text-align: center;">
-
-                    <h:outputText
-                            value="#{u.cambioPasswordObligatorio
-                            ? 'Pendiente'
-                            : 'No'}"
-                            styleClass="#{u.cambioPasswordObligatorio
-                            ? 'pendiente'
-                            : ''}"/>
-
-                </p:column>
-
-                <p:column headerText="Fecha de creación">
-
-                    <h:outputText value="#{u.fechaCreacionUtc}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Acciones"
-                        style="width: 150px; text-align: center;">
-
-                    <p:commandButton
-                            icon="pi pi-user-edit"
-                            title="Cambiar rol"
-                            actionListener="#{usuarioBean.prepararCambioRol(u)}"
-                            process="@this"
-                            update=":formCambiarRol"
-                            oncomplete="PF('dlgCambiarRol').show()"
-                            styleClass="ui-button-warning rounded-button"
-                            style="margin-right: 5px;"/>
-
-                    <p:commandButton
-                            icon="#{u.activo
-                            ? 'pi pi-user-minus'
-                            : 'pi pi-user-plus'}"
-                            title="#{u.activo
-                            ? 'Desactivar usuario'
-                            : 'Activar usuario'}"
-                            actionListener="#{usuarioBean.cambiarEstado(u)}"
-                            process="@this"
-                            update=":formUsuarios:tablaUsuarios
-                                    :formUsuarios:mensajes"
-                            styleClass="#{u.activo
-                            ? 'ui-button-danger rounded-button'
-                            : 'ui-button-success rounded-button'}">
-
-                        <p:confirm
-                                header="Confirmación"
-                                message="#{u.activo
-                                ? '¿Desea desactivar este usuario?'
-                                : '¿Desea activar este usuario?'}"
-                                icon="pi pi-exclamation-triangle"/>
-
-                    </p:commandButton>
-
-                </p:column>
-
-            </p:dataTable>
-
-        </p:card>
-
-        <p:confirmDialog
-                global="true"
-                showEffect="fade"
-                hideEffect="fade"
-                responsive="true">
-
-            <p:commandButton
-                    value="Sí"
-                    type="button"
-                    styleClass="ui-confirmdialog-yes ui-button-danger"
-                    icon="pi pi-check"/>
-
-            <p:commandButton
-                    value="No"
-                    type="button"
-                    styleClass="ui-confirmdialog-no ui-button-secondary"
-                    icon="pi pi-times"/>
-
-        </p:confirmDialog>
-
-    </h:form>
-
-    <!-- Diálogo para crear usuario -->
-
-    <p:dialog
-            header="Registrar nuevo usuario"
-            widgetVar="dlgNuevoUsuario"
-            modal="true"
-            responsive="true"
-            resizable="false"
-            width="520"
-            showEffect="fade"
-            hideEffect="fade">
+    <p:dialog header="Registrar nuevo usuario"
+              widgetVar="dlgNuevoUsuario"
+              modal="true"
+              responsive="true"
+              width="720"
+              closeOnEscape="true"
+              appendTo="@(body)">
 
         <h:form id="formNuevoUsuario">
+            <h:panelGroup id="panelNuevo"
+                          layout="block">
+                <p:messages id="mensajesNuevo"
+                            showDetail="true"
+                            closable="true"/>
 
-            <p:messages
-                    id="mensajesNuevo"
-                    showDetail="true"
-                    closable="true"/>
+                <div class="formulario-grid">
+                    <div class="campo">
+                        <p:outputLabel for="usernameNuevo"
+                                       value="Nombre de usuario"/>
+                        <p:inputText id="usernameNuevo"
+                                     value="#{usuarioBean.nuevoUsuario.username}"
+                                     required="true"
+                                     requiredMessage="El nombre de usuario es obligatorio."
+                                     minlength="4"
+                                     maxlength="60"
+                                     placeholder="Ejemplo: juan.perez"/>
+                        <small class="campo-ayuda">
+                            De 4 a 60 caracteres. Puede usar letras, números, punto, guion y guion bajo.
+                        </small>
+                    </div>
 
-            <div class="campo">
+                    <div class="campo">
+                        <p:outputLabel for="nombreNuevo"
+                                       value="Nombre completo"/>
+                        <p:inputText id="nombreNuevo"
+                                     value="#{usuarioBean.nuevoUsuario.nombre}"
+                                     required="true"
+                                     requiredMessage="El nombre completo es obligatorio."
+                                     maxlength="150"
+                                     placeholder="Ejemplo: Juan Pérez"/>
+                    </div>
 
-                <p:outputLabel
-                        for="usernameNuevo"
-                        value="Usuario:"/>
+                    <div class="campo completo">
+                        <p:outputLabel for="passwordNuevo"
+                                       value="Contraseña inicial"/>
+                        <p:password id="passwordNuevo"
+                                    value="#{usuarioBean.nuevoUsuario.password}"
+                                    required="true"
+                                    requiredMessage="La contraseña es obligatoria."
+                                    minlength="8"
+                                    feedback="true"
+                                    toggleMask="true"
+                                    placeholder="Ingrese una contraseña segura"/>
+                        <small class="campo-ayuda">
+                            El usuario deberá cambiar esta contraseña si el sistema marca el cambio como obligatorio.
+                        </small>
+                    </div>
 
-                <p:inputText
-                        id="usernameNuevo"
-                        value="#{usuarioBean.nuevoUsuario.username}"
-                        required="true"
-                        requiredMessage="El usuario es obligatorio."
-                        maxlength="60"
-                        style="width: 100%;"/>
+                    <div class="campo">
+                        <p:outputLabel for="rolNuevo"
+                                       value="Rol de la cuenta"/>
+                        <p:selectOneMenu id="rolNuevo"
+                                         value="#{usuarioBean.nuevoUsuario.rol}"
+                                         required="true"
+                                         requiredMessage="Seleccione un rol.">
+                            <f:selectItem itemLabel="Usuario"
+                                          itemValue="USUARIO"/>
+                            <f:selectItem itemLabel="Invitado"
+                                          itemValue="INVITADO"/>
+                        </p:selectOneMenu>
+                    </div>
 
-            </div>
+                    <div class="campo">
+                        <p:outputLabel for="activoNuevo"
+                                       value="Estado inicial"/>
+                        <div class="estado-nuevo">
+                            <p:selectBooleanCheckbox id="activoNuevo"
+                                                     value="#{usuarioBean.nuevoUsuario.activo}"/>
+                            <p:outputLabel for="activoNuevo"
+                                           value="Cuenta activa"/>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="campo">
+                <div class="acciones-dialogo">
+                    <p:commandButton value="Cancelar"
+                                     type="button"
+                                     icon="pi pi-times"
+                                     onclick="PF('dlgNuevoUsuario').hide()"
+                                     styleClass="ui-button-outlined ui-button-secondary"/>
 
-                <p:outputLabel
-                        for="nombreNuevo"
-                        value="Nombre completo:"/>
-
-                <p:inputText
-                        id="nombreNuevo"
-                        value="#{usuarioBean.nuevoUsuario.nombre}"
-                        required="true"
-                        requiredMessage="El nombre es obligatorio."
-                        maxlength="150"
-                        style="width: 100%;"/>
-
-            </div>
-
-            <div class="campo">
-
-                <p:outputLabel
-                        for="passwordNuevo"
-                        value="Contraseña inicial:"/>
-
-                <p:password
-                        id="passwordNuevo"
-                        value="#{usuarioBean.nuevoUsuario.password}"
-                        required="true"
-                        requiredMessage="La contraseña es obligatoria."
-                        minlength="8"
-                        feedback="true"
-                        toggleMask="true"
-                        style="width: 100%;"/>
-
-            </div>
-
-            <div class="campo">
-
-                <p:outputLabel
-                        for="rolNuevo"
-                        value="Rol:"/>
-
-                <p:selectOneMenu
-                        id="rolNuevo"
-                        value="#{usuarioBean.nuevoUsuario.rol}"
-                        required="true"
-                        requiredMessage="Seleccione un rol."
-                        style="width: 100%;">
-
-                    <f:selectItem
-                            itemLabel="Seleccione"
-                            itemValue="#{null}"
-                            noSelectionOption="true"/>
-
-                    <f:selectItem
-                            itemLabel="Usuario"
-                            itemValue="USUARIO"/>
-
-                    <f:selectItem
-                            itemLabel="Invitado"
-                            itemValue="INVITADO"/>
-
-                </p:selectOneMenu>
-
-            </div>
-
-            <div class="campo">
-
-                <p:selectBooleanCheckbox
-                        id="activoNuevo"
-                        value="#{usuarioBean.nuevoUsuario.activo}"/>
-
-                <p:outputLabel
-                        for="activoNuevo"
-                        value=" Cuenta activa"/>
-
-            </div>
-
-            <div class="botones-dialogo">
-
-                <p:commandButton
-                        value="Cancelar"
-                        icon="pi pi-times"
-                        type="button"
-                        onclick="PF('dlgNuevoUsuario').hide()"
-                        styleClass="ui-button-secondary"
-                        style="margin-right: 8px;"/>
-
-                <p:commandButton
-                        value="Guardar"
-                        icon="pi pi-check"
-                        actionListener="#{usuarioBean.crearUsuario}"
-                        process="@form"
-                        update="@form
-                                :formUsuarios:tablaUsuarios
-                                :formUsuarios:mensajes"
-                        oncomplete="if (!args.validationFailed) {
-                            PF('dlgNuevoUsuario').hide();
-                        }"/>
-
-            </div>
-
+                    <p:commandButton value="Guardar usuario"
+                                     icon="pi pi-check"
+                                     action="#{usuarioBean.crearUsuario}"
+                                     process="@form"
+                                     update=":formUsuarios:panelTabla :formUsuarios:panelResumen :formUsuarios:mensajes panelNuevo mensajesNuevo"
+                                     oncomplete="if (args.operacionExitosa === true) { PF('dlgNuevoUsuario').hide(); }"/>
+                </div>
+            </h:panelGroup>
         </h:form>
-
     </p:dialog>
 
-    <!-- Diálogo para cambiar rol -->
-
-    <p:dialog
-            header="Cambiar rol del usuario"
-            widgetVar="dlgCambiarRol"
-            modal="true"
-            responsive="true"
-            resizable="false"
-            width="420"
-            showEffect="fade"
-            hideEffect="fade">
+    <p:dialog header="Cambiar rol"
+              widgetVar="dlgCambiarRol"
+              modal="true"
+              responsive="true"
+              width="520"
+              closeOnEscape="true"
+              appendTo="@(body)">
 
         <h:form id="formCambiarRol">
+            <h:panelGroup id="panelRol"
+                          layout="block">
+                <p:messages id="mensajesRol"
+                            showDetail="true"
+                            closable="true"/>
 
-            <p:messages
-                    id="mensajesRol"
-                    showDetail="true"
-                    closable="true"/>
+                <div class="usuario-dialogo">
+                    <strong>#{usuarioBean.usuarioSeleccionado.nombre}</strong>
+                    <span>Cuenta: #{usuarioBean.usuarioSeleccionado.username}</span>
+                </div>
 
-            <div class="campo">
+                <div class="campo">
+                    <p:outputLabel for="nuevoRol"
+                                   value="Nuevo rol"/>
+                    <p:selectOneMenu id="nuevoRol"
+                                     value="#{usuarioBean.nuevoRol}"
+                                     required="true"
+                                     requiredMessage="Seleccione un rol.">
+                        <f:selectItem itemLabel="Usuario"
+                                      itemValue="USUARIO"/>
+                        <f:selectItem itemLabel="Invitado"
+                                      itemValue="INVITADO"/>
+                    </p:selectOneMenu>
+                    <small class="campo-ayuda">
+                        Por seguridad, el sistema no permite asignar el rol ADMINISTRADOR desde este módulo.
+                    </small>
+                </div>
 
-                <p:outputLabel value="Usuario:"/>
+                <div class="acciones-dialogo">
+                    <p:commandButton value="Cancelar"
+                                     type="button"
+                                     icon="pi pi-times"
+                                     onclick="PF('dlgCambiarRol').hide()"
+                                     styleClass="ui-button-outlined ui-button-secondary"/>
 
-                <h:outputText
-                        value="#{usuarioBean.usuarioSeleccionado.username}"
-                        style="display: block;
-                               font-weight: bold;
-                               margin-top: 5px;"/>
-
-            </div>
-
-            <div class="campo">
-
-                <p:outputLabel
-                        for="nuevoRol"
-                        value="Nuevo rol:"/>
-
-                <p:selectOneMenu
-                        id="nuevoRol"
-                        value="#{usuarioBean.nuevoRol}"
-                        required="true"
-                        requiredMessage="Seleccione un rol."
-                        style="width: 100%;">
-
-                    <f:selectItem
-                            itemLabel="Usuario"
-                            itemValue="USUARIO"/>
-
-                    <f:selectItem
-                            itemLabel="Invitado"
-                            itemValue="INVITADO"/>
-
-                </p:selectOneMenu>
-
-            </div>
-
-            <div class="botones-dialogo">
-
-                <p:commandButton
-                        value="Cancelar"
-                        icon="pi pi-times"
-                        type="button"
-                        onclick="PF('dlgCambiarRol').hide()"
-                        styleClass="ui-button-secondary"
-                        style="margin-right: 8px;"/>
-
-                <p:commandButton
-                        value="Actualizar rol"
-                        icon="pi pi-save"
-                        actionListener="#{usuarioBean.cambiarRol}"
-                        process="@form"
-                        update="@form
-                                :formUsuarios:tablaUsuarios
-                                :formUsuarios:mensajes"
-                        oncomplete="if (!args.validationFailed) {
-                            PF('dlgCambiarRol').hide();
-                        }"/>
-
-            </div>
-
+                    <p:commandButton value="Guardar rol"
+                                     icon="pi pi-save"
+                                     action="#{usuarioBean.cambiarRol}"
+                                     process="@form"
+                                     update=":formUsuarios:panelTabla :formUsuarios:panelResumen :formUsuarios:mensajes panelRol mensajesRol"
+                                     oncomplete="if (args.operacionExitosa === true) { PF('dlgCambiarRol').hide(); }"/>
+                </div>
+            </h:panelGroup>
         </h:form>
-
     </p:dialog>
 
-</div>
+    <p:dialog header="Restablecer contraseña"
+              widgetVar="dlgPassword"
+              modal="true"
+              responsive="true"
+              width="560"
+              closeOnEscape="true"
+              appendTo="@(body)">
 
+        <h:form id="formPassword">
+            <h:panelGroup id="panelPassword"
+                          layout="block">
+                <p:messages id="mensajesPassword"
+                            showDetail="true"
+                            closable="true"/>
+
+                <div class="usuario-dialogo">
+                    <strong>#{usuarioBean.usuarioSeleccionado.nombre}</strong>
+                    <span>Cuenta: #{usuarioBean.usuarioSeleccionado.username}</span>
+                </div>
+
+                <div class="campo">
+                    <p:outputLabel for="nuevaPassword"
+                                   value="Nueva contraseña"/>
+                    <p:password id="nuevaPassword"
+                                value="#{usuarioBean.cambioPassword.nuevaPassword}"
+                                required="true"
+                                requiredMessage="La nueva contraseña es obligatoria."
+                                minlength="8"
+                                feedback="true"
+                                toggleMask="true"
+                                placeholder="Ingrese una contraseña segura"/>
+                    <small class="campo-ayuda">
+                        Al guardar, todas las sesiones anteriores de esta cuenta serán revocadas.
+                    </small>
+                </div>
+
+                <div class="campo">
+                    <div class="estado-nuevo">
+                        <p:selectBooleanCheckbox id="obligarCambio"
+                                                 value="#{usuarioBean.cambioPassword.obligarCambio}"/>
+                        <p:outputLabel for="obligarCambio"
+                                       value="Obligar al usuario a cambiar la contraseña al ingresar"/>
+                    </div>
+                </div>
+
+                <div class="acciones-dialogo">
+                    <p:commandButton value="Cancelar"
+                                     type="button"
+                                     icon="pi pi-times"
+                                     onclick="PF('dlgPassword').hide()"
+                                     styleClass="ui-button-outlined ui-button-secondary"/>
+
+                    <p:commandButton value="Restablecer contraseña"
+                                     icon="pi pi-key"
+                                     action="#{usuarioBean.cambiarPassword}"
+                                     process="@form"
+                                     update=":formUsuarios:panelTabla :formUsuarios:panelResumen :formUsuarios:mensajes panelPassword mensajesPassword"
+                                     oncomplete="if (args.operacionExitosa === true) { PF('dlgPassword').hide(); }"/>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
 </h:body>
-
 </html>

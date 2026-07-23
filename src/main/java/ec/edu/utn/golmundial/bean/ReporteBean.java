@@ -2,7 +2,12 @@ package ec.edu.utn.golmundial.bean;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +36,13 @@ public class ReporteBean implements Serializable {
     private static final String URL_ESTADISTICAS =
             "http://localhost:8080/golmundial-estadisticas/api/estadisticas/selecciones";
 
+    private static final DateTimeFormatter FORMATO_FECHA =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
-    private String torneo;
+    @Inject
+    private LoginBean loginBean;
+
+    private String torneo = "Copa Mundial de la FIFA 2026";
     private Long roles = 0L;
     private Long usuarios = 0L;
     private Long fases = 0L;
@@ -40,9 +50,10 @@ public class ReporteBean implements Serializable {
     private Long sedes = 0L;
     private Long selecciones = 0L;
     private Long partidos = 0L;
-    private String estado;
+    private String estado = "SIN_DATOS";
 
     private String grupoSeleccionado;
+    private String fechaActualizacion = "Sin actualizar";
 
     private List<EstadisticaSeleccionDTO> estadisticas =
             new ArrayList<>();
@@ -50,13 +61,24 @@ public class ReporteBean implements Serializable {
     @PostConstruct
     public void init() {
 
-        cargarReportes();
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
 
+        cargarReportes();
     }
 
     public void cargarReportes() {
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
         cargarResumen();
         cargarEstadisticas();
+        fechaActualizacion = LocalDateTime.now().format(FORMATO_FECHA);
     }
 
     public void cargarResumen() {
@@ -70,11 +92,10 @@ public class ReporteBean implements Serializable {
             if (respuesta.getStatus()
                     == Response.Status.OK.getStatusCode()) {
 
-                Map<String, Object> datos =
-                        respuesta.readEntity(
-                                new GenericType<Map<String, Object>>() {
-                                }
-                        );
+                Map<String, Object> datos = respuesta.readEntity(
+                        new GenericType<Map<String, Object>>() {
+                        }
+                );
 
                 torneo = obtenerTexto(datos, "torneo");
                 roles = obtenerNumero(datos, "roles");
@@ -85,13 +106,12 @@ public class ReporteBean implements Serializable {
                 selecciones = obtenerNumero(datos, "selecciones");
                 partidos = obtenerNumero(datos, "partidos");
                 estado = obtenerTexto(datos, "estado");
-
                 return;
             }
 
             mostrarErrorRespuesta(
                     respuesta,
-                    "No se pudo cargar el resumen."
+                    "No se pudo cargar el resumen general."
             );
 
         } catch (Exception e) {
@@ -108,6 +128,11 @@ public class ReporteBean implements Serializable {
 
     public void cargarEstadisticas() {
 
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
         try (Client cliente = ClientBuilder.newClient()) {
 
             var destino = cliente.target(URL_ESTADISTICAS);
@@ -117,7 +142,7 @@ public class ReporteBean implements Serializable {
 
                 destino = destino.queryParam(
                         "grupo",
-                        grupoSeleccionado
+                        grupoSeleccionado.trim()
                 );
             }
 
@@ -137,6 +162,10 @@ public class ReporteBean implements Serializable {
                         estadisticas = new ArrayList<>();
                     }
 
+                    ordenarEstadisticasPorGrupo();
+
+                    fechaActualizacion = LocalDateTime.now()
+                            .format(FORMATO_FECHA);
                     return;
                 }
 
@@ -162,9 +191,218 @@ public class ReporteBean implements Serializable {
         }
     }
 
+    private void ordenarEstadisticasPorGrupo() {
+
+        if (estadisticas == null || estadisticas.isEmpty()) {
+            return;
+        }
+
+        estadisticas.sort(
+                Comparator
+                        .comparing(
+                                (EstadisticaSeleccionDTO item) ->
+                                        item.getGrupo() == null
+                                                ? ""
+                                                : item.getGrupo()
+                        )
+                        .thenComparing(
+                                Comparator.comparingInt(
+                                        EstadisticaSeleccionDTO::getPuntos
+                                ).reversed()
+                        )
+                        .thenComparing(
+                                Comparator.comparingInt(
+                                        EstadisticaSeleccionDTO::getDiferenciaGoles
+                                ).reversed()
+                        )
+                        .thenComparing(
+                                Comparator.comparingInt(
+                                        EstadisticaSeleccionDTO::getGolesFavor
+                                ).reversed()
+                        )
+                        .thenComparing(
+                                item -> item.getSeleccion() == null
+                                        ? ""
+                                        : item.getSeleccion()
+                        )
+        );
+    }
+
     public void limpiarFiltro() {
         grupoSeleccionado = null;
         cargarEstadisticas();
+    }
+
+    public int getCantidadEstadisticas() {
+        return estadisticas == null ? 0 : estadisticas.size();
+    }
+
+    public int getPartidosFinalizadosCalculados() {
+
+        if (estadisticas == null || estadisticas.isEmpty()) {
+            return 0;
+        }
+
+        int participaciones = estadisticas.stream()
+                .filter(item -> item != null)
+                .mapToInt(EstadisticaSeleccionDTO::getJugados)
+                .sum();
+
+        return participaciones / 2;
+    }
+
+    public int getTotalGoles() {
+
+        if (estadisticas == null || estadisticas.isEmpty()) {
+            return 0;
+        }
+
+        return estadisticas.stream()
+                .filter(item -> item != null)
+                .mapToInt(EstadisticaSeleccionDTO::getGolesFavor)
+                .sum();
+    }
+
+    public BigDecimal getPromedioGolesPorPartido() {
+
+        int partidosFinalizados = getPartidosFinalizadosCalculados();
+
+        if (partidosFinalizados == 0) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
+
+        return BigDecimal.valueOf(getTotalGoles())
+                .divide(
+                        BigDecimal.valueOf(partidosFinalizados),
+                        2,
+                        RoundingMode.HALF_UP
+                );
+    }
+
+    public EstadisticaSeleccionDTO getLiderPuntos() {
+
+        return estadisticasValidas().stream()
+                .max(Comparator
+                        .comparingInt(EstadisticaSeleccionDTO::getPuntos)
+                        .thenComparingInt(
+                                EstadisticaSeleccionDTO::getDiferenciaGoles
+                        )
+                        .thenComparingInt(
+                                EstadisticaSeleccionDTO::getGolesFavor
+                        ))
+                .orElse(null);
+    }
+
+    public EstadisticaSeleccionDTO getMejorAtaque() {
+
+        return estadisticasValidas().stream()
+                .max(Comparator
+                        .comparingInt(EstadisticaSeleccionDTO::getGolesFavor)
+                        .thenComparingInt(
+                                EstadisticaSeleccionDTO::getDiferenciaGoles
+                        ))
+                .orElse(null);
+    }
+
+    public EstadisticaSeleccionDTO getMejorDefensa() {
+
+        return estadisticasValidas().stream()
+                .filter(item -> item.getJugados() > 0)
+                .min(Comparator
+                        .comparingInt(EstadisticaSeleccionDTO::getGolesContra)
+                        .thenComparing(
+                                Comparator.comparingInt(
+                                        EstadisticaSeleccionDTO::getPuntos
+                                ).reversed()
+                        ))
+                .orElse(null);
+    }
+
+    public EstadisticaSeleccionDTO getMayorDiferencia() {
+
+        return estadisticasValidas().stream()
+                .max(Comparator
+                        .comparingInt(
+                                EstadisticaSeleccionDTO::getDiferenciaGoles
+                        )
+                        .thenComparingInt(
+                                EstadisticaSeleccionDTO::getGolesFavor
+                        ))
+                .orElse(null);
+    }
+
+    public String getNombreLiderPuntos() {
+        return nombreSeleccion(getLiderPuntos());
+    }
+
+    public String getNombreMejorAtaque() {
+        return nombreSeleccion(getMejorAtaque());
+    }
+
+    public String getNombreMejorDefensa() {
+        return nombreSeleccion(getMejorDefensa());
+    }
+
+    public String getNombreMayorDiferencia() {
+        return nombreSeleccion(getMayorDiferencia());
+    }
+
+    public int getPuntosLider() {
+        EstadisticaSeleccionDTO item = getLiderPuntos();
+        return item == null ? 0 : item.getPuntos();
+    }
+
+    public int getGolesMejorAtaque() {
+        EstadisticaSeleccionDTO item = getMejorAtaque();
+        return item == null ? 0 : item.getGolesFavor();
+    }
+
+    public int getGolesMejorDefensa() {
+        EstadisticaSeleccionDTO item = getMejorDefensa();
+        return item == null ? 0 : item.getGolesContra();
+    }
+
+    public int getDiferenciaMayor() {
+        EstadisticaSeleccionDTO item = getMayorDiferencia();
+        return item == null ? 0 : item.getDiferenciaGoles();
+    }
+
+    public boolean isDatosCargados() {
+        return "DATOS_CARGADOS".equalsIgnoreCase(estado);
+    }
+
+    public String getGrupoMostrado() {
+
+        if (grupoSeleccionado == null
+                || grupoSeleccionado.isBlank()) {
+            return "Todos los grupos";
+        }
+
+        return "Grupo " + grupoSeleccionado.toUpperCase();
+    }
+
+    private List<EstadisticaSeleccionDTO> estadisticasValidas() {
+
+        if (estadisticas == null || estadisticas.isEmpty()) {
+            return List.of();
+        }
+
+        return estadisticas.stream()
+                .filter(item -> item != null)
+                .toList();
+    }
+
+    private String nombreSeleccion(
+            EstadisticaSeleccionDTO item
+    ) {
+
+        if (item == null
+                || item.getSeleccion() == null
+                || item.getSeleccion().isBlank()) {
+            return "Sin datos";
+        }
+
+        return item.getSeleccion();
     }
 
     private Long obtenerNumero(
@@ -228,26 +466,29 @@ public class ReporteBean implements Serializable {
         );
     }
 
+    private boolean sesionValida() {
+
+        return loginBean != null
+                && loginBean.isAdministrador()
+                && loginBean.getAuthorizationHeader() != null;
+    }
+
     private void redirigirAlLogin() {
 
-        FacesContext contexto =
-                FacesContext.getCurrentInstance();
+        FacesContext contexto = FacesContext.getCurrentInstance();
 
         if (contexto == null
                 || contexto.getResponseComplete()) {
             return;
         }
 
-        String ruta =
-                contexto.getExternalContext()
-                        .getRequestContextPath()
-                        + "/login.xhtml";
+        String ruta = contexto.getExternalContext()
+                .getRequestContextPath()
+                + "/login.xhtml";
 
         try {
 
-            contexto.getExternalContext()
-                    .redirect(ruta);
-
+            contexto.getExternalContext().redirect(ruta);
             contexto.responseComplete();
 
         } catch (IOException e) {
@@ -261,8 +502,7 @@ public class ReporteBean implements Serializable {
             String detalle
     ) {
 
-        FacesContext contexto =
-                FacesContext.getCurrentInstance();
+        FacesContext contexto = FacesContext.getCurrentInstance();
 
         if (contexto != null) {
 
@@ -321,6 +561,10 @@ public class ReporteBean implements Serializable {
             String grupoSeleccionado
     ) {
         this.grupoSeleccionado = grupoSeleccionado;
+    }
+
+    public String getFechaActualizacion() {
+        return fechaActualizacion;
     }
 
     public List<EstadisticaSeleccionDTO> getEstadisticas() {

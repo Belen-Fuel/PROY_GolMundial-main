@@ -6,659 +6,1338 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
-    <f:metadata>
-        <f:viewAction
-                action="#{loginBean.verificarAccesoAdministrador}"
-                onPostback="false"/>
-    </f:metadata>
-
 <h:head>
-
     <title>Reportes - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
     <style>
-
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #1e293b;
+        * {
+            box-sizing: border-box;
         }
 
-        .barra {
-            background-color: #0f172a;
-            color: white;
-            padding: 18px 14px;
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #172033;
+        }
+
+        body .ui-button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .aplicacion {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .barra-lateral {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px 18px;
+            background: linear-gradient(180deg, #0b1732 0%, #132752 100%);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 4px 8px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .marca-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #2f80ed, #1fd1a5);
+            box-shadow: 0 10px 24px rgba(24, 144, 255, 0.28);
+            font-size: 23px;
         }
 
         .marca h1 {
             margin: 0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
+        .marca span {
+            display: block;
+            margin-top: 4px;
+            color: #a9b8d6;
+            font-size: 12px;
+        }
+
+        .titulo-menu {
+            margin: 24px 10px 10px;
+            color: #8094bc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: grid;
+            gap: 7px;
+        }
+
+        .menu-item {
+            min-height: 46px;
+            padding: 0 14px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #dce5f5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.18s ease;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+
+        .menu-item.activo {
+            background: linear-gradient(90deg, #2c7df0, #365fdb);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 103, 226, 0.26);
+        }
+
+        .pie-lateral {
+            margin-top: auto;
+            padding: 18px 10px 2px;
+            color: #8295ba;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .area-principal {
+            min-width: 0;
+        }
+
+        .barra-superior {
+            min-height: 76px;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #e5eaf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+        }
+
+        .encabezado-pagina h2 {
+            margin: 0;
             font-size: 22px;
         }
 
-        .marca small {
-            color: #cbd5e1;
+        .encabezado-pagina p {
+            margin: 5px 0 0;
+            color: #758198;
+            font-size: 13px;
         }
 
-        .menu {
+        .acciones-superiores {
             display: flex;
             align-items: center;
-            gap: 7px;
-            flex-wrap: wrap;
-        }
-
-       .form-menu {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            justify-content: flex-end;
             gap: 10px;
-            margin-top: 12px;
-        }
-
-        .menu {
-            display: flex;
-            align-items: center;
-            gap: 7px;
             flex-wrap: wrap;
         }
 
-        .sesion-fila {
+        .usuario-conectado {
+            min-height: 43px;
+            padding: 7px 12px 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
             display: flex;
             align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #e8f1ff;
+            color: #2563eb;
+        }
+
+        .usuario-datos strong,
+        .usuario-datos small {
+            display: block;
+        }
+
+        .usuario-datos strong {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .usuario-datos small {
+            margin-top: 2px;
+            color: #8792a6;
+            font-size: 11px;
+        }
+
+        .contenido {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 30px 40px;
+        }
+
+        .hero-reportes {
+            position: relative;
+            overflow: hidden;
+            min-height: 190px;
+            padding: 30px;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #102759 0%, #1e4fbb 58%, #2577ec 100%);
+            color: #ffffff;
+            box-shadow: 0 15px 38px rgba(19, 67, 154, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .hero-reportes::before,
+        .hero-reportes::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-reportes::before {
+            width: 260px;
+            height: 260px;
+            right: -70px;
+            top: -105px;
+        }
+
+        .hero-reportes::after {
+            width: 150px;
+            height: 150px;
+            right: 210px;
+            bottom: -110px;
+        }
+
+        .hero-texto,
+        .hero-estado {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.13);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .hero-texto h3 {
+            margin: 17px 0 8px;
+            font-size: 31px;
+        }
+
+        .hero-texto p {
+            max-width: 650px;
+            margin: 0;
+            color: #d6e4ff;
+            line-height: 1.65;
+        }
+
+        .hero-estado {
+            min-width: 230px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 17px;
+            background: rgba(6, 23, 56, 0.25);
+            backdrop-filter: blur(6px);
+        }
+
+        .estado-linea {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+        }
+
+        .estado-punto {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #45e6a8;
+            box-shadow: 0 0 0 6px rgba(69, 230, 168, 0.12);
+        }
+
+        .hero-estado small {
+            display: block;
+            margin-top: 12px;
+            color: #c9daf8;
+            line-height: 1.5;
+        }
+
+        .resumen-general {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 22px;
+        }
+
+        .tarjeta-resumen {
+            min-height: 135px;
+            padding: 20px;
+            border: 1px solid #e4eaf3;
+            border-radius: 17px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(28, 55, 98, 0.06);
+        }
+
+        .tarjeta-cabecera {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .tarjeta-icono {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+        }
+
+        .icono-azul {
+            background: #e8f1ff;
+            color: #2268dd;
+        }
+
+        .icono-verde {
+            background: #e8fbf3;
+            color: #119166;
+        }
+
+        .icono-violeta {
+            background: #f1ebff;
+            color: #7651d7;
+        }
+
+        .icono-naranja {
+            background: #fff1df;
+            color: #cf7610;
+        }
+
+        .tarjeta-resumen strong {
+            display: block;
+            margin-top: 18px;
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .tarjeta-resumen span {
+            display: block;
+            margin-top: 8px;
+            color: #758198;
+            font-size: 13px;
+        }
+
+        .resumen-secundario {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .dato-secundario {
+            padding: 17px 18px;
+            border: 1px solid #e4eaf3;
+            border-radius: 15px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .dato-secundario div {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: #637087;
+            font-weight: 600;
+        }
+
+        .dato-secundario i {
+            color: #2d72df;
+        }
+
+        .dato-secundario strong {
+            font-size: 21px;
+        }
+
+        .seccion-titulo {
+            margin: 28px 0 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 15px;
+        }
+
+        .seccion-titulo h3 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .seccion-titulo p {
+            margin: 5px 0 0;
+            color: #7b879a;
+            font-size: 13px;
+        }
+
+        .indicadores-deportivos {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .indicador-deportivo {
+            min-height: 150px;
+            padding: 20px;
+            border: 1px solid #e4eaf3;
+            border-radius: 17px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(28, 55, 98, 0.05);
+        }
+
+        .indicador-deportivo .etiqueta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #718096;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .indicador-deportivo h4 {
+            margin: 17px 0 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 18px;
+        }
+
+        .indicador-deportivo strong {
+            color: #2469d9;
+            font-size: 25px;
+        }
+
+        .indicador-deportivo small {
+            margin-left: 5px;
+            color: #7b879a;
+        }
+
+        .barra-herramientas {
+            margin-top: 25px;
+            padding: 16px;
+            border: 1px solid #e4eaf3;
+            border-radius: 17px;
+            background: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 8px 22px rgba(28, 55, 98, 0.05);
+        }
+
+        .filtro-grupo {
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filtro-grupo i {
+            color: #2b70dc;
+        }
+
+        .filtro-grupo .ui-selectonemenu {
+            width: 210px;
+        }
+
+        .acciones-filtro {
+            display: flex;
             gap: 9px;
             flex-wrap: wrap;
         }
 
-        .sesion-usuario {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .contenedor {
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-       .encabezado {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 30px 28px;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
+        .buscador-tabla {
             position: relative;
-            overflow: hidden;
+            min-width: 290px;
         }
 
-        .encabezado::after {
-            content: "";
+        .buscador-tabla i {
             position: absolute;
-            width: 230px;
-            height: 230px;
-            right: -80px;
-            top: -95px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            color: #8b97aa;
         }
 
-        .encabezado h1 {
+        .buscador-tabla .ui-inputfield {
+            width: 100%;
+            padding-left: 39px;
+            border-radius: 11px;
+        }
+
+        .panel-tabla {
+            margin-top: 16px;
+            overflow: hidden;
+            border: 1px solid #e4eaf3;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(28, 55, 98, 0.05);
+        }
+
+        .panel-tabla-cabecera {
+            padding: 20px;
+            border-bottom: 1px solid #e8edf4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .panel-tabla-cabecera h3 {
             margin: 0;
-            font-size: 28px;
+            font-size: 18px;
+        }
+
+        .panel-tabla-cabecera p {
+            margin: 5px 0 0;
+            color: #7b879a;
+            font-size: 13px;
+        }
+
+        .contador-registros {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #edf4ff;
+            color: #2169dd;
+            font-size: 12px;
             font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tabla-reportes .ui-datatable-tablewrapper {
+            overflow-x: auto;
+        }
+
+        .tabla-reportes table {
+            min-width: 1160px;
+        }
+
+        .tabla-reportes .ui-datatable-thead > tr > th {
+            padding: 14px 10px;
+            background: #f8fafc;
+            color: #4a5568;
+            border-color: #e7ebf1;
+            font-size: 12px;
+        }
+
+        .tabla-reportes .ui-datatable-data > tr > td {
+            padding: 13px 10px;
+            border-color: #edf0f5;
+            font-size: 13px;
+        }
+
+        .tabla-reportes .ui-rowgroup-header > td {
+            padding: 0 !important;
+            border-top: 14px solid #f4f7fb !important;
+            border-bottom: 1px solid #dbe5f2 !important;
+            background: #ffffff !important;
+        }
+
+        .encabezado-grupo-tabla {
+            min-height: 58px;
+            padding: 13px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            background: linear-gradient(90deg, #102759 0%, #1f56bd 100%);
+            color: #ffffff;
+        }
+
+        .grupo-tabla-identidad {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .grupo-tabla-letra {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .grupo-tabla-texto strong,
+        .grupo-tabla-texto small {
+            display: block;
+        }
+
+        .grupo-tabla-texto strong {
+            font-size: 15px;
+        }
+
+        .grupo-tabla-texto small {
+            margin-top: 3px;
+            color: rgba(255, 255, 255, 0.76);
+            font-size: 11px;
+        }
+
+        .grupo-tabla-ayuda {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tabla-reportes .ui-rowgroup-toggler {
+            color: #ffffff !important;
+        }
+
+        .seleccion-celda {
             display: flex;
             align-items: center;
             gap: 10px;
-            position: relative;
-            z-index: 1;
         }
 
-        .encabezado p {
-            margin: 12px 0 0;
-            font-size: 14px;
-            color: #dbeafe;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
-        }
-
-        .acciones{
-            background:#fff;
-            border-radius:14px;
-            padding:16px 20px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:22px;
-            box-shadow:0 4px 15px rgba(0,0,0,.08);
-        }
-
-        .resumen {
+        .codigo-seleccion {
+            min-width: 42px;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: 9px;
             display: grid;
-            grid-template-columns:
-                    repeat(auto-fit, minmax(170px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
+            place-items: center;
+            background: #edf4ff;
+            color: #2268da;
+            font-size: 11px;
+            font-weight: 800;
         }
 
-        .tarjeta-resumen {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow:
-                    0 3px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .tarjeta-resumen i {
+        .seleccion-celda strong,
+        .seleccion-celda small {
             display: block;
-            font-size: 28px;
-            color: #2563eb;
-            margin-bottom: 10px;
         }
 
-        .tarjeta-resumen h3 {
-            margin: 0;
-            font-size: 27px;
+        .seleccion-celda small {
+            margin-top: 3px;
+            color: #8a96a8;
+            font-size: 11px;
         }
 
-        .tarjeta-resumen p {
-            margin: 5px 0 0;
-            color: #64748b;
-        }
-
-        .estado-datos {
-            background-color: white;
-            padding: 12px 18px;
+        .grupo-badge {
+            display: inline-flex;
+            min-width: 34px;
+            justify-content: center;
+            padding: 5px 8px;
             border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 5px solid #15803d;
+            background: #eef2f7;
+            color: #46536a;
+            font-weight: 700;
         }
 
-        .filtros {
-            background-color: white;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-            flex-wrap: wrap;
-
-            box-shadow:
-                    0 3px 10px rgba(0, 0, 0, 0.07);
+        .numero {
+            text-align: center;
+            font-variant-numeric: tabular-nums;
         }
 
-        .campo-filtro {
-            min-width: 220px;
-        }
-
-        .campo-filtro label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
+        .puntos {
+            color: #1d5ec8;
+            font-size: 15px;
+            font-weight: 800;
         }
 
         .positivo {
-            color: #15803d;
-            font-weight: bold;
+            color: #11845f;
+            font-weight: 700;
         }
 
         .negativo {
-            color: #b91c1c;
-            font-weight: bold;
+            color: #c24141;
+            font-weight: 700;
         }
 
-        .tabla-reportes {
-            min-width: 1150px;
+        .neutro {
+            color: #68758a;
+            font-weight: 700;
         }
 
-        @media (max-width: 700px) {
+        @media (max-width: 1180px) {
+            .resumen-general,
+            .indicadores-deportivos {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
 
-            .encabezado {
+        @media (max-width: 900px) {
+            .aplicacion {
+                display: block;
+            }
+
+            .barra-lateral {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .menu {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .pie-lateral {
+                display: none;
+            }
+
+            .barra-superior {
+                position: relative;
                 align-items: flex-start;
+                flex-direction: column;
+                padding: 17px 20px;
             }
 
-            .filtros {
-                align-items: stretch;
+            .acciones-superiores {
+                width: 100%;
+                justify-content: flex-start;
             }
 
-            .campo-filtro {
+            .contenido {
+                padding: 22px 20px 35px;
+            }
+
+            .hero-reportes {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .hero-estado {
                 width: 100%;
             }
         }
 
+        @media (max-width: 680px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
+            .resumen-general,
+            .resumen-secundario,
+            .indicadores-deportivos {
+                grid-template-columns: 1fr;
+            }
+
+            .contenido {
+                padding: 16px 12px 28px;
+            }
+
+            .hero-reportes {
+                padding: 23px;
+                border-radius: 17px;
+            }
+
+            .hero-texto h3 {
+                font-size: 25px;
+            }
+
+            .barra-herramientas,
+            .panel-tabla-cabecera {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .buscador-tabla,
+            .filtro-grupo,
+            .filtro-grupo .ui-selectonemenu {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .acciones-filtro {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .acciones-filtro .ui-button {
+                width: 100%;
+            }
+        }
     </style>
-
 </h:head>
+
 <h:body>
+    <div class="aplicacion">
+        <aside class="barra-lateral">
+            <div class="marca">
+                <div class="marca-icono">
+                    <i class="pi pi-chart-bar"></i>
+                </div>
 
-<div class="barra">
+                <div>
+                    <h1>UTN GolMundial</h1>
+                    <span>Administración 2026</span>
+                </div>
+            </div>
 
-    <div class="marca">
-        <h1>UTN GolMundial 2026</h1>
-        <small>Panel administrativo del torneo</small>
+            <div class="titulo-menu">Menú principal</div>
+
+            <nav class="menu">
+                <h:link outcome="/dashboard.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:link>
+
+                <h:link outcome="/partidos.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Partidos</span>
+                </h:link>
+
+                <h:link outcome="/selecciones.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-flag"></i>
+                    <span>Selecciones</span>
+                </h:link>
+
+                <h:link outcome="/sedes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-map-marker"></i>
+                    <span>Sedes</span>
+                </h:link>
+
+                <h:link outcome="/usuarios.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-users"></i>
+                    <span>Usuarios</span>
+                </h:link>
+
+                <h:link outcome="/reportes.xhtml"
+                        styleClass="menu-item activo">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Reportes</span>
+                </h:link>
+
+                <h:link outcome="/auditoria.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-book"></i>
+                    <span>Auditoría</span>
+                </h:link>
+
+                <h:link outcome="/publico/inicio.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-globe"></i>
+                    <span>Portal público</span>
+                </h:link>
+            </nav>
+
+            <div class="pie-lateral">
+                Resumen ejecutivo y rendimiento deportivo del torneo.
+            </div>
+        </aside>
+
+        <main class="area-principal">
+            <header class="barra-superior">
+                <div class="encabezado-pagina">
+                    <h2>Reportes y estadísticas</h2>
+                    <p>Consulte el estado general y el rendimiento acumulado del torneo.</p>
+                </div>
+
+                <div class="acciones-superiores">
+                    <div class="usuario-conectado">
+                        <div class="avatar">
+                            <i class="pi pi-user"></i>
+                        </div>
+
+                        <div class="usuario-datos">
+                            <strong>#{loginBean.usuario.nombre}</strong>
+                            <small>#{loginBean.usuario.rol}</small>
+                        </div>
+                    </div>
+
+                    <p:button value="Ver portal"
+                              icon="pi pi-external-link"
+                              outcome="/publico/inicio.xhtml"
+                              styleClass="ui-button-outlined"/>
+
+                    <h:form id="formSesion">
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+                    </h:form>
+                </div>
+            </header>
+
+            <div class="contenido">
+                <h:form id="formReportes">
+                    <p:growl id="mensajes"
+                             showDetail="true"
+                             life="5000"/>
+
+                    <h:panelGroup id="panelContenido"
+                                  layout="block">
+                        <section class="hero-reportes">
+                            <div class="hero-texto">
+                                <span class="hero-etiqueta">
+                                    <i class="pi pi-chart-line"></i>
+                                    Centro de información
+                                </span>
+
+                                <h3>Resumen ejecutivo del torneo</h3>
+
+                                <p>
+                                    Visualice los registros generales, los indicadores
+                                    deportivos y el desempeño acumulado de las selecciones
+                                    participantes en #{reporteBean.torneo}.
+                                </p>
+                            </div>
+
+                            <div class="hero-estado">
+                                <div class="estado-linea">
+                                    <span class="estado-punto"></span>
+                                    <span>
+                                        #{reporteBean.datosCargados
+                                        ? 'Datos disponibles'
+                                        : 'Revisión requerida'}
+                                    </span>
+                                </div>
+
+                                <small>
+                                    Vista: #{reporteBean.grupoMostrado}<br/>
+                                    Última actualización: #{reporteBean.fechaActualizacion}
+                                </small>
+                            </div>
+                        </section>
+
+                        <section class="resumen-general">
+                            <div class="tarjeta-resumen">
+                                <div class="tarjeta-cabecera">
+                                    <span>Usuarios</span>
+                                    <div class="tarjeta-icono icono-azul">
+                                        <i class="pi pi-users"></i>
+                                    </div>
+                                </div>
+                                <strong>#{reporteBean.usuarios}</strong>
+                                <span>Cuentas registradas en el sistema</span>
+                            </div>
+
+                            <div class="tarjeta-resumen">
+                                <div class="tarjeta-cabecera">
+                                    <span>Selecciones</span>
+                                    <div class="tarjeta-icono icono-verde">
+                                        <i class="pi pi-flag"></i>
+                                    </div>
+                                </div>
+                                <strong>#{reporteBean.selecciones}</strong>
+                                <span>Equipos participantes cargados</span>
+                            </div>
+
+                            <div class="tarjeta-resumen">
+                                <div class="tarjeta-cabecera">
+                                    <span>Partidos</span>
+                                    <div class="tarjeta-icono icono-violeta">
+                                        <i class="pi pi-calendar"></i>
+                                    </div>
+                                </div>
+                                <strong>#{reporteBean.partidos}</strong>
+                                <span>Encuentros registrados en el torneo</span>
+                            </div>
+
+                            <div class="tarjeta-resumen">
+                                <div class="tarjeta-cabecera">
+                                    <span>Sedes</span>
+                                    <div class="tarjeta-icono icono-naranja">
+                                        <i class="pi pi-map-marker"></i>
+                                    </div>
+                                </div>
+                                <strong>#{reporteBean.sedes}</strong>
+                                <span>Estadios y ciudades disponibles</span>
+                            </div>
+                        </section>
+
+                        <section class="resumen-secundario">
+                            <div class="dato-secundario">
+                                <div>
+                                    <i class="pi pi-th-large"></i>
+                                    <span>Grupos configurados</span>
+                                </div>
+                                <strong>#{reporteBean.grupos}</strong>
+                            </div>
+
+                            <div class="dato-secundario">
+                                <div>
+                                    <i class="pi pi-sitemap"></i>
+                                    <span>Fases del torneo</span>
+                                </div>
+                                <strong>#{reporteBean.fases}</strong>
+                            </div>
+
+                            <div class="dato-secundario">
+                                <div>
+                                    <i class="pi pi-id-card"></i>
+                                    <span>Roles del sistema</span>
+                                </div>
+                                <strong>#{reporteBean.roles}</strong>
+                            </div>
+                        </section>
+
+                        <div class="seccion-titulo">
+                            <div>
+                                <h3>Indicadores deportivos</h3>
+                                <p>Valores calculados con los resultados oficiales disponibles.</p>
+                            </div>
+                        </div>
+
+                        <section class="indicadores-deportivos">
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-check-circle"></i>
+                                    Partidos finalizados
+                                </div>
+                                <h4>Encuentros computados</h4>
+                                <strong>#{reporteBean.partidosFinalizadosCalculados}</strong>
+                                <small>resultados</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-bolt"></i>
+                                    Producción ofensiva
+                                </div>
+                                <h4>Total de goles</h4>
+                                <strong>#{reporteBean.totalGoles}</strong>
+                                <small>goles</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-chart-bar"></i>
+                                    Promedio del torneo
+                                </div>
+                                <h4>Goles por partido</h4>
+                                <strong>#{reporteBean.promedioGolesPorPartido}</strong>
+                                <small>promedio</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-list"></i>
+                                    Registros visibles
+                                </div>
+                                <h4>Selecciones analizadas</h4>
+                                <strong>#{reporteBean.cantidadEstadisticas}</strong>
+                                <small>equipos</small>
+                            </div>
+                        </section>
+
+                        <div class="seccion-titulo">
+                            <div>
+                                <h3>Destacados del rendimiento</h3>
+                                <p>Comparación automática de los datos mostrados actualmente.</p>
+                            </div>
+                        </div>
+
+                        <section class="indicadores-deportivos">
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-star-fill"></i>
+                                    Mayor puntaje
+                                </div>
+                                <h4>#{reporteBean.nombreLiderPuntos}</h4>
+                                <strong>#{reporteBean.puntosLider}</strong>
+                                <small>puntos</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-send"></i>
+                                    Mejor ataque
+                                </div>
+                                <h4>#{reporteBean.nombreMejorAtaque}</h4>
+                                <strong>#{reporteBean.golesMejorAtaque}</strong>
+                                <small>goles a favor</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-shield"></i>
+                                    Mejor defensa
+                                </div>
+                                <h4>#{reporteBean.nombreMejorDefensa}</h4>
+                                <strong>#{reporteBean.golesMejorDefensa}</strong>
+                                <small>goles recibidos</small>
+                            </div>
+
+                            <div class="indicador-deportivo">
+                                <div class="etiqueta">
+                                    <i class="pi pi-sort-amount-up"></i>
+                                    Mayor diferencia
+                                </div>
+                                <h4>#{reporteBean.nombreMayorDiferencia}</h4>
+                                <strong>
+                                    <h:outputText value="+#{reporteBean.diferenciaMayor}"
+                                                  rendered="#{reporteBean.diferenciaMayor > 0}"/>
+                                    <h:outputText value="#{reporteBean.diferenciaMayor}"
+                                                  rendered="#{reporteBean.diferenciaMayor le 0}"/>
+                                </strong>
+                                <small>diferencia de gol</small>
+                            </div>
+                        </section>
+
+                        <section class="barra-herramientas">
+                            <div class="buscador-tabla">
+                                <i class="pi pi-search"></i>
+                                <p:inputText id="busquedaGlobal"
+                                             placeholder="Buscar selección o confederación..."
+                                             onkeyup="document.getElementById('formReportes:tablaEstadisticas:globalFilter').value=this.value; PF('tablaReportes').filter()"/>
+                            </div>
+
+                            <div class="filtro-grupo">
+                                <i class="pi pi-filter"></i>
+
+                                <p:selectOneMenu id="grupo"
+                                                 value="#{reporteBean.grupoSeleccionado}">
+                                    <f:selectItem itemLabel="Todos los grupos"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItem itemLabel="Grupo A" itemValue="A"/>
+                                    <f:selectItem itemLabel="Grupo B" itemValue="B"/>
+                                    <f:selectItem itemLabel="Grupo C" itemValue="C"/>
+                                    <f:selectItem itemLabel="Grupo D" itemValue="D"/>
+                                    <f:selectItem itemLabel="Grupo E" itemValue="E"/>
+                                    <f:selectItem itemLabel="Grupo F" itemValue="F"/>
+                                    <f:selectItem itemLabel="Grupo G" itemValue="G"/>
+                                    <f:selectItem itemLabel="Grupo H" itemValue="H"/>
+                                    <f:selectItem itemLabel="Grupo I" itemValue="I"/>
+                                    <f:selectItem itemLabel="Grupo J" itemValue="J"/>
+                                    <f:selectItem itemLabel="Grupo K" itemValue="K"/>
+                                    <f:selectItem itemLabel="Grupo L" itemValue="L"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="acciones-filtro">
+                                <p:commandButton value="Aplicar"
+                                                 icon="pi pi-filter"
+                                                 action="#{reporteBean.cargarEstadisticas}"
+                                                 process="@this grupo"
+                                                 update=":formReportes:panelContenido :formReportes:mensajes"/>
+
+                                <p:commandButton value="Limpiar"
+                                                 icon="pi pi-times"
+                                                 action="#{reporteBean.limpiarFiltro}"
+                                                 process="@this"
+                                                 update=":formReportes:panelContenido :formReportes:mensajes"
+                                                 styleClass="ui-button-outlined ui-button-secondary"/>
+
+                                <p:commandButton value="Actualizar todo"
+                                                 icon="pi pi-refresh"
+                                                 action="#{reporteBean.cargarReportes}"
+                                                 process="@this"
+                                                 update=":formReportes:panelContenido :formReportes:mensajes"
+                                                 styleClass="ui-button-outlined"/>
+                            </div>
+                        </section>
+
+                        <section class="panel-tabla">
+                            <div class="panel-tabla-cabecera">
+                                <div>
+                                    <h3>Clasificación organizada por grupos</h3>
+                                    <p>
+                                        Cada grupo se presenta por separado y ordenado por puntos, diferencia de gol y goles a favor.
+                                    </p>
+                                </div>
+
+                                <span class="contador-registros">
+                                    #{reporteBean.cantidadEstadisticas} registros
+                                </span>
+                            </div>
+
+                            <p:dataTable id="tablaEstadisticas"
+                                         widgetVar="tablaReportes"
+                                         value="#{reporteBean.estadisticas}"
+                                         var="e"
+                                         rowKey="#{e.seleccionId}"
+                                         sortBy="#{e.grupo}"
+                                         paginator="true"
+                                         rows="12"
+                                         rowsPerPageTemplate="12,24,48"
+                                         paginatorPosition="bottom"
+                                         responsiveLayout="scroll"
+                                         emptyMessage="No existen estadísticas disponibles."
+                                         styleClass="tabla-reportes">
+
+                                <f:facet name="header">
+                                    <p:inputText id="globalFilter"
+                                                 style="display:none;"/>
+                                </f:facet>
+
+                                <p:headerRow field="grupo"
+                                             expandable="true"
+                                             expanded="true">
+                                    <p:column colspan="9">
+                                        <div class="encabezado-grupo-tabla">
+                                            <div class="grupo-tabla-identidad">
+                                                <span class="grupo-tabla-letra">
+                                                    #{e.grupo}
+                                                </span>
+
+                                                <div class="grupo-tabla-texto">
+                                                    <strong>Grupo #{e.grupo}</strong>
+                                                    <small>Tabla de posiciones del grupo</small>
+                                                </div>
+                                            </div>
+
+                                            <span class="grupo-tabla-ayuda">
+                                                Puede contraer o expandir este grupo
+                                            </span>
+                                        </div>
+                                    </p:column>
+                                </p:headerRow>
+
+                                <p:column headerText="Selección"
+                                          filterBy="#{e.seleccion} #{e.codigoFifa} #{e.confederacion}"
+                                          filterMatchMode="contains"
+                                          sortBy="#{e.seleccion}"
+                                          style="width:260px;min-width:260px;">
+                                    <div class="seleccion-celda">
+                                        <span class="codigo-seleccion">
+                                            #{e.codigoFifa}
+                                        </span>
+
+                                        <div>
+                                            <strong>#{e.seleccion}</strong>
+                                            <small>#{e.confederacion}</small>
+                                        </div>
+                                    </div>
+                                </p:column>
+
+                                <p:column headerText="PJ"
+                                          sortBy="#{e.jugados}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.jugados}</span>
+                                </p:column>
+
+                                <p:column headerText="PG"
+                                          sortBy="#{e.ganados}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.ganados}</span>
+                                </p:column>
+
+                                <p:column headerText="PE"
+                                          sortBy="#{e.empatados}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.empatados}</span>
+                                </p:column>
+
+                                <p:column headerText="PP"
+                                          sortBy="#{e.perdidos}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.perdidos}</span>
+                                </p:column>
+
+                                <p:column headerText="GF"
+                                          sortBy="#{e.golesFavor}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.golesFavor}</span>
+                                </p:column>
+
+                                <p:column headerText="GC"
+                                          sortBy="#{e.golesContra}"
+                                          style="width:70px;min-width:70px;text-align:center;">
+                                    <span class="numero">#{e.golesContra}</span>
+                                </p:column>
+
+                                <p:column headerText="DG"
+                                          sortBy="#{e.diferenciaGoles}"
+                                          style="width:80px;min-width:80px;text-align:center;">
+                                    <h:outputText value="+#{e.diferenciaGoles}"
+                                                  rendered="#{e.diferenciaGoles > 0}"
+                                                  styleClass="positivo"/>
+                                    <h:outputText value="#{e.diferenciaGoles}"
+                                                  rendered="#{e.diferenciaGoles lt 0}"
+                                                  styleClass="negativo"/>
+                                    <h:outputText value="0"
+                                                  rendered="#{e.diferenciaGoles == 0}"
+                                                  styleClass="neutro"/>
+                                </p:column>
+
+                                <p:column headerText="PTS"
+                                          sortBy="#{e.puntos}"
+                                          style="width:80px;min-width:80px;text-align:center;">
+                                    <span class="puntos">#{e.puntos}</span>
+                                </p:column>
+                            </p:dataTable>
+                        </section>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </main>
     </div>
-
-   <h:form id="formMenu" styleClass="form-menu">
-
-    <div class="menu">
-
-        <p:button
-                value="Panel"
-                icon="pi pi-home"
-                href="#{request.contextPath}/dashboard.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Partidos"
-                icon="pi pi-calendar"
-                href="#{request.contextPath}/partidos.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Selecciones"
-                icon="pi pi-flag"
-                href="#{request.contextPath}/selecciones.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Sedes"
-                icon="pi pi-map-marker"
-                href="#{request.contextPath}/sedes.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Usuarios"
-                icon="pi pi-users"
-                href="#{request.contextPath}/usuarios.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Auditoría"
-                icon="pi pi-history"
-                href="#{request.contextPath}/auditoria.xhtml"
-                styleClass="ui-button-outlined"/>
-
-        <p:button
-                value="Reportes"
-                icon="pi pi-chart-bar"
-                href="#{request.contextPath}/reportes.xhtml"/>
-
-    </div>
-
-
-   <div class="sesion-fila">
-
-        <span class="sesion-usuario">
-            <i class="pi pi-user"></i>
-            <h:outputText
-                    value="#{empty loginBean.usuario.nombre
-                    ? 'Administrador del Torneo'
-                    : loginBean.usuario.nombre}"/>
-        </span>
-
-        <p:commandButton
-                value="Cerrar sesión"
-                icon="pi pi-sign-out"
-                action="#{loginBean.cerrarSesion}"
-                ajax="false"
-                styleClass="ui-button-danger"/>
-
-    </div>
-
-</h:form>
-
-</div>
-
-<div class="contenedor">
-
-    <div class="encabezado">
-
-        <div>
-
-            <h1>
-                <i class="pi pi-chart-bar"></i>
-                Reportes básicos
-            </h1>
-
-            <p>
-                Consulta estadísticas y datos generales de la Copa Mundial de la FIFA 2026.
-            </p>
-
-        </div>
-
-    </div>
-
-    <h:form id="formReportes">
-
-        <p:growl
-                id="mensajes"
-                showDetail="true"
-                life="5000"/>
-
-        <div class="estado-datos">
-
-            <strong>Estado de los datos:</strong>
-
-            <h:outputText
-                    value="#{reporteBean.estado == 'DATOS_CARGADOS'
-                    ? ' Datos cargados correctamente'
-                    : reporteBean.estado}"/>
-
-        </div>
-
-        <div class="resumen">
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-users"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.usuarios}"/>
-                </h3>
-
-                <p>Usuarios</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-id-card"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.roles}"/>
-                </h3>
-
-                <p>Roles</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-flag"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.selecciones}"/>
-                </h3>
-
-                <p>Selecciones</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-calendar"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.partidos}"/>
-                </h3>
-
-                <p>Partidos</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-map-marker"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.sedes}"/>
-                </h3>
-
-                <p>Sedes</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-th-large"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.grupos}"/>
-                </h3>
-
-                <p>Grupos</p>
-
-            </div>
-
-            <div class="tarjeta-resumen">
-
-                <i class="pi pi-sitemap"></i>
-
-                <h3>
-                    <h:outputText
-                            value="#{reporteBean.fases}"/>
-                </h3>
-
-                <p>Fases</p>
-
-            </div>
-
-        </div>
-
-        <div class="filtros">
-
-            <div class="campo-filtro">
-
-                <p:outputLabel
-                        for="grupo"
-                        value="Filtrar por grupo:"/>
-
-                <p:selectOneMenu
-                        id="grupo"
-                        value="#{reporteBean.grupoSeleccionado}"
-                        style="width: 100%;">
-
-                    <f:selectItem
-                            itemLabel="Todos los grupos"
-                            itemValue="#{null}"/>
-
-                    <f:selectItem itemLabel="Grupo A" itemValue="A"/>
-                    <f:selectItem itemLabel="Grupo B" itemValue="B"/>
-                    <f:selectItem itemLabel="Grupo C" itemValue="C"/>
-                    <f:selectItem itemLabel="Grupo D" itemValue="D"/>
-                    <f:selectItem itemLabel="Grupo E" itemValue="E"/>
-                    <f:selectItem itemLabel="Grupo F" itemValue="F"/>
-                    <f:selectItem itemLabel="Grupo G" itemValue="G"/>
-                    <f:selectItem itemLabel="Grupo H" itemValue="H"/>
-                    <f:selectItem itemLabel="Grupo I" itemValue="I"/>
-                    <f:selectItem itemLabel="Grupo J" itemValue="J"/>
-                    <f:selectItem itemLabel="Grupo K" itemValue="K"/>
-                    <f:selectItem itemLabel="Grupo L" itemValue="L"/>
-
-                </p:selectOneMenu>
-
-            </div>
-
-            <p:button
-                    value="Volver al panel"
-                    icon="pi pi-home"
-                    href="#{request.contextPath}/dashboard.xhtml"
-                    styleClass="ui-button-secondary"/>
-
-            <p:commandButton
-                    value="Aplicar filtro"
-                    icon="pi pi-filter"
-                    actionListener="#{reporteBean.cargarEstadisticas}"
-                    process="@this grupo"
-                    update=":formReportes:tablaEstadisticas
-                            :formReportes:mensajes"/>
-
-            <p:commandButton
-                    value="Limpiar"
-                    icon="pi pi-times"
-                    actionListener="#{reporteBean.limpiarFiltro}"
-                    process="@this"
-                    update=":formReportes:grupo
-                            :formReportes:tablaEstadisticas
-                            :formReportes:mensajes"
-                    styleClass="ui-button-secondary"/>
-
-            <p:commandButton
-                    value="Actualizar todo"
-                    icon="pi pi-refresh"
-                    actionListener="#{reporteBean.cargarReportes}"
-                    process="@this"
-                    update=":formReportes"
-                    styleClass="ui-button-success"/>
-
-        </div>
-
-        <p:card>
-
-            <p:dataTable
-                    id="tablaEstadisticas"
-                    value="#{reporteBean.estadisticas}"
-                    var="e"
-                    paginator="true"
-                    rows="12"
-                    paginatorPosition="bottom"
-                    rowsPerPageTemplate="12,24,48"
-                    emptyMessage="No existen estadísticas disponibles."
-                    scrollable="true"
-                    scrollWidth="100%"
-                    styleClass="tabla-reportes">
-
-                <f:facet name="header">
-                    Estadísticas acumuladas por selección
-                </f:facet>
-
-                <p:column
-                        headerText="Código"
-                        filterBy="#{e.codigoFifa}"
-                        filterMatchMode="contains"
-                        style="width: 90px;">
-
-                    <h:outputText
-                            value="#{e.codigoFifa}"
-                            style="font-weight: bold;"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Selección"
-                        filterBy="#{e.seleccion}"
-                        filterMatchMode="contains"
-                        style="width: 190px;">
-
-                    <h:outputText
-                            value="#{e.seleccion}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Grupo"
-                        filterBy="#{e.grupo}"
-                        filterMatchMode="exact"
-                        style="width: 80px; text-align: center;">
-
-                    <h:outputText
-                            value="#{e.grupo}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="Confederación"
-                        filterBy="#{e.confederacion}"
-                        filterMatchMode="contains"
-                        style="width: 150px;">
-
-                    <h:outputText
-                            value="#{e.confederacion}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="PJ"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.jugados}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="PG"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.ganados}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="PE"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.empatados}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="PP"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.perdidos}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="GF"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.golesFavor}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="GC"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText value="#{e.golesContra}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="DG"
-                        style="width: 65px; text-align: center;">
-
-                    <h:outputText
-                            value="#{e.diferenciaGoles}"
-                            styleClass="#{e.diferenciaGoles >= 0
-                            ? 'positivo'
-                            : 'negativo'}"/>
-
-                </p:column>
-
-                <p:column
-                        headerText="PTS"
-                        style="width: 70px; text-align: center;">
-
-                    <h:outputText
-                            value="#{e.puntos}"
-                            style="font-weight: bold;"/>
-
-                </p:column>
-
-            </p:dataTable>
-
-        </p:card>
-
-    </h:form>
-
-</div>
-
 </h:body>
 
 </html>

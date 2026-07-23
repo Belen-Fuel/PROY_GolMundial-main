@@ -7,143 +7,481 @@
 
 <h:head>
 
-    <title>Registro - UTN GolMundial 2026</title>
+    <title>Crear cuenta - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
     <style>
 
+        :root {
+            --azul-noche: #07152f;
+            --azul-profundo: #0b2455;
+            --azul: #1769ff;
+            --celeste: #1cc8e5;
+            --dorado: #f6c84c;
+            --blanco: #ffffff;
+            --fondo: #f4f7fb;
+            --texto: #17233a;
+            --texto-suave: #6f7f99;
+            --borde: #dce5f2;
+            --verde: #18a66a;
+            --sombra: 0 24px 70px rgba(7, 21, 47, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
         body {
             margin: 0;
-            min-height: 100vh;
+            min-height: 100%;
             font-family: "Segoe UI", Arial, sans-serif;
-            background:
-                    linear-gradient(
-                            135deg,
-                            #0f172a,
-                            #1d4ed8
-                    );
-            color: #1e293b;
+            background: var(--fondo);
+            color: var(--texto);
         }
 
-        .barra {
-            background-color: #0f172a;
-            color: white;
-            padding: 16px 24px;
+        body {
+            min-height: 100vh;
+        }
 
+        .barra-publica {
+            position: relative;
+            z-index: 20;
+            background: rgba(7, 21, 47, 0.98);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .barra-contenido {
+            max-width: 1320px;
+            min-height: 78px;
+            margin: 0 auto;
+            padding: 12px 22px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 18px;
         }
 
-        .marca h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .marca small {
-            color: #cbd5e1;
-        }
-
-        .menu {
+        .marca-publica {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .marca-icono {
+            width: 47px;
+            height: 47px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--azul), var(--celeste));
+            box-shadow: 0 10px 28px rgba(23, 105, 255, 0.35);
+        }
+
+        .marca-icono i {
+            font-size: 21px;
+        }
+
+        .marca-texto strong {
+            display: block;
+            font-size: 18px;
+            letter-spacing: 0.2px;
+        }
+
+        .marca-texto small {
+            color: #aebbd2;
+            font-size: 12px;
+        }
+
+        .menu-publico {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
             gap: 8px;
             flex-wrap: wrap;
         }
 
-        .contenido {
-            min-height: calc(100vh - 90px);
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            padding: 35px 18px;
+        .menu-publico .ui-button {
+            border-radius: 10px !important;
+            box-shadow: none !important;
         }
 
-        .tarjeta-registro {
+        .boton-menu.ui-button {
+            background: transparent !important;
+            border: 1px solid rgba(255, 255, 255, 0.16) !important;
+            color: #d7e1f2 !important;
+        }
+
+        .boton-menu.ui-button:hover {
+            background: rgba(255, 255, 255, 0.10) !important;
+            color: white !important;
+        }
+
+        .boton-login.ui-button {
+            background: var(--dorado) !important;
+            border-color: var(--dorado) !important;
+            color: #1b2941 !important;
+            font-weight: 800 !important;
+        }
+
+        .pagina-registro {
+            position: relative;
+            min-height: calc(100vh - 78px);
+            overflow: hidden;
+            background:
+                    radial-gradient(circle at 86% 12%, rgba(28, 200, 229, 0.21), transparent 25%),
+                    radial-gradient(circle at 11% 88%, rgba(246, 200, 76, 0.17), transparent 28%),
+                    linear-gradient(135deg, #07152f 0%, #0b2b70 58%, #1769ff 100%);
+        }
+
+        .pagina-registro::before,
+        .pagina-registro::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+        .pagina-registro::before {
+            width: 540px;
+            height: 540px;
+            right: -235px;
+            top: -250px;
+        }
+
+        .pagina-registro::after {
+            width: 320px;
+            height: 320px;
+            left: -165px;
+            bottom: -180px;
+        }
+
+        .registro-contenido {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1240px;
+            min-height: calc(100vh - 78px);
+            margin: 0 auto;
+            padding: 44px 22px;
+            display: grid;
+            grid-template-columns: minmax(0, 0.96fr) minmax(430px, 0.82fr);
+            gap: 52px;
+            align-items: center;
+        }
+
+        .presentacion {
+            color: white;
+            padding: 20px 8px;
+        }
+
+        .etiqueta-superior {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 13px;
+            margin-bottom: 20px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.21);
+            background: rgba(255, 255, 255, 0.09);
+            color: #dce9ff;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .presentacion h1 {
+            max-width: 690px;
+            margin: 0;
+            font-size: clamp(42px, 5.7vw, 69px);
+            line-height: 0.99;
+            letter-spacing: -2.4px;
+        }
+
+        .presentacion h1 span {
+            color: var(--dorado);
+        }
+
+        .presentacion-descripcion {
+            max-width: 640px;
+            margin: 23px 0 29px;
+            color: #d4e0f3;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+        .beneficios {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+            max-width: 650px;
+        }
+
+        .beneficio {
+            min-height: 104px;
+            padding: 17px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .beneficio i {
+            width: 34px;
+            height: 34px;
+            margin-bottom: 11px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: #0b2455;
+            background: var(--dorado);
+        }
+
+        .beneficio strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 15px;
+        }
+
+        .beneficio span {
+            color: #c8d7ed;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .panel-registro {
             width: 100%;
             max-width: 520px;
-
-            background-color: white;
-            border-radius: 14px;
-            padding: 30px;
-
-            box-shadow:
-                    0 14px 35px rgba(15, 23, 42, 0.28);
+            justify-self: end;
+            padding: 32px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--sombra);
         }
 
-        .cabecera {
-            text-align: center;
-            margin-bottom: 24px;
+        .panel-cabecera {
+            margin-bottom: 23px;
         }
 
-        .cabecera i {
-            font-size: 48px;
-            color: #2563eb;
+        .panel-icono {
+            width: 55px;
+            height: 55px;
+            margin-bottom: 16px;
+            border-radius: 17px;
+            display: grid;
+            place-items: center;
+            color: white;
+            background: linear-gradient(135deg, var(--azul), var(--celeste));
+            box-shadow: 0 12px 30px rgba(23, 105, 255, 0.27);
         }
 
-        .cabecera h2 {
-            margin: 12px 0 6px;
-            font-size: 28px;
+        .panel-icono i {
+            font-size: 23px;
         }
 
-        .cabecera p {
+        .panel-cabecera h2 {
+            margin: 0 0 7px;
+            color: var(--texto);
+            font-size: 29px;
+            letter-spacing: -0.7px;
+        }
+
+        .panel-cabecera p {
             margin: 0;
-            color: #64748b;
+            color: var(--texto-suave);
+            line-height: 1.55;
+        }
+
+        .fila-campos {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
         }
 
         .campo {
             margin-bottom: 17px;
         }
 
-        .campo label {
+        .campo .ui-outputlabel {
             display: block;
-            margin-bottom: 7px;
-            font-weight: bold;
-            color: #334155;
-        }
-
-        .acciones {
-            margin-top: 22px;
-        }
-
-        .acciones .ui-button {
-            width: 100%;
-        }
-
-        .enlace-login {
-            margin-top: 20px;
-            text-align: center;
-            color: #64748b;
-        }
-
-        .enlace-login a {
-            color: #2563eb;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .nota {
-            margin-top: 18px;
-            padding: 12px;
-            border-radius: 8px;
-            background-color: #eff6ff;
-            color: #1e40af;
+            margin-bottom: 8px;
+            color: #30415f;
+            font-weight: 800;
             font-size: 14px;
         }
 
-        @media (max-width: 600px) {
+        .campo .ui-inputfield {
+            width: 100% !important;
+            min-height: 48px;
+            border: 1px solid var(--borde) !important;
+            border-radius: 12px !important;
+            padding: 0.75rem 0.9rem !important;
+            box-shadow: none !important;
+        }
 
-            .tarjeta-registro {
-                padding: 22px;
+        .campo .ui-inputfield:focus {
+            border-color: var(--azul) !important;
+            box-shadow: 0 0 0 3px rgba(23, 105, 255, 0.12) !important;
+        }
+
+        .campo .ui-password,
+        .campo .ui-password input {
+            width: 100% !important;
+        }
+
+        .requisitos {
+            margin: 2px 0 18px;
+            padding: 13px 14px;
+            border: 1px solid #cfe0ff;
+            border-radius: 12px;
+            background: #eef5ff;
+            color: #28508d;
+        }
+
+        .requisitos-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .requisitos ul {
+            margin: 0;
+            padding-left: 21px;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .acciones-registro {
+            margin-top: 20px;
+        }
+
+        .acciones-registro .ui-button {
+            width: 100%;
+            min-height: 49px;
+            border-radius: 12px !important;
+            background: linear-gradient(135deg, var(--azul), #0754d8) !important;
+            border-color: var(--azul) !important;
+            font-weight: 800 !important;
+            box-shadow: 0 12px 27px rgba(23, 105, 255, 0.22) !important;
+        }
+
+        .separador {
+            margin: 21px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #96a3b8;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .separador::before,
+        .separador::after {
+            content: "";
+            height: 1px;
+            flex: 1;
+            background: var(--borde);
+        }
+
+        .enlaces-inferiores {
+            text-align: center;
+            color: var(--texto-suave);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .enlaces-inferiores a {
+            color: var(--azul);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .enlaces-inferiores a:hover {
+            text-decoration: underline;
+        }
+
+        .ui-messages {
+            margin: 0 0 20px !important;
+            border-radius: 12px !important;
+        }
+
+        .pie-registro {
+            margin-top: 18px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.67);
+            font-size: 12px;
+        }
+
+        @media (max-width: 1020px) {
+
+            .registro-contenido {
+                grid-template-columns: 1fr;
+                gap: 28px;
+                padding-top: 38px;
+                padding-bottom: 38px;
             }
 
-            .menu {
+            .presentacion {
+                text-align: center;
+                padding-bottom: 0;
+            }
+
+            .presentacion h1,
+            .presentacion-descripcion,
+            .beneficios {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .panel-registro {
+                justify-self: center;
+            }
+        }
+
+        @media (max-width: 680px) {
+
+            .barra-contenido {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .menu-publico {
                 width: 100%;
+                justify-content: stretch;
+            }
+
+            .menu-publico .ui-button {
+                flex: 1;
+            }
+
+            .registro-contenido {
+                padding: 30px 15px;
+            }
+
+            .presentacion h1 {
+                font-size: 43px;
+            }
+
+            .presentacion-descripcion {
+                font-size: 16px;
+            }
+
+            .beneficios,
+            .fila-campos {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-registro {
+                padding: 25px 20px;
+                border-radius: 19px;
             }
         }
 
@@ -153,176 +491,239 @@
 
 <h:body>
 
-    <div class="barra">
+    <header class="barra-publica">
 
-        <div class="marca">
+        <div class="barra-contenido">
 
-            <h1>UTN GolMundial 2026</h1>
+            <h:link outcome="/publico/inicio.xhtml"
+                    styleClass="marca-publica">
 
-            <small>
-                Portal público del torneo
-            </small>
+                <span class="marca-icono">
+                    <i class="pi pi-globe"></i>
+                </span>
+
+                <span class="marca-texto">
+                    <strong>UTN GolMundial 2026</strong>
+                    <small>Portal público del torneo</small>
+                </span>
+
+            </h:link>
+
+            <nav class="menu-publico">
+
+                <p:button value="Volver al portal"
+                          icon="pi pi-arrow-left"
+                          outcome="/publico/inicio.xhtml"
+                          styleClass="boton-menu"/>
+
+                <p:button value="Iniciar sesión"
+                          icon="pi pi-sign-in"
+                          outcome="/publico/login.xhtml"
+                          styleClass="boton-login"/>
+
+            </nav>
 
         </div>
 
-        <div class="menu">
+    </header>
 
-            <p:button
-                    value="Inicio"
-                    icon="pi pi-home"
-                    href="#{request.contextPath}/publico/inicio.xhtml"
-                    styleClass="ui-button-outlined"/>
+    <main class="pagina-registro">
 
-            <p:button
-                    value="Partidos"
-                    icon="pi pi-calendar"
-                    href="#{request.contextPath}/publico/partidos.xhtml"
-                    styleClass="ui-button-outlined"/>
+        <div class="registro-contenido">
 
-            <p:button
-                    value="Ingresar"
-                    icon="pi pi-sign-in"
-                    href="#{request.contextPath}/publico/login.xhtml"
-                    styleClass="ui-button-success"/>
+            <section class="presentacion">
 
-        </div>
+                <div class="etiqueta-superior">
+                    <i class="pi pi-user-plus"></i>
+                    Registro gratuito de usuarios
+                </div>
 
-    </div>
+                <h1>
+                    Crea tu cuenta y sigue el torneo
+                    <span>en un solo lugar.</span>
+                </h1>
 
-    <main class="contenido">
-
-        <section class="tarjeta-registro">
-
-            <div class="cabecera">
-
-                <i class="pi pi-user-plus"></i>
-
-                <h2>Crear una cuenta</h2>
-
-                <p>
-                    Regístrate para acceder a las funciones
-                    disponibles para usuarios del sistema.
+                <p class="presentacion-descripcion">
+                    Regístrate para ingresar al portal con tu propia cuenta y
+                    consultar partidos, posiciones, selecciones y estadísticas
+                    del UTN GolMundial 2026.
                 </p>
 
-            </div>
+                <div class="beneficios">
 
-            <h:form id="formRegistro">
+                    <article class="beneficio">
+                        <i class="pi pi-calendar"></i>
+                        <strong>Calendario del torneo</strong>
+                        <span>Consulta encuentros, fechas, sedes y estados actualizados.</span>
+                    </article>
 
-                <p:messages
-                        id="mensajes"
-                        showDetail="true"
-                        closable="true"/>
+                    <article class="beneficio">
+                        <i class="pi pi-chart-line"></i>
+                        <strong>Posiciones y rendimiento</strong>
+                        <span>Revisa tablas por grupo y estadísticas de cada selección.</span>
+                    </article>
 
-                <div class="campo">
+                    <article class="beneficio">
+                        <i class="pi pi-flag"></i>
+                        <strong>Selecciones participantes</strong>
+                        <span>Explora equipos, banderas, grupos y confederaciones.</span>
+                    </article>
 
-                    <p:outputLabel
-                            for="username"
-                            value="Nombre de usuario:"/>
-
-                    <p:inputText
-                            id="username"
-                            value="#{registroPublicoBean.username}"
-                            required="true"
-                            requiredMessage="El usuario es obligatorio."
-                            minlength="4"
-                            maxlength="60"
-                            placeholder="Ejemplo: usuario2026"
-                            style="width: 100%;"/>
-
-                </div>
-
-                <div class="campo">
-
-                    <p:outputLabel
-                            for="nombre"
-                            value="Nombre completo:"/>
-
-                    <p:inputText
-                            id="nombre"
-                            value="#{registroPublicoBean.nombre}"
-                            required="true"
-                            requiredMessage="El nombre es obligatorio."
-                            maxlength="150"
-                            placeholder="Ingrese su nombre completo"
-                            style="width: 100%;"/>
+                    <article class="beneficio">
+                        <i class="pi pi-shield"></i>
+                        <strong>Cuenta protegida</strong>
+                        <span>Tu contraseña se valida y almacena de forma segura.</span>
+                    </article>
 
                 </div>
 
-                <div class="campo">
+                <div class="pie-registro">
+                    Servicio de Estadísticas · UTN GolMundial 2026
+                </div>
 
-                    <p:outputLabel
-                            for="password"
-                            value="Contraseña:"/>
+            </section>
 
-                    <p:password
-                            id="password"
-                            value="#{registroPublicoBean.password}"
-                            required="true"
-                            requiredMessage="La contraseña es obligatoria."
-                            minlength="8"
-                            maxlength="128"
-                            feedback="true"
-                            toggleMask="true"
-                            redisplay="true"
-                            placeholder="Mínimo 8 caracteres"
-                            style="width: 100%;"/>
+            <section class="panel-registro">
+
+                <div class="panel-cabecera">
+
+                    <div class="panel-icono">
+                        <i class="pi pi-user-plus"></i>
+                    </div>
+
+                    <h2>Crear una cuenta</h2>
+
+                    <p>
+                        Completa tus datos para registrarte como usuario del portal.
+                    </p>
 
                 </div>
 
-                <div class="campo">
+                <h:form id="formRegistro">
 
-                    <p:outputLabel
-                            for="confirmarPassword"
-                            value="Confirmar contraseña:"/>
+                    <p:messages id="mensajes"
+                                showDetail="true"
+                                closable="true"/>
 
-                    <p:password
-                            id="confirmarPassword"
-                            value="#{registroPublicoBean.confirmarPassword}"
-                            required="true"
-                            requiredMessage="Confirme la contraseña."
-                            minlength="8"
-                            maxlength="128"
-                            toggleMask="true"
-                            redisplay="true"
-                            placeholder="Repita la contraseña"
-                            style="width: 100%;"/>
+                    <div class="fila-campos">
 
-                </div>
+                        <div class="campo">
 
-                <div class="nota">
+                            <p:outputLabel for="username"
+                                           value="Nombre de usuario"/>
 
-                    <i class="pi pi-info-circle"></i>
+                            <p:inputText id="username"
+                                         value="#{registroPublicoBean.username}"
+                                         required="true"
+                                         requiredMessage="El nombre de usuario es obligatorio."
+                                         minlength="4"
+                                         maxlength="60"
+                                         autocomplete="username"
+                                         placeholder="Mínimo 4 caracteres"/>
 
-                    Las cuentas registradas públicamente
-                    reciben automáticamente el rol de usuario.
+                        </div>
 
-                </div>
+                        <div class="campo">
 
-                <div class="acciones">
+                            <p:outputLabel for="nombre"
+                                           value="Nombre completo"/>
 
-                    <p:commandButton
-                            value="Crear cuenta"
-                            icon="pi pi-check"
-                            action="#{registroPublicoBean.registrar}"
-                            process="@form"
-                            ajax="false"
-                            styleClass="ui-button-success"/>
+                            <p:inputText id="nombre"
+                                         value="#{registroPublicoBean.nombre}"
+                                         required="true"
+                                         requiredMessage="El nombre completo es obligatorio."
+                                         maxlength="150"
+                                         autocomplete="name"
+                                         placeholder="Nombres y apellidos"/>
 
-                </div>
+                        </div>
 
-                <div class="enlace-login">
+                    </div>
 
-                    <span>¿Ya tienes una cuenta? </span>
+                    <div class="fila-campos">
 
-                    <h:link
-                            value="Iniciar sesión"
-                            outcome="/publico/login.xhtml"/>
+                        <div class="campo">
 
-                </div>
+                            <p:outputLabel for="password"
+                                           value="Contraseña"/>
 
-            </h:form>
+                            <p:password id="password"
+                                        value="#{registroPublicoBean.password}"
+                                        required="true"
+                                        requiredMessage="La contraseña es obligatoria."
+                                        minlength="8"
+                                        maxlength="128"
+                                        feedback="true"
+                                        toggleMask="true"
+                                        redisplay="true"
+                                        autocomplete="new-password"
+                                        placeholder="Mínimo 8 caracteres"/>
 
-        </section>
+                        </div>
+
+                        <div class="campo">
+
+                            <p:outputLabel for="confirmarPassword"
+                                           value="Confirmar contraseña"/>
+
+                            <p:password id="confirmarPassword"
+                                        value="#{registroPublicoBean.confirmarPassword}"
+                                        required="true"
+                                        requiredMessage="Confirma tu contraseña."
+                                        minlength="8"
+                                        maxlength="128"
+                                        toggleMask="true"
+                                        redisplay="true"
+                                        autocomplete="new-password"
+                                        placeholder="Repite la contraseña"/>
+
+                        </div>
+
+                    </div>
+
+                    <div class="requisitos">
+
+                        <div class="requisitos-titulo">
+                            <i class="pi pi-info-circle"></i>
+                            Requisitos de la cuenta
+                        </div>
+
+                        <ul>
+                            <li>El usuario debe contener al menos 4 caracteres.</li>
+                            <li>La contraseña debe contener al menos 8 caracteres.</li>
+                            <li>Las dos contraseñas deben coincidir.</li>
+                            <li>La cuenta recibirá automáticamente el rol de usuario.</li>
+                        </ul>
+
+                    </div>
+
+                    <div class="acciones-registro">
+
+                        <p:commandButton value="Crear cuenta"
+                                         icon="pi pi-check"
+                                         action="#{registroPublicoBean.registrar}"
+                                         process="@form"
+                                         ajax="false"/>
+
+                    </div>
+
+                    <div class="separador">
+                        ¿Ya tienes una cuenta?
+                    </div>
+
+                    <div class="enlaces-inferiores">
+                        <h:link value="Iniciar sesión"
+                                outcome="/publico/login.xhtml"/>
+                        <br/>
+                        <h:link value="Regresar al portal"
+                                outcome="/publico/inicio.xhtml"/>
+                    </div>
+
+                </h:form>
+
+            </section>
+
+        </div>
 
     </main>
 

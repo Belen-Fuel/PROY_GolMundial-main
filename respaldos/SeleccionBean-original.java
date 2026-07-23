@@ -1,11 +1,8 @@
 package ec.edu.utn.golmundial.bean;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.primefaces.PrimeFaces;
 
 import ec.edu.utn.golmundial.dto.ActualizarSeleccionRequest;
 import ec.edu.utn.golmundial.dto.CrearSeleccionRequest;
@@ -14,7 +11,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -33,11 +29,12 @@ public class SeleccionBean implements Serializable {
     private static final String API_URL =
             "http://localhost:8080/golmundial-estadisticas/api/selecciones";
 
-    @Inject
-    private LoginBean loginBean;
+    // Credencial temporal que ya está usando el proyecto.
+    // Después será reemplazada por el token obtenido en el inicio de sesión.
+    private static final String AUTORIZACION =
+            "Basic YWRtaW46YWRtaW4xMjM=";
 
-    private List<SeleccionDTO> selecciones =
-            new ArrayList<>();
+    private List<SeleccionDTO> selecciones = new ArrayList<>();
 
     private CrearSeleccionRequest nuevaSeleccion =
             new CrearSeleccionRequest();
@@ -49,23 +46,10 @@ public class SeleccionBean implements Serializable {
 
     @PostConstruct
     public void init() {
-
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
-
-        prepararNuevaSeleccion();
         cargarSelecciones();
     }
 
     public void cargarSelecciones() {
-
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
-
         try (Client cliente = ClientBuilder.newClient()) {
 
             this.selecciones = cliente
@@ -92,29 +76,12 @@ public class SeleccionBean implements Serializable {
         }
     }
 
-    public void prepararNuevaSeleccion() {
-
-        this.nuevaSeleccion =
-                new CrearSeleccionRequest();
-
-        this.nuevaSeleccion.setEsAnfitrion(false);
-    }
-
     public void guardarSeleccion() {
-
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
-
         try (Client cliente = ClientBuilder.newClient();
              Response respuesta = cliente
                      .target(API_URL)
                      .request(MediaType.APPLICATION_JSON)
-                     .header(
-                             HttpHeaders.AUTHORIZATION,
-                             loginBean.getAuthorizationHeader()
-                     )
+                     .header(HttpHeaders.AUTHORIZATION, AUTORIZACION)
                      .post(
                              Entity.entity(
                                      nuevaSeleccion,
@@ -126,7 +93,7 @@ public class SeleccionBean implements Serializable {
                     == Response.Status.CREATED.getStatusCode()) {
 
                 cargarSelecciones();
-                prepararNuevaSeleccion();
+                nuevaSeleccion = new CrearSeleccionRequest();
 
                 mostrarMensaje(
                         FacesMessage.SEVERITY_INFO,
@@ -134,38 +101,30 @@ public class SeleccionBean implements Serializable {
                         "Selección registrada correctamente."
                 );
 
-                agregarResultadoAjax(true);
-                return;
+            } else {
+                mostrarErrorApi(
+                        respuesta,
+                        "No se pudo registrar la selección."
+                );
             }
-
-            manejarRespuestaError(
-                    respuesta,
-                    "No se pudo registrar la selección."
-            );
 
         } catch (Exception e) {
 
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible registrar la selección."
+                    e.getMessage()
             );
 
             e.printStackTrace();
         }
     }
 
-    public void prepararEdicion(
-            SeleccionDTO seleccion
-    ) {
+    public void prepararEdicion(SeleccionDTO seleccion) {
 
         this.seleccionSeleccionada = seleccion;
         this.seleccionEditada =
                 new ActualizarSeleccionRequest();
-
-        if (seleccion == null) {
-            return;
-        }
 
         seleccionEditada.setCodigoFifa(
                 seleccion.getCodigoFifa()
@@ -194,11 +153,6 @@ public class SeleccionBean implements Serializable {
 
     public void actualizarSeleccion() {
 
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
-
         if (seleccionSeleccionada == null
                 || seleccionSeleccionada.getId() == null) {
 
@@ -218,10 +172,7 @@ public class SeleccionBean implements Serializable {
              Response respuesta = cliente
                      .target(url)
                      .request(MediaType.APPLICATION_JSON)
-                     .header(
-                             HttpHeaders.AUTHORIZATION,
-                             loginBean.getAuthorizationHeader()
-                     )
+                     .header(HttpHeaders.AUTHORIZATION, AUTORIZACION)
                      .put(
                              Entity.entity(
                                      seleccionEditada,
@@ -240,51 +191,38 @@ public class SeleccionBean implements Serializable {
                         "Selección actualizada correctamente."
                 );
 
-                agregarResultadoAjax(true);
-                return;
+            } else {
+                mostrarErrorApi(
+                        respuesta,
+                        "No se pudo actualizar la selección."
+                );
             }
-
-            manejarRespuestaError(
-                    respuesta,
-                    "No se pudo actualizar la selección."
-            );
 
         } catch (Exception e) {
 
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible actualizar la selección."
+                    e.getMessage()
             );
 
             e.printStackTrace();
         }
     }
 
-    public void eliminarSeleccion(
-            SeleccionDTO seleccion
-    ) {
-
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
+    public void eliminarSeleccion(SeleccionDTO seleccion) {
 
         if (seleccion == null || seleccion.getId() == null) {
             return;
         }
 
-        String url =
-                API_URL + "/" + seleccion.getId();
+        String url = API_URL + "/" + seleccion.getId();
 
         try (Client cliente = ClientBuilder.newClient();
              Response respuesta = cliente
                      .target(url)
                      .request(MediaType.APPLICATION_JSON)
-                     .header(
-                             HttpHeaders.AUTHORIZATION,
-                             loginBean.getAuthorizationHeader()
-                     )
+                     .header(HttpHeaders.AUTHORIZATION, AUTORIZACION)
                      .delete()) {
 
             if (respuesta.getStatus()
@@ -298,59 +236,36 @@ public class SeleccionBean implements Serializable {
                         "Selección eliminada correctamente."
                 );
 
-                return;
+            } else {
+                mostrarErrorApi(
+                        respuesta,
+                        "No se pudo eliminar la selección."
+                );
             }
-
-            manejarRespuestaError(
-                    respuesta,
-                    "No se pudo eliminar la selección."
-            );
 
         } catch (Exception e) {
 
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible eliminar la selección."
+                    e.getMessage()
             );
 
             e.printStackTrace();
         }
     }
 
-    private boolean sesionValida() {
-
-        return loginBean != null
-                && loginBean.isAdministrador()
-                && loginBean.getAuthorizationHeader() != null;
-    }
-
-    private void manejarRespuestaError(
+    private void mostrarErrorApi(
             Response respuesta,
             String mensajePredeterminado
     ) {
 
-        if (respuesta.getStatus()
-                == Response.Status.UNAUTHORIZED.getStatusCode()) {
-
-            mostrarMensaje(
-                    FacesMessage.SEVERITY_WARN,
-                    "Sesión expirada",
-                    "Debe iniciar sesión nuevamente."
-            );
-
-            redirigirAlLogin();
-            return;
-        }
-
         String detalle = mensajePredeterminado;
 
         try {
-
             if (respuesta.hasEntity()) {
                 detalle = respuesta.readEntity(String.class);
             }
-
         } catch (Exception ignored) {
         }
 
@@ -361,65 +276,21 @@ public class SeleccionBean implements Serializable {
         );
     }
 
-    private void agregarResultadoAjax(
-            boolean operacionExitosa
-    ) {
-
-        PrimeFaces.current()
-                .ajax()
-                .addCallbackParam(
-                        "operacionExitosa",
-                        operacionExitosa
-                );
-    }
-
-    private void redirigirAlLogin() {
-
-        FacesContext contexto =
-                FacesContext.getCurrentInstance();
-
-        if (contexto == null
-                || contexto.getResponseComplete()) {
-            return;
-        }
-
-        String ruta =
-                contexto.getExternalContext()
-                        .getRequestContextPath()
-                        + "/login.xhtml";
-
-        try {
-
-            contexto.getExternalContext()
-                    .redirect(ruta);
-
-            contexto.responseComplete();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void mostrarMensaje(
             FacesMessage.Severity severidad,
             String titulo,
             String detalle
     ) {
 
-        FacesContext contexto =
-                FacesContext.getCurrentInstance();
-
-        if (contexto != null) {
-
-            contexto.addMessage(
-                    null,
-                    new FacesMessage(
-                            severidad,
-                            titulo,
-                            detalle
-                    )
-            );
-        }
+        FacesContext.getCurrentInstance()
+                .addMessage(
+                        null,
+                        new FacesMessage(
+                                severidad,
+                                titulo,
+                                detalle
+                        )
+                );
     }
 
     public List<SeleccionDTO> getSelecciones() {

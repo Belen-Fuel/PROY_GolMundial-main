@@ -5,11 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.primefaces.PrimeFaces;
-
-import ec.edu.utn.golmundial.dto.ActualizarSedeRequest;
-import ec.edu.utn.golmundial.dto.CrearSedeRequest;
-import ec.edu.utn.golmundial.dto.SedeDTO;
+import ec.edu.utn.golmundial.dto.CambiarEstadoUsuarioRequest;
+import ec.edu.utn.golmundial.dto.CambiarRolUsuarioRequest;
+import ec.edu.utn.golmundial.dto.CrearUsuarioRequest;
+import ec.edu.utn.golmundial.dto.UsuarioDTO;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -24,79 +23,91 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Named("sedeBean")
+@Named("usuarioBean")
 @ViewScoped
-public class SedeBean implements Serializable {
+public class UsuarioBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private static final String API_URL =
-            "http://localhost:8080/golmundial-estadisticas/api/sedes";
+            "http://localhost:8080/golmundial-estadisticas/api/usuarios";
 
     @Inject
     private LoginBean loginBean;
 
-    private List<SedeDTO> sedes =
-            new ArrayList<>();
+    private List<UsuarioDTO> usuarios = new ArrayList<>();
 
-    private CrearSedeRequest nuevaSede =
-            new CrearSedeRequest();
+    private CrearUsuarioRequest nuevoUsuario =
+            new CrearUsuarioRequest();
 
-    private SedeDTO sedeSeleccionada;
+    private UsuarioDTO usuarioSeleccionado;
 
-    private ActualizarSedeRequest sedeEditada =
-            new ActualizarSedeRequest();
+    private String nuevoRol;
 
     @PostConstruct
     public void init() {
 
-        if (!sesionValida()) {
+        if (loginBean == null || !loginBean.isAdministrador()) {
             redirigirAlLogin();
             return;
         }
 
-        prepararNuevaSede();
-        cargarSedes();
+        nuevoUsuario.setActivo(true);
+        cargarUsuarios();
     }
 
-    public void cargarSedes() {
+    public void cargarUsuarios() {
 
         if (!sesionValida()) {
             redirigirAlLogin();
             return;
         }
 
-        try (Client cliente = ClientBuilder.newClient()) {
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(API_URL)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .get()) {
 
-            this.sedes = cliente
-                    .target(API_URL)
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(new GenericType<List<SedeDTO>>() {
-                    });
+            if (respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
 
-            if (this.sedes == null) {
-                this.sedes = new ArrayList<>();
+                usuarios = respuesta.readEntity(
+                        new GenericType<List<UsuarioDTO>>() {
+                        }
+                );
+
+                if (usuarios == null) {
+                    usuarios = new ArrayList<>();
+                }
+
+                return;
             }
+
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudieron cargar los usuarios."
+            );
 
         } catch (Exception e) {
 
-            this.sedes = new ArrayList<>();
+            usuarios = new ArrayList<>();
 
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
-                    "Error",
-                    "No se pudieron cargar las sedes."
+                    "Error de comunicación",
+                    "No fue posible conectarse con la API de usuarios."
             );
 
             e.printStackTrace();
         }
     }
 
-    public void prepararNuevaSede() {
-        this.nuevaSede = new CrearSedeRequest();
-    }
-
-    public void guardarSede() {
+    public void crearUsuario() {
 
         if (!sesionValida()) {
             redirigirAlLogin();
@@ -113,7 +124,7 @@ public class SedeBean implements Serializable {
                      )
                      .post(
                              Entity.entity(
-                                     nuevaSede,
+                                     nuevoUsuario,
                                      MediaType.APPLICATION_JSON
                              )
                      )) {
@@ -121,22 +132,23 @@ public class SedeBean implements Serializable {
             if (respuesta.getStatus()
                     == Response.Status.CREATED.getStatusCode()) {
 
-                cargarSedes();
-                prepararNuevaSede();
+                nuevoUsuario = new CrearUsuarioRequest();
+                nuevoUsuario.setActivo(true);
+
+                cargarUsuarios();
 
                 mostrarMensaje(
                         FacesMessage.SEVERITY_INFO,
                         "Éxito",
-                        "Sede registrada correctamente."
+                        "Usuario creado correctamente."
                 );
 
-                agregarResultadoAjax(true);
                 return;
             }
 
             manejarRespuestaError(
                     respuesta,
-                    "No se pudo registrar la sede."
+                    "No se pudo crear el usuario."
             );
 
         } catch (Exception e) {
@@ -144,62 +156,56 @@ public class SedeBean implements Serializable {
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible registrar la sede."
+                    "No fue posible registrar el usuario."
             );
 
             e.printStackTrace();
         }
     }
 
-    public void prepararEdicion(
-            SedeDTO sede
+    public void prepararCambioRol(
+            UsuarioDTO usuario
     ) {
 
-        this.sedeSeleccionada = sede;
-        this.sedeEditada = new ActualizarSedeRequest();
-
-        if (sede == null) {
-            return;
-        }
-
-        sedeEditada.setNombre(
-                sede.getNombre()
-        );
-
-        sedeEditada.setCiudad(
-                sede.getCiudad()
-        );
-
-        sedeEditada.setPais(
-                sede.getPais()
-        );
-
-        sedeEditada.setCapacidadAprox(
-                sede.getCapacidadAprox()
-        );
+        this.usuarioSeleccionado = usuario;
+        this.nuevoRol = usuario.getRol();
     }
 
-    public void actualizarSede() {
+    public void cambiarRol() {
 
-        if (!sesionValida()) {
-            redirigirAlLogin();
-            return;
-        }
-
-        if (sedeSeleccionada == null
-                || sedeSeleccionada.getId() == null) {
+        if (usuarioSeleccionado == null
+                || usuarioSeleccionado.getId() == null) {
 
             mostrarMensaje(
                     FacesMessage.SEVERITY_WARN,
                     "Advertencia",
-                    "No se ha seleccionado una sede."
+                    "No se ha seleccionado un usuario."
             );
 
             return;
         }
 
+        if (nuevoRol == null || nuevoRol.isBlank()) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Advertencia",
+                    "Seleccione un rol."
+            );
+
+            return;
+        }
+
+        CambiarRolUsuarioRequest solicitud =
+                new CambiarRolUsuarioRequest();
+
+        solicitud.setRol(nuevoRol);
+
         String url =
-                API_URL + "/" + sedeSeleccionada.getId();
+                API_URL
+                        + "/"
+                        + usuarioSeleccionado.getId()
+                        + "/rol";
 
         try (Client cliente = ClientBuilder.newClient();
              Response respuesta = cliente
@@ -211,7 +217,7 @@ public class SedeBean implements Serializable {
                      )
                      .put(
                              Entity.entity(
-                                     sedeEditada,
+                                     solicitud,
                                      MediaType.APPLICATION_JSON
                              )
                      )) {
@@ -219,21 +225,20 @@ public class SedeBean implements Serializable {
             if (respuesta.getStatus()
                     == Response.Status.OK.getStatusCode()) {
 
-                cargarSedes();
+                cargarUsuarios();
 
                 mostrarMensaje(
                         FacesMessage.SEVERITY_INFO,
                         "Éxito",
-                        "Sede actualizada correctamente."
+                        "Rol actualizado correctamente."
                 );
 
-                agregarResultadoAjax(true);
                 return;
             }
 
             manejarRespuestaError(
                     respuesta,
-                    "No se pudo actualizar la sede."
+                    "No se pudo cambiar el rol."
             );
 
         } catch (Exception e) {
@@ -241,28 +246,31 @@ public class SedeBean implements Serializable {
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible actualizar la sede."
+                    "No fue posible cambiar el rol."
             );
 
             e.printStackTrace();
         }
     }
 
-    public void eliminarSede(
-            SedeDTO sede
+    public void cambiarEstado(
+            UsuarioDTO usuario
     ) {
 
-        if (!sesionValida()) {
-            redirigirAlLogin();
+        if (usuario == null || usuario.getId() == null) {
             return;
         }
 
-        if (sede == null || sede.getId() == null) {
-            return;
-        }
+        CambiarEstadoUsuarioRequest solicitud =
+                new CambiarEstadoUsuarioRequest();
+
+        solicitud.setActivo(!usuario.isActivo());
 
         String url =
-                API_URL + "/" + sede.getId();
+                API_URL
+                        + "/"
+                        + usuario.getId()
+                        + "/estado";
 
         try (Client cliente = ClientBuilder.newClient();
              Response respuesta = cliente
@@ -272,17 +280,24 @@ public class SedeBean implements Serializable {
                              HttpHeaders.AUTHORIZATION,
                              loginBean.getAuthorizationHeader()
                      )
-                     .delete()) {
+                     .put(
+                             Entity.entity(
+                                     solicitud,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
 
             if (respuesta.getStatus()
                     == Response.Status.OK.getStatusCode()) {
 
-                cargarSedes();
+                cargarUsuarios();
 
                 mostrarMensaje(
                         FacesMessage.SEVERITY_INFO,
                         "Éxito",
-                        "Sede eliminada correctamente."
+                        solicitud.getActivo()
+                                ? "Usuario activado correctamente."
+                                : "Usuario desactivado correctamente."
                 );
 
                 return;
@@ -290,7 +305,7 @@ public class SedeBean implements Serializable {
 
             manejarRespuestaError(
                     respuesta,
-                    "No se pudo eliminar la sede."
+                    "No se pudo cambiar el estado del usuario."
             );
 
         } catch (Exception e) {
@@ -298,65 +313,14 @@ public class SedeBean implements Serializable {
             mostrarMensaje(
                     FacesMessage.SEVERITY_ERROR,
                     "Error de comunicación",
-                    "No fue posible eliminar la sede."
+                    "No fue posible cambiar el estado."
             );
 
             e.printStackTrace();
         }
     }
 
-    public int getCantidadSedes() {
-        return sedes == null ? 0 : sedes.size();
-    }
-
-    public long getCapacidadTotal() {
-
-        if (sedes == null) {
-            return 0L;
-        }
-
-        return sedes.stream()
-                .filter(sede -> sede != null
-                        && sede.getCapacidadAprox() != null)
-                .mapToLong(sede -> sede.getCapacidadAprox())
-                .sum();
-    }
-
-    public long getCapacidadPromedio() {
-
-        if (sedes == null || sedes.isEmpty()) {
-            return 0L;
-        }
-
-        return Math.round(
-                sedes.stream()
-                        .filter(sede -> sede != null
-                                && sede.getCapacidadAprox() != null)
-                        .mapToInt(sede -> sede.getCapacidadAprox())
-                        .average()
-                        .orElse(0.0)
-        );
-    }
-
-    public String getSedeMayorCapacidad() {
-
-        if (sedes == null || sedes.isEmpty()) {
-            return "Sin datos";
-        }
-
-        return sedes.stream()
-                .filter(sede -> sede != null
-                        && sede.getCapacidadAprox() != null)
-                .max((primera, segunda) -> Integer.compare(
-                        primera.getCapacidadAprox(),
-                        segunda.getCapacidadAprox()
-                ))
-                .map(SedeDTO::getNombre)
-                .orElse("Sin datos");
-    }
-
     private boolean sesionValida() {
-
         return loginBean != null
                 && loginBean.isAdministrador()
                 && loginBean.getAuthorizationHeader() != null;
@@ -385,10 +349,7 @@ public class SedeBean implements Serializable {
         try {
 
             if (respuesta.hasEntity()) {
-                detalle = extraerMensajeError(
-                        respuesta.readEntity(String.class),
-                        mensajePredeterminado
-                );
+                detalle = respuesta.readEntity(String.class);
             }
 
         } catch (Exception ignored) {
@@ -399,51 +360,6 @@ public class SedeBean implements Serializable {
                 "Error",
                 detalle
         );
-    }
-
-    private String extraerMensajeError(
-            String contenido,
-            String mensajePredeterminado
-    ) {
-
-        if (contenido == null || contenido.isBlank()) {
-            return mensajePredeterminado;
-        }
-
-        String clave = "\"error\"";
-        int posicionClave = contenido.indexOf(clave);
-
-        if (posicionClave < 0) {
-            return contenido;
-        }
-
-        int inicio = contenido.indexOf(':', posicionClave);
-        int primeraComilla = contenido.indexOf('"', inicio + 1);
-        int segundaComilla = contenido.indexOf('"', primeraComilla + 1);
-
-        if (inicio >= 0
-                && primeraComilla >= 0
-                && segundaComilla > primeraComilla) {
-
-            return contenido.substring(
-                    primeraComilla + 1,
-                    segundaComilla
-            );
-        }
-
-        return mensajePredeterminado;
-    }
-
-    private void agregarResultadoAjax(
-            boolean operacionExitosa
-    ) {
-
-        PrimeFaces.current()
-                .ajax()
-                .addCallbackParam(
-                        "operacionExitosa",
-                        operacionExitosa
-                );
     }
 
     private void redirigirAlLogin() {
@@ -495,43 +411,43 @@ public class SedeBean implements Serializable {
         }
     }
 
-    public List<SedeDTO> getSedes() {
-        return sedes;
+    public List<UsuarioDTO> getUsuarios() {
+        return usuarios;
     }
 
-    public void setSedes(
-            List<SedeDTO> sedes
+    public void setUsuarios(
+            List<UsuarioDTO> usuarios
     ) {
-        this.sedes = sedes;
+        this.usuarios = usuarios;
     }
 
-    public CrearSedeRequest getNuevaSede() {
-        return nuevaSede;
+    public CrearUsuarioRequest getNuevoUsuario() {
+        return nuevoUsuario;
     }
 
-    public void setNuevaSede(
-            CrearSedeRequest nuevaSede
+    public void setNuevoUsuario(
+            CrearUsuarioRequest nuevoUsuario
     ) {
-        this.nuevaSede = nuevaSede;
+        this.nuevoUsuario = nuevoUsuario;
     }
 
-    public SedeDTO getSedeSeleccionada() {
-        return sedeSeleccionada;
+    public UsuarioDTO getUsuarioSeleccionado() {
+        return usuarioSeleccionado;
     }
 
-    public void setSedeSeleccionada(
-            SedeDTO sedeSeleccionada
+    public void setUsuarioSeleccionado(
+            UsuarioDTO usuarioSeleccionado
     ) {
-        this.sedeSeleccionada = sedeSeleccionada;
+        this.usuarioSeleccionado = usuarioSeleccionado;
     }
 
-    public ActualizarSedeRequest getSedeEditada() {
-        return sedeEditada;
+    public String getNuevoRol() {
+        return nuevoRol;
     }
 
-    public void setSedeEditada(
-            ActualizarSedeRequest sedeEditada
+    public void setNuevoRol(
+            String nuevoRol
     ) {
-        this.sedeEditada = sedeEditada;
+        this.nuevoRol = nuevoRol;
     }
 }

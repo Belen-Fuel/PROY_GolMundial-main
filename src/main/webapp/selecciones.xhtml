@@ -6,953 +6,1245 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
-    <f:metadata>
-        <f:viewAction
-                action="#{loginBean.verificarAccesoAdministrador}"
-                onPostback="false"/>
-</f:metadata>
-
 <h:head>
-    <title>Administrar Selecciones - UTN GolMundial 2026</title>
+    <title>Gestión de Selecciones - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
-    <style type="text/css">
-
+    <style>
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
-            background: #f4f6f9;
+            min-height: 100%;
+            background: #f4f7fb;
             font-family: "Segoe UI", Arial, sans-serif;
-            color: #1e293b;
+            color: #172033;
         }
 
-        .barra {
-            background: #0f172a;
-            color: white;
-            padding: 16px 24px;
+        body .ui-button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        body .ui-inputfield,
+        body .ui-selectonemenu,
+        body .ui-inputtextarea {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .aplicacion {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .barra-lateral {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px 18px;
+            background: linear-gradient(180deg, #0b1732 0%, #132752 100%);
+            color: #ffffff;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .marca {
+            display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 13px;
+            padding: 4px 8px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .marca-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #2f80ed, #1fd1a5);
+            box-shadow: 0 10px 24px rgba(24, 144, 255, 0.28);
+            font-size: 23px;
         }
 
         .marca h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .marca small {
-            color: #cbd5e1;
+        .marca span {
+            display: block;
+            margin-top: 4px;
+            color: #a9b8d6;
+            font-size: 12px;
+        }
+
+        .titulo-menu {
+            margin: 24px 10px 10px;
+            color: #8094bc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
         .menu {
+            display: grid;
+            gap: 7px;
+        }
+
+        .menu-item {
+            min-height: 46px;
+            padding: 0 14px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .sesion-usuario {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .contenido {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .encabezado {
-            background:
-                linear-gradient(
-                    135deg,
-                    #0f172a 0%,
-                    #1e3a8a 45%,
-                    #2563eb 100%
-                );
-
-            color: white;
-            border-radius: 16px;
-            padding: 30px 28px;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .encabezado::after {
-            content: "";
-            position: absolute;
-            width: 230px;
-            height: 230px;
-            right: -80px;
-            top: -95px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .encabezado h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .encabezado p {
-            margin: 12px 0 0;
+            gap: 12px;
+            color: #dce5f5;
+            text-decoration: none;
             font-size: 14px;
-            color: #dbeafe;
-            line-height: 1.5;
-            position: relative;
-            z-index: 1;
+            font-weight: 600;
+            transition: 0.18s ease;
         }
 
-        .acciones {
-            background: white;
-            border-radius: 14px;
-            padding: 16px 20px;
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+
+        .menu-item.activo {
+            background: linear-gradient(90deg, #2c7df0, #365fdb);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 103, 226, 0.26);
+        }
+
+        .pie-lateral {
+            margin-top: auto;
+            padding: 18px 10px 2px;
+            color: #8295ba;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .area-principal {
+            min-width: 0;
+        }
+
+        .barra-superior {
+            min-height: 76px;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #e5eaf2;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 22px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+        }
+
+        .encabezado-pagina h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .encabezado-pagina p {
+            margin: 5px 0 0;
+            color: #758198;
+            font-size: 13px;
+        }
+
+        .acciones-superiores {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .grupo-botones {
+        .usuario-conectado {
+            min-height: 43px;
+            padding: 7px 12px 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
-            flex-wrap: wrap;
         }
 
-        .busqueda-global {
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #e8f1ff;
+            color: #2563eb;
+        }
+
+        .usuario-datos strong,
+        .usuario-datos small {
+            display: block;
+        }
+
+        .usuario-datos strong {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .usuario-datos small {
+            margin-top: 2px;
+            color: #8792a6;
+            font-size: 11px;
+        }
+
+        .contenido {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 30px 40px;
+        }
+
+        .resumen-selecciones {
+            position: relative;
+            overflow: hidden;
+            padding: 26px 28px;
+            border-radius: 20px;
+            background: linear-gradient(120deg, #102759 0%, #1e4fbb 58%, #2577ec 100%);
+            color: #ffffff;
+            box-shadow: 0 15px 38px rgba(19, 67, 154, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .resumen-selecciones::before,
+        .resumen-selecciones::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .resumen-selecciones::before {
+            width: 230px;
+            height: 230px;
+            right: -65px;
+            top: -110px;
+        }
+
+        .resumen-selecciones::after {
+            width: 120px;
+            height: 120px;
+            right: 180px;
+            bottom: -90px;
+        }
+
+        .resumen-texto,
+        .resumen-contador {
+            position: relative;
+            z-index: 1;
+        }
+
+        .resumen-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.13);
+            color: #eaf2ff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .resumen-selecciones h3 {
+            margin: 15px 0 8px;
+            font-size: clamp(25px, 3vw, 34px);
+            line-height: 1.15;
+        }
+
+        .resumen-selecciones p {
+            max-width: 720px;
+            margin: 0;
+            color: #dbe7ff;
+            line-height: 1.6;
+        }
+
+        .resumen-contador {
+            min-width: 180px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 17px;
+            background: rgba(6, 22, 58, 0.23);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .resumen-contador i {
+            display: block;
+            margin-bottom: 7px;
+            color: #6ef0c7;
+            font-size: 27px;
+        }
+
+        .resumen-contador strong {
+            display: block;
+            font-size: 29px;
+            line-height: 1;
+        }
+
+        .resumen-contador span {
+            display: block;
+            margin-top: 7px;
+            color: #cbd9f5;
+            font-size: 12px;
+        }
+
+        .barra-herramientas {
+            margin: 22px 0 16px;
+            padding: 15px;
+            border: 1px solid #e5eaf2;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(25, 45, 82, 0.05);
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
-        .busqueda-global .ui-inputfield {
-            width: 260px;
+        .buscador {
+            flex: 1 1 340px;
+            max-width: 560px;
+            position: relative;
+        }
+
+        .buscador i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a96aa;
+            z-index: 2;
+        }
+
+        .buscador .ui-inputfield {
+            min-height: 43px;
+            padding-left: 41px;
+        }
+
+        .herramientas-acciones {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .panel-tabla {
+            overflow: hidden;
+            border: 1px solid #e5eaf2;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 10px 26px rgba(25, 45, 82, 0.06);
+        }
+
+        .panel-tabla-cabecera {
+            padding: 18px 20px;
+            border-bottom: 1px solid #e7ecf3;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .panel-tabla-cabecera h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .panel-tabla-cabecera p {
+            margin: 5px 0 0;
+            color: #7b879b;
+            font-size: 13px;
+        }
+
+        .tabla-selecciones .ui-datatable-header {
+            display: none;
+        }
+
+        .tabla-selecciones .ui-datatable-tablewrapper {
+            overflow-x: auto;
+        }
+
+        .tabla-selecciones .ui-datatable-thead > tr > th {
+            padding: 13px 12px;
+            border-color: #e8edf4;
+            background: #f7f9fc;
+            color: #526079;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .tabla-selecciones .ui-datatable-data > tr > td {
+            padding: 13px 12px;
+            border-color: #edf1f6;
+            vertical-align: middle;
+        }
+
+        .tabla-selecciones .ui-datatable-data > tr:hover {
+            background: #f8fbff;
+        }
+
+        .seleccion-identidad {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        .bandera-tabla {
+            width: 46px;
+            height: 31px;
+            object-fit: cover;
+            border: 1px solid #d8e0eb;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.12);
+            flex: 0 0 auto;
+        }
+
+        .seleccion-identidad strong,
+        .seleccion-identidad small {
+            display: block;
+        }
+
+        .seleccion-identidad strong {
+            color: #172033;
+            font-size: 14px;
+        }
+
+        .seleccion-identidad small {
+            margin-top: 3px;
+            color: #8a95a7;
+            font-size: 11px;
         }
 
         .codigo-fifa {
-            font-weight: bold;
-            color: #1d4ed8;
-            letter-spacing: 1px;
+            display: inline-flex;
+            min-width: 46px;
+            justify-content: center;
+            padding: 6px 8px;
+            border-radius: 8px;
+            background: #edf4ff;
+            color: #245fc4;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
         }
 
-        .nombre-seleccion {
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        .etiqueta-grupo {
-            display: inline-block;
-            min-width: 35px;
-            padding: 5px 9px;
-            border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .etiqueta-anfitrion {
+        .grupo-etiqueta {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 5px 9px;
+            gap: 6px;
+            padding: 6px 9px;
             border-radius: 999px;
-            background: #dcfce7;
-            color: #15803d;
+            background: #eef2ff;
+            color: #4f46b7;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 700;
         }
 
-        .etiqueta-no-anfitrion {
-            color: #64748b;
+        .confederacion-etiqueta {
+            display: inline-flex;
+            padding: 6px 9px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #526176;
+            font-size: 12px;
+            font-weight: 700;
         }
 
-        .campo-completo {
-            width: 100%;
+        .clasificacion-texto {
+            display: block;
+            max-width: 260px;
+            color: #58677d;
+            font-size: 13px;
+            line-height: 1.4;
         }
 
-        .botones-dialogo {
+        .acciones-tabla {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .acciones-tabla .ui-button {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+        }
+
+        .sin-datos {
+            padding: 36px 20px;
+            color: #738096;
+            text-align: center;
+        }
+
+        .sin-datos i {
+            display: block;
+            margin-bottom: 10px;
+            color: #9ba8ba;
+            font-size: 30px;
+        }
+
+        .formulario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 17px;
+        }
+
+        .campo {
+            min-width: 0;
+        }
+
+        .campo.completo {
+            grid-column: 1 / -1;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 7px;
+            color: #334158;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .campo small {
+            display: block;
+            margin-top: 6px;
+            color: #8b96a8;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .campo-anfitrion {
+            min-height: 47px;
+            padding: 12px 14px;
+            border: 1px solid #e0e6ef;
+            border-radius: 10px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .campo-anfitrion label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .dialogo-pie {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e7ecf3;
             display: flex;
             justify-content: flex-end;
-            gap: 8px;
-            margin-top: 18px;
+            gap: 9px;
+            flex-wrap: wrap;
         }
 
-        .pie {
-            background: #0f172a;
-            color: #cbd5e1;
-            text-align: center;
-            padding: 24px;
-            margin-top: 35px;
+        .ui-dialog .ui-dialog-titlebar {
+            padding: 17px 20px;
+            border-bottom: 1px solid #e5eaf2;
+            background: #ffffff;
         }
 
-        @media (max-width: 650px) {
+        .ui-dialog .ui-dialog-content {
+            padding: 20px;
+        }
 
-            .barra {
-                align-items: flex-start;
+        @media (max-width: 1050px) {
+            .aplicacion {
+                grid-template-columns: 220px minmax(0, 1fr);
+            }
+
+            .barra-lateral {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .marca span,
+            .pie-lateral {
+                display: none;
+            }
+        }
+
+        @media (max-width: 780px) {
+            .aplicacion {
+                display: block;
+            }
+
+            .barra-lateral {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 16px;
+            }
+
+            .marca {
+                padding-bottom: 15px;
+            }
+
+            .titulo-menu {
+                margin-top: 15px;
             }
 
             .menu {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .menu-item {
+                justify-content: center;
+                min-height: 43px;
+                padding: 0 9px;
+                font-size: 12px;
+            }
+
+            .barra-superior {
+                position: relative;
+                padding: 15px 18px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .acciones-superiores {
                 width: 100%;
+                justify-content: flex-start;
             }
 
             .contenido {
-                padding: 20px 10px;
+                padding: 20px 14px 32px;
             }
 
-            .acciones {
-                align-items: stretch;
+            .resumen-selecciones {
+                align-items: flex-start;
+                flex-direction: column;
             }
 
-            .grupo-botones {
+            .resumen-contador {
                 width: 100%;
+                min-width: 0;
             }
 
-            .busqueda-global {
-                width: 100%;
+            .formulario-grid {
+                grid-template-columns: 1fr;
             }
 
-            .busqueda-global .ui-inputfield {
-                width: 100%;
+            .campo.completo {
+                grid-column: auto;
             }
         }
 
+        @media (max-width: 520px) {
+            .menu {
+                grid-template-columns: 1fr;
+            }
+
+            .usuario-conectado {
+                width: 100%;
+            }
+
+            .barra-herramientas,
+            .herramientas-acciones {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .herramientas-acciones,
+            .herramientas-acciones .ui-button {
+                width: 100%;
+            }
+        }
     </style>
 </h:head>
 
 <h:body>
-
-    <!-- Barra superior administrativa -->
-    <div class="barra">
-
-        <div class="marca">
-
-            <h1>UTN GolMundial 2026</h1>
-
-            <small>
-                Panel administrativo del torneo
-            </small>
-
-        </div>
-
-        <h:form id="formMenu">
-
-            <div class="menu">
-
-                <p:button
-                        value="Panel"
-                        icon="pi pi-home"
-                        href="#{request.contextPath}/dashboard.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Partidos"
-                        icon="pi pi-calendar"
-                        href="#{request.contextPath}/partidos.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Selecciones"
-                        icon="pi pi-flag"
-                        href="#{request.contextPath}/selecciones.xhtml"/>
-
-                <p:button
-                        value="Sedes"
-                        icon="pi pi-map-marker"
-                        href="#{request.contextPath}/sedes.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Usuarios"
-                        icon="pi pi-users"
-                        href="#{request.contextPath}/usuarios.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Auditoría"
-                        icon="pi pi-search"
-                        href="#{request.contextPath}/auditoria.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <p:button
-                        value="Reportes"
-                        icon="pi pi-chart-bar"
-                        href="#{request.contextPath}/reportes.xhtml"
-                        styleClass="ui-button-outlined"/>
-
-                <h:panelGroup
-                        rendered="#{
-                            loginBean.logueado
-                            and loginBean.administrador
-                        }"
-                        layout="block"
-                        style="
-                            display:inline-flex;
-                            align-items:center;
-                            gap:8px;
-                        ">
-
-                    <span class="sesion-usuario">
-
-                        <i class="pi pi-user"></i>
-
-                        #{loginBean.usuario.nombre}
-
-                    </span>
-
-                    <p:commandButton
-                            value="Cerrar sesión"
-                            icon="pi pi-sign-out"
-                            action="#{loginBean.cerrarSesion}"
-                            ajax="false"
-                            styleClass="ui-button-danger"/>
-
-                </h:panelGroup>
-
-            </div>
-
-        </h:form>
-
-    </div>
-
-    <main class="contenido">
-
-        <!-- Encabezado -->
-        <div class="encabezado">
-
-            <h1>
-                <i class="pi pi-flag"></i>
-                Administración de selecciones
-            </h1>
-
-            <p>
-                Registra, modifica y elimina las selecciones
-                participantes del Mundial 2026.
-            </p>
-
-        </div>
-
-        <!-- Formulario principal -->
-        <h:form id="formSelecciones">
-
-            <p:growl id="mensajes"
-                        showSummary="true"
-                        showDetail="false"
-                        skipDetailIfEqualsSummary="true"
-                        life="5000"
-                        closable="true"/>
-
-            <div class="acciones">
-
-                <p:button
-                        value="Volver al panel"
-                        icon="pi pi-home"
-                        href="#{request.contextPath}/dashboard.xhtml"
-                        styleClass="ui-button-secondary"/>
-
-                <div class="grupo-botones">
-
-                    <p:commandButton
-                            value="Actualizar"
-                            icon="pi pi-refresh"
-                            action="#{seleccionBean.cargarSelecciones}"
-                            process="@this"
-                            update=":formSelecciones:tablaSelecciones :formSelecciones:mensajes"
-                            styleClass="ui-button-secondary"/>
-
-                    <p:commandButton
-                            value="Nueva selección"
-                            icon="pi pi-plus"
-                            type="button"
-                            onclick="PF('dlgNuevaSeleccion').show()"
-                            styleClass="ui-button-success"/>
-
+    <div class="aplicacion">
+        <aside class="barra-lateral">
+            <div class="marca">
+                <div class="marca-icono">
+                    <i class="pi pi-chart-bar"></i>
                 </div>
 
+                <div>
+                    <h1>UTN GolMundial</h1>
+                    <span>Administración 2026</span>
+                </div>
             </div>
 
-            <!-- Tabla administrativa -->
-                <p:dataTable
-                        id="tablaSelecciones"
-                        widgetVar="tablaSeleccionesWidget"
-                        var="seleccion"
-                        value="#{seleccionBean.selecciones}"
-                        rowIndexVar="indice"
-                        reflow="true"
-                        rows="10"
-                        paginator="true"
-                        paginatorPosition="bottom"
-                        rowHover="true"
-                        filterDelay="300"
-                        globalFilterOnly="true"
-                        emptyMessage="No se encontraron selecciones que coincidan con la búsqueda.">
+            <div class="titulo-menu">Menú principal</div>
 
+            <nav class="menu">
+                <h:link outcome="/dashboard.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:link>
 
-                    <f:facet name="header">
+                <h:link outcome="/partidos.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Partidos</span>
+                </h:link>
 
-                        <div class="busqueda-global">
+                <h:link outcome="/selecciones.xhtml"
+                        styleClass="menu-item activo">
+                    <i class="pi pi-flag"></i>
+                    <span>Selecciones</span>
+                </h:link>
 
-                            <span class="ui-input-icon-left">
+                <h:link outcome="/sedes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-map-marker"></i>
+                    <span>Sedes</span>
+                </h:link>
 
-                                <i class="pi pi-search"></i>
+                <h:link outcome="/usuarios.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-users"></i>
+                    <span>Usuarios</span>
+                </h:link>
 
-                                <p:inputText
-                                        id="globalFilter"
-                                        placeholder="Buscar selección..."
-                                        autocomplete="off"
-                                        onkeydown="
-                                            if (event.key === 'Enter') {
-                                                event.preventDefault();
-                                                PF('tablaSeleccionesWidget').filter();
-                                                return false;
-                                            }
-                                        "/>
+                <h:link outcome="/reportes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Reportes</span>
+                </h:link>
 
-                            </span>
+                <h:link outcome="/auditoria.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-book"></i>
+                    <span>Auditoría</span>
+                </h:link>
 
-                            <p:commandButton
-                                    value="Buscar"
-                                    icon="pi pi-search"
-                                    type="button"
-                                    onclick="
-                                        PF('tablaSeleccionesWidget').filter();
-                                        return false;
-                                    "
-                                    styleClass="ui-button-info"/>
+                <h:link outcome="/publico/inicio.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-globe"></i>
+                    <span>Portal público</span>
+                </h:link>
+            </nav>
 
-                            <p:commandButton
-                                    value="Limpiar"
-                                    icon="pi pi-filter-slash"
-                                    type="button"
-                                    onclick="PF('tablaSeleccionesWidget').clearFilters(); return false;"
-                                    styleClass="ui-button-secondary ui-button-outlined"/>
+            <div class="pie-lateral">
+                Gestión de equipos participantes, grupos y confederaciones.
+            </div>
+        </aside>
 
+        <main class="area-principal">
+            <header class="barra-superior">
+                <div class="encabezado-pagina">
+                    <h2>Gestión de selecciones</h2>
+                    <p>Administre las selecciones participantes del torneo.</p>
+                </div>
+
+                <div class="acciones-superiores">
+                    <div class="usuario-conectado">
+                        <div class="avatar">
+                            <i class="pi pi-user"></i>
                         </div>
 
-                    </f:facet>
+                        <div class="usuario-datos">
+                            <strong>#{loginBean.usuario.nombre}</strong>
+                            <small>#{loginBean.usuario.rol}</small>
+                        </div>
+                    </div>
 
-               <p:column
-                        headerText="N.º"
-                        style="width:60px;text-align:center;">
+                    <p:button value="Ver portal"
+                              icon="pi pi-external-link"
+                              outcome="/publico/selecciones.xhtml"
+                              styleClass="ui-button-outlined"/>
 
-                    <h:outputText value="#{indice + 1}"/>
+                    <h:form id="formSesion">
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+                    </h:form>
+                </div>
+            </header>
 
-                </p:column>
+            <div class="contenido">
+                <h:form id="formSeleccion">
+                    <p:growl id="mensajes"
+                             showDetail="true"
+                             life="5000"/>
 
-                <p:column
-                        headerText="Código FIFA"
-                        filterBy="#{seleccion.codigoFifa}"
-                        filterMatchMode="contains"
-                        style="text-align:center;">
+                    <section class="resumen-selecciones">
+                        <div class="resumen-texto">
+                            <span class="resumen-etiqueta">
+                                <i class="pi pi-shield"></i>
+                                Módulo administrativo
+                            </span>
 
-                    <h:outputText
-                            value="#{seleccion.codigoFifa}"
-                            styleClass="codigo-fifa"/>
+                            <h3>Selecciones participantes</h3>
 
-                </p:column>
+                            <p>
+                                Registre, consulte, actualice o elimine la información
+                                de los equipos clasificados al Mundial 2026.
+                            </p>
+                        </div>
 
-                <p:column
-                        headerText="Selección"
-                        filterBy="#{seleccion.nombre}"
-                        filterMatchMode="contains">
+                        <h:panelGroup id="contador"
+                                      layout="block"
+                                      styleClass="resumen-contador">
+                            <i class="pi pi-flag"></i>
+                            <strong>
+                                #{empty seleccionBean.selecciones
+                                   ? 0
+                                   : seleccionBean.selecciones.size()}
+                            </strong>
+                            <span>Selecciones registradas</span>
+                        </h:panelGroup>
+                    </section>
 
-                    <h:outputText
-                            value="#{seleccion.nombre}"
-                            styleClass="nombre-seleccion"/>
+                    <section class="barra-herramientas">
+                        <div class="buscador">
+                            <i class="pi pi-search"></i>
+                            <p:inputText id="busquedaGlobal"
+                                         placeholder="Buscar por nombre, código, grupo o confederación..."
+                                         onkeyup="document.getElementById('formSeleccion:tablaSelecciones:globalFilter').value=this.value; PF('tablaSelecciones').filter()"/>
+                        </div>
 
-                </p:column>
+                        <div class="herramientas-acciones">
+                            <p:commandButton value="Actualizar"
+                                             icon="pi pi-refresh"
+                                             action="#{seleccionBean.cargarSelecciones}"
+                                             process="@this"
+                                             update=":formSeleccion:tablaPanel :formSeleccion:contador :formSeleccion:mensajes"
+                                             styleClass="ui-button-outlined"/>
 
-                <p:column
-                        headerText="Grupo"
-                        filterBy="#{seleccion.grupo}"
-                        filterMatchMode="contains"
-                        style="text-align:center;">
+                            <p:commandButton value="Nueva selección"
+                                             icon="pi pi-plus"
+                                             action="#{seleccionBean.prepararNuevaSeleccion}"
+                                             process="@this"
+                                             update=":formNueva:panelNueva"
+                                             oncomplete="PF('dlgNuevaSeleccion').show()"/>
+                        </div>
+                    </section>
 
-                    <span class="etiqueta-grupo">
-                        #{seleccion.grupo}
-                    </span>
+                    <h:panelGroup id="tablaPanel"
+                                  layout="block"
+                                  styleClass="panel-tabla">
+                        <div class="panel-tabla-cabecera">
+                            <div>
+                                <h3>Listado de selecciones</h3>
+                                <p>Use el buscador para localizar rápidamente un registro.</p>
+                            </div>
 
-                </p:column>
+                            <span class="codigo-fifa">
+                                #{empty seleccionBean.selecciones
+                                   ? 0
+                                   : seleccionBean.selecciones.size()} equipos
+                            </span>
+                        </div>
 
-                <p:column
-                        headerText="Confederación"
-                        filterBy="#{seleccion.confederacion}"
-                        filterMatchMode="contains">
+                        <p:dataTable id="tablaSelecciones"
+                                     widgetVar="tablaSelecciones"
+                                     value="#{seleccionBean.selecciones}"
+                                     var="s"
+                                     rowKey="#{s.id}"
+                                     paginator="true"
+                                     rows="10"
+                                     rowsPerPageTemplate="5,10,15,20"
+                                     paginatorPosition="bottom"
+                                     responsiveLayout="scroll"
+                                     emptyMessage="No existen selecciones registradas."
+                                     styleClass="tabla-selecciones">
 
-                    <h:outputText
-                            value="#{seleccion.confederacion}"/>
+                            <f:facet name="header">
+                                <p:inputText id="globalFilter"
+                                             style="display:none;"/>
+                            </f:facet>
 
-                </p:column>
+                            <p:column headerText="Selección"
+                                      filterBy="#{s.nombre}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{s.nombre}">
+                                <div class="seleccion-identidad">
+                                    <h:graphicImage
+                                            library="images"
+                                            name="banderas/#{publicoBean.obtenerCodigoBandera(s.codigoFifa)}.svg"
+                                            styleClass="bandera-tabla"
+                                            alt="Bandera de #{s.nombre}"/>
 
-                <p:column
-                        headerText="Clasificación"
-                        filterBy="#{seleccion.clasificacion}"
-                        filterMatchMode="contains">
+                                    <div>
+                                        <strong>#{s.nombre}</strong>
+                                        <small>ID del registro: #{s.id}</small>
+                                    </div>
+                                </div>
+                            </p:column>
 
-                    <h:outputText
-                            value="#{seleccion.clasificacion}"/>
+                            <p:column headerText="Código"
+                                      filterBy="#{s.codigoFifa}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{s.codigoFifa}"
+                                      style="width:100px;text-align:center;">
+                                <span class="codigo-fifa">#{s.codigoFifa}</span>
+                            </p:column>
 
-                </p:column>
+                            <p:column headerText="Grupo"
+                                      filterBy="#{s.grupo}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{s.grupo}"
+                                      style="width:110px;text-align:center;">
+                                <span class="grupo-etiqueta">
+                                    <i class="pi pi-sitemap"></i>
+                                    Grupo #{s.grupo}
+                                </span>
+                            </p:column>
 
-                <p:column
-                        headerText="Anfitrión"
-                        style="text-align:center;">
+                            <p:column headerText="Confederación"
+                                      filterBy="#{s.confederacion}"
+                                      filterMatchMode="contains"
+                                      sortBy="#{s.confederacion}"
+                                      style="width:150px;text-align:center;">
+                                <span class="confederacion-etiqueta">
+                                    #{s.confederacion}
+                                </span>
+                            </p:column>
 
-                    <h:panelGroup rendered="#{seleccion.anfitrion}">
+                            <p:column headerText="Clasificación"
+                                      filterBy="#{s.clasificacion}"
+                                      filterMatchMode="contains">
+                                <span class="clasificacion-texto">
+                                    #{empty s.clasificacion
+                                      ? 'No especificada'
+                                      : s.clasificacion}
+                                </span>
+                            </p:column>
 
-                        <span class="etiqueta-anfitrion">
+                            <p:column headerText="Condición"
+                                      style="width:125px;text-align:center;">
+                                <p:tag value="Anfitrión"
+                                       icon="pi pi-star-fill"
+                                       severity="success"
+                                       rendered="#{s.anfitrion}"/>
 
-                            <i class="pi pi-star-fill"></i>
-                            Sí
+                                <p:tag value="Clasificado"
+                                       icon="pi pi-check-circle"
+                                       severity="info"
+                                       rendered="#{not s.anfitrion}"/>
+                            </p:column>
 
-                        </span>
+                            <p:column headerText="Acciones"
+                                      exportable="false"
+                                      style="width:115px;text-align:center;">
+                                <div class="acciones-tabla">
+                                    <p:commandButton icon="pi pi-pencil"
+                                                     title="Editar selección"
+                                                     actionListener="#{seleccionBean.prepararEdicion(s)}"
+                                                     process="@this"
+                                                     update=":formEditar:panelEditar"
+                                                     oncomplete="PF('dlgEditarSeleccion').show()"
+                                                     styleClass="ui-button-info ui-button-outlined"/>
 
+                                    <p:commandButton icon="pi pi-trash"
+                                                     title="Eliminar selección"
+                                                     actionListener="#{seleccionBean.eliminarSeleccion(s)}"
+                                                     process="@this"
+                                                     update=":formSeleccion:tablaPanel :formSeleccion:contador :formSeleccion:mensajes"
+                                                     styleClass="ui-button-danger ui-button-outlined">
+                                        <p:confirm header="Confirmar eliminación"
+                                                   message="¿Está seguro de eliminar a #{s.nombre}? Esta acción no se puede deshacer."
+                                                   icon="pi pi-exclamation-triangle"/>
+                                    </p:commandButton>
+                                </div>
+                            </p:column>
+                        </p:dataTable>
                     </h:panelGroup>
 
-                    <h:panelGroup
-                            rendered="#{not seleccion.anfitrion}">
+                    <p:confirmDialog global="true"
+                                     responsive="true"
+                                     width="430"
+                                     showEffect="fade"
+                                     hideEffect="fade"
+                                     yesButtonLabel="Eliminar"
+                                     noButtonLabel="Cancelar"
+                                     yesButtonClass="ui-button-danger"
+                                     noButtonClass="ui-button-outlined"/>
+                </h:form>
+            </div>
+        </main>
+    </div>
 
-                        <span class="etiqueta-no-anfitrion">
-                            No
-                        </span>
+    <p:dialog header="Registrar nueva selección"
+              widgetVar="dlgNuevaSeleccion"
+              modal="true"
+              responsive="true"
+              width="720"
+              closeOnEscape="true"
+              appendTo="@(body)">
 
-                    </h:panelGroup>
+        <h:form id="formNueva">
+            <h:panelGroup id="panelNueva"
+                          layout="block">
+                <p:messages id="mensajesNueva"
+                            showDetail="true"
+                            closable="true"/>
 
-                </p:column>
+                <div class="formulario-grid">
+                    <div class="campo">
+                        <p:outputLabel for="codigoNuevo"
+                                       value="Código FIFA *"/>
+                        <p:inputText id="codigoNuevo"
+                                     value="#{seleccionBean.nuevaSeleccion.codigoFifa}"
+                                     required="true"
+                                     requiredMessage="El código FIFA es obligatorio."
+                                     maxlength="3"
+                                     placeholder="Ejemplo: ECU"/>
+                        <small>Debe contener exactamente tres letras o números.</small>
+                    </div>
 
-                <p:column
-                        headerText="Acciones"
-                        style="width:150px; text-align:center;">
+                    <div class="campo">
+                        <p:outputLabel for="nombreNuevo"
+                                       value="Nombre de la selección *"/>
+                        <p:inputText id="nombreNuevo"
+                                     value="#{seleccionBean.nuevaSeleccion.nombre}"
+                                     required="true"
+                                     requiredMessage="El nombre es obligatorio."
+                                     maxlength="100"
+                                     placeholder="Ejemplo: Ecuador"/>
+                    </div>
 
-                    <p:commandButton
-                            icon="pi pi-pencil"
-                            title="Editar selección"
-                            actionListener="#{
-                                seleccionBean.prepararEdicion(seleccion)
-                            }"
-                            process="@this"
-                            update=":formEditarSeleccion"
-                            oncomplete="
-                                if (!args.validationFailed) {
-                                    PF('dlgEditarSeleccion').show();
-                                }
-                            "
-                            styleClass="ui-button-warning"
-                            style="margin-right:6px;"/>
+                    <div class="campo">
+                        <p:outputLabel for="grupoNuevo"
+                                       value="Grupo *"/>
+                        <p:selectOneMenu id="grupoNuevo"
+                                         value="#{seleccionBean.nuevaSeleccion.grupo}"
+                                         required="true"
+                                         requiredMessage="Seleccione un grupo.">
+                            <f:selectItem itemLabel="Seleccione un grupo"
+                                          itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItem itemLabel="Grupo A" itemValue="A"/>
+                            <f:selectItem itemLabel="Grupo B" itemValue="B"/>
+                            <f:selectItem itemLabel="Grupo C" itemValue="C"/>
+                            <f:selectItem itemLabel="Grupo D" itemValue="D"/>
+                            <f:selectItem itemLabel="Grupo E" itemValue="E"/>
+                            <f:selectItem itemLabel="Grupo F" itemValue="F"/>
+                            <f:selectItem itemLabel="Grupo G" itemValue="G"/>
+                            <f:selectItem itemLabel="Grupo H" itemValue="H"/>
+                            <f:selectItem itemLabel="Grupo I" itemValue="I"/>
+                            <f:selectItem itemLabel="Grupo J" itemValue="J"/>
+                            <f:selectItem itemLabel="Grupo K" itemValue="K"/>
+                            <f:selectItem itemLabel="Grupo L" itemValue="L"/>
+                        </p:selectOneMenu>
+                    </div>
 
-                    <p:commandButton
-                            icon="pi pi-trash"
-                            title="Eliminar selección"
-                            actionListener="#{
-                                seleccionBean.eliminarSeleccion(seleccion)
-                            }"
-                            process="@this"
-                            update=":formSelecciones:tablaSelecciones :formSelecciones:mensajes"
-                            styleClass="ui-button-danger">
+                    <div class="campo">
+                        <p:outputLabel for="confederacionNueva"
+                                       value="Confederación *"/>
+                        <p:selectOneMenu id="confederacionNueva"
+                                         value="#{seleccionBean.nuevaSeleccion.confederacion}"
+                                         required="true"
+                                         requiredMessage="Seleccione una confederación.">
+                            <f:selectItem itemLabel="Seleccione una confederación"
+                                          itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItem itemLabel="AFC" itemValue="AFC"/>
+                            <f:selectItem itemLabel="CAF" itemValue="CAF"/>
+                            <f:selectItem itemLabel="CONCACAF" itemValue="CONCACAF"/>
+                            <f:selectItem itemLabel="CONMEBOL" itemValue="CONMEBOL"/>
+                            <f:selectItem itemLabel="OFC" itemValue="OFC"/>
+                            <f:selectItem itemLabel="UEFA" itemValue="UEFA"/>
+                        </p:selectOneMenu>
+                    </div>
 
-                        <p:confirm
-                                header="Confirmar eliminación"
-                                message="¿Está seguro de eliminar esta selección?"
-                                icon="pi pi-exclamation-triangle"/>
+                    <div class="campo completo">
+                        <p:outputLabel for="clasificacionNueva"
+                                       value="Método de clasificación"/>
+                        <p:inputTextarea id="clasificacionNueva"
+                                         value="#{seleccionBean.nuevaSeleccion.clasificacion}"
+                                         maxlength="150"
+                                         rows="3"
+                                         autoResize="false"
+                                         placeholder="Ejemplo: Clasificación CONMEBOL"/>
+                        <small>Campo opcional, máximo 150 caracteres.</small>
+                    </div>
 
-                    </p:commandButton>
+                    <div class="campo completo">
+                        <div class="campo-anfitrion">
+                            <p:selectBooleanCheckbox id="anfitrionNuevo"
+                                                     value="#{seleccionBean.nuevaSeleccion.esAnfitrion}"/>
+                            <p:outputLabel for="anfitrionNuevo"
+                                           value="Esta selección es anfitriona del torneo"/>
+                        </div>
+                    </div>
+                </div>
 
-                </p:column>
+                <div class="dialogo-pie">
+                    <p:commandButton value="Cancelar"
+                                     icon="pi pi-times"
+                                     type="button"
+                                     onclick="PF('dlgNuevaSeleccion').hide()"
+                                     styleClass="ui-button-outlined ui-button-secondary"/>
 
-            </p:dataTable>
-
+                    <p:commandButton value="Guardar selección"
+                                     icon="pi pi-save"
+                                     action="#{seleccionBean.guardarSeleccion}"
+                                     process="@form"
+                                     update=":formSeleccion:tablaPanel :formSeleccion:contador :formSeleccion:mensajes panelNueva mensajesNueva"
+                                     oncomplete="if (args.operacionExitosa) PF('dlgNuevaSeleccion').hide()"/>
+                </div>
+            </h:panelGroup>
         </h:form>
+    </p:dialog>
 
-        <!-- Diálogo para registrar -->
-        <p:dialog
-                id="dialogoNuevaSeleccion"
-                header="Registrar nueva selección"
-                widgetVar="dlgNuevaSeleccion"
-                modal="true"
-                responsive="true"
-                resizable="false"
-                closable="true"
-                width="520"
-                showEffect="fade"
-                hideEffect="fade">
+    <p:dialog header="Editar selección"
+              widgetVar="dlgEditarSeleccion"
+              modal="true"
+              responsive="true"
+              width="720"
+              closeOnEscape="true"
+              appendTo="@(body)">
 
-            <h:form id="formNuevaSeleccion">
+        <h:form id="formEditar">
+            <h:panelGroup id="panelEditar"
+                          layout="block">
+                <p:messages id="mensajesEditar"
+                            showDetail="true"
+                            closable="true"/>
 
-                <p:messages
-                        id="mensajesNueva"
-                        showSummary="true"
-                        showDetail="false"
-                        closable="true"/>
+                <div class="formulario-grid">
+                    <div class="campo">
+                        <p:outputLabel for="codigoEditar"
+                                       value="Código FIFA *"/>
+                        <p:inputText id="codigoEditar"
+                                     value="#{seleccionBean.seleccionEditada.codigoFifa}"
+                                     required="true"
+                                     requiredMessage="El código FIFA es obligatorio."
+                                     maxlength="3"/>
+                    </div>
 
-                <p:panelGrid
-                        columns="2"
-                        layout="grid"
-                        styleClass="ui-panelgrid-blank"
-                        columnClasses="ui-grid-col-4,ui-grid-col-8">
+                    <div class="campo">
+                        <p:outputLabel for="nombreEditar"
+                                       value="Nombre de la selección *"/>
+                        <p:inputText id="nombreEditar"
+                                     value="#{seleccionBean.seleccionEditada.nombre}"
+                                     required="true"
+                                     requiredMessage="El nombre es obligatorio."
+                                     maxlength="100"/>
+                    </div>
 
-                    <p:outputLabel
-                            for="codigoNuevo"
-                            value="Código FIFA:"/>
+                    <div class="campo">
+                        <p:outputLabel for="grupoEditar"
+                                       value="Grupo *"/>
+                        <p:selectOneMenu id="grupoEditar"
+                                         value="#{seleccionBean.seleccionEditada.grupo}"
+                                         required="true"
+                                         requiredMessage="Seleccione un grupo.">
+                            <f:selectItem itemLabel="Seleccione un grupo"
+                                          itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItem itemLabel="Grupo A" itemValue="A"/>
+                            <f:selectItem itemLabel="Grupo B" itemValue="B"/>
+                            <f:selectItem itemLabel="Grupo C" itemValue="C"/>
+                            <f:selectItem itemLabel="Grupo D" itemValue="D"/>
+                            <f:selectItem itemLabel="Grupo E" itemValue="E"/>
+                            <f:selectItem itemLabel="Grupo F" itemValue="F"/>
+                            <f:selectItem itemLabel="Grupo G" itemValue="G"/>
+                            <f:selectItem itemLabel="Grupo H" itemValue="H"/>
+                            <f:selectItem itemLabel="Grupo I" itemValue="I"/>
+                            <f:selectItem itemLabel="Grupo J" itemValue="J"/>
+                            <f:selectItem itemLabel="Grupo K" itemValue="K"/>
+                            <f:selectItem itemLabel="Grupo L" itemValue="L"/>
+                        </p:selectOneMenu>
+                    </div>
 
-                    <p:inputText
-                            id="codigoNuevo"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.codigoFifa
-                            }"
-                            maxlength="3"
-                            required="true"
-                            requiredMessage="El código FIFA es obligatorio."
-                            styleClass="campo-completo"/>
+                    <div class="campo">
+                        <p:outputLabel for="confederacionEditar"
+                                       value="Confederación *"/>
+                        <p:selectOneMenu id="confederacionEditar"
+                                         value="#{seleccionBean.seleccionEditada.confederacion}"
+                                         required="true"
+                                         requiredMessage="Seleccione una confederación.">
+                            <f:selectItem itemLabel="Seleccione una confederación"
+                                          itemValue=""
+                                          noSelectionOption="true"/>
+                            <f:selectItem itemLabel="AFC" itemValue="AFC"/>
+                            <f:selectItem itemLabel="CAF" itemValue="CAF"/>
+                            <f:selectItem itemLabel="CONCACAF" itemValue="CONCACAF"/>
+                            <f:selectItem itemLabel="CONMEBOL" itemValue="CONMEBOL"/>
+                            <f:selectItem itemLabel="OFC" itemValue="OFC"/>
+                            <f:selectItem itemLabel="UEFA" itemValue="UEFA"/>
+                        </p:selectOneMenu>
+                    </div>
 
-                    <p:outputLabel
-                            for="nombreNuevo"
-                            value="Nombre:"/>
+                    <div class="campo completo">
+                        <p:outputLabel for="clasificacionEditar"
+                                       value="Método de clasificación"/>
+                        <p:inputTextarea id="clasificacionEditar"
+                                         value="#{seleccionBean.seleccionEditada.clasificacion}"
+                                         maxlength="150"
+                                         rows="3"
+                                         autoResize="false"/>
+                    </div>
 
-                    <p:inputText
-                            id="nombreNuevo"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.nombre
-                            }"
-                            required="true"
-                            requiredMessage="El nombre es obligatorio."
-                            styleClass="campo-completo"/>
-
-                    <p:outputLabel
-                            for="grupoNuevo"
-                            value="Grupo:"/>
-
-                    <p:selectOneMenu
-                            id="grupoNuevo"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.grupo
-                            }"
-                            required="true"
-                            requiredMessage="Seleccione un grupo."
-                            styleClass="campo-completo">
-
-                        <f:selectItem
-                                itemLabel="Seleccione"
-                                itemValue="#{null}"
-                                noSelectionOption="true"/>
-
-                        <f:selectItem itemLabel="Grupo A" itemValue="A"/>
-                        <f:selectItem itemLabel="Grupo B" itemValue="B"/>
-                        <f:selectItem itemLabel="Grupo C" itemValue="C"/>
-                        <f:selectItem itemLabel="Grupo D" itemValue="D"/>
-                        <f:selectItem itemLabel="Grupo E" itemValue="E"/>
-                        <f:selectItem itemLabel="Grupo F" itemValue="F"/>
-                        <f:selectItem itemLabel="Grupo G" itemValue="G"/>
-                        <f:selectItem itemLabel="Grupo H" itemValue="H"/>
-                        <f:selectItem itemLabel="Grupo I" itemValue="I"/>
-                        <f:selectItem itemLabel="Grupo J" itemValue="J"/>
-                        <f:selectItem itemLabel="Grupo K" itemValue="K"/>
-                        <f:selectItem itemLabel="Grupo L" itemValue="L"/>
-
-                    </p:selectOneMenu>
-
-                    <p:outputLabel
-                            for="confederacionNueva"
-                            value="Confederación:"/>
-
-                    <p:selectOneMenu
-                            id="confederacionNueva"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.confederacion
-                            }"
-                            required="true"
-                            requiredMessage="Seleccione una confederación."
-                            styleClass="campo-completo">
-
-                        <f:selectItem
-                                itemLabel="Seleccione"
-                                itemValue="#{null}"
-                                noSelectionOption="true"/>
-
-                        <f:selectItem itemLabel="AFC" itemValue="AFC"/>
-                        <f:selectItem itemLabel="CAF" itemValue="CAF"/>
-                        <f:selectItem
-                                itemLabel="CONCACAF"
-                                itemValue="CONCACAF"/>
-                        <f:selectItem
-                                itemLabel="CONMEBOL"
-                                itemValue="CONMEBOL"/>
-                        <f:selectItem itemLabel="OFC" itemValue="OFC"/>
-                        <f:selectItem itemLabel="UEFA" itemValue="UEFA"/>
-
-                    </p:selectOneMenu>
-
-                    <p:outputLabel
-                            for="clasificacionNueva"
-                            value="Clasificación:"/>
-
-                    <p:inputText
-                            id="clasificacionNueva"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.clasificacion
-                            }"
-                            required="true"
-                            requiredMessage="
-                                La forma de clasificación es obligatoria.
-                            "
-                            styleClass="campo-completo"/>
-
-                    <p:outputLabel
-                            for="anfitrionNuevo"
-                            value="Es anfitrión:"/>
-
-                    <p:selectBooleanCheckbox
-                            id="anfitrionNuevo"
-                            value="#{
-                                seleccionBean.nuevaSeleccion.esAnfitrion
-                            }"/>
-
-                </p:panelGrid>
-
-                <div class="botones-dialogo">
-
-                    <p:commandButton
-                            value="Cancelar"
-                            icon="pi pi-times"
-                            type="button"
-                            onclick="PF('dlgNuevaSeleccion').hide()"
-                            styleClass="ui-button-secondary"/>
-
-                    <p:commandButton
-                            value="Guardar"
-                            icon="pi pi-check"
-                            action="#{seleccionBean.guardarSeleccion}"
-                            process="@form"
-                            update="@form :formSelecciones:tablaSelecciones :formSelecciones:mensajes"
-                            ajax="true"
-                            styleClass="ui-button-success"/>
-
+                    <div class="campo completo">
+                        <div class="campo-anfitrion">
+                            <p:selectBooleanCheckbox id="anfitrionEditar"
+                                                     value="#{seleccionBean.seleccionEditada.esAnfitrion}"/>
+                            <p:outputLabel for="anfitrionEditar"
+                                           value="Esta selección es anfitriona del torneo"/>
+                        </div>
+                    </div>
                 </div>
 
-            </h:form>
+                <div class="dialogo-pie">
+                    <p:commandButton value="Cancelar"
+                                     icon="pi pi-times"
+                                     type="button"
+                                     onclick="PF('dlgEditarSeleccion').hide()"
+                                     styleClass="ui-button-outlined ui-button-secondary"/>
 
-        </p:dialog>
-
-        <!-- Diálogo para editar -->
-        <p:dialog
-                id="dialogoEditarSeleccion"
-                header="Editar selección"
-                widgetVar="dlgEditarSeleccion"
-                modal="true"
-                responsive="true"
-                resizable="false"
-                closable="true"
-                width="520"
-                showEffect="fade"
-                hideEffect="fade">
-
-            <h:form id="formEditarSeleccion">
-            <p:messages
-                    id="mensajesEditar"
-                    showSummary="true"
-                    showDetail="false"
-                    closable="true"/>
-
-                <p:panelGrid
-                        columns="2"
-                        layout="grid"
-                        styleClass="ui-panelgrid-blank"
-                        columnClasses="ui-grid-col-4,ui-grid-col-8">
-
-                    <p:outputLabel
-                            for="codigoEditar"
-                            value="Código FIFA:"/>
-
-                    <p:inputText
-                            id="codigoEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.codigoFifa
-                            }"
-                            maxlength="3"
-                            required="true"
-                            requiredMessage="El código FIFA es obligatorio."
-                            styleClass="campo-completo"/>
-
-                    <p:outputLabel
-                            for="nombreEditar"
-                            value="Nombre:"/>
-
-                    <p:inputText
-                            id="nombreEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.nombre
-                            }"
-                            required="true"
-                            requiredMessage="El nombre es obligatorio."
-                            styleClass="campo-completo"/>
-
-                    <p:outputLabel
-                            for="grupoEditar"
-                            value="Grupo:"/>
-
-                    <p:selectOneMenu
-                            id="grupoEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.grupo
-                            }"
-                            required="true"
-                            requiredMessage="Seleccione un grupo."
-                            styleClass="campo-completo">
-
-                        <f:selectItem itemLabel="Grupo A" itemValue="A"/>
-                        <f:selectItem itemLabel="Grupo B" itemValue="B"/>
-                        <f:selectItem itemLabel="Grupo C" itemValue="C"/>
-                        <f:selectItem itemLabel="Grupo D" itemValue="D"/>
-                        <f:selectItem itemLabel="Grupo E" itemValue="E"/>
-                        <f:selectItem itemLabel="Grupo F" itemValue="F"/>
-                        <f:selectItem itemLabel="Grupo G" itemValue="G"/>
-                        <f:selectItem itemLabel="Grupo H" itemValue="H"/>
-                        <f:selectItem itemLabel="Grupo I" itemValue="I"/>
-                        <f:selectItem itemLabel="Grupo J" itemValue="J"/>
-                        <f:selectItem itemLabel="Grupo K" itemValue="K"/>
-                        <f:selectItem itemLabel="Grupo L" itemValue="L"/>
-
-                    </p:selectOneMenu>
-
-                    <p:outputLabel
-                            for="confederacionEditar"
-                            value="Confederación:"/>
-
-                    <p:selectOneMenu
-                            id="confederacionEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.confederacion
-                            }"
-                            required="true"
-                            requiredMessage="Seleccione una confederación."
-                            styleClass="campo-completo">
-
-                        <f:selectItem itemLabel="AFC" itemValue="AFC"/>
-                        <f:selectItem itemLabel="CAF" itemValue="CAF"/>
-                        <f:selectItem
-                                itemLabel="CONCACAF"
-                                itemValue="CONCACAF"/>
-                        <f:selectItem
-                                itemLabel="CONMEBOL"
-                                itemValue="CONMEBOL"/>
-                        <f:selectItem itemLabel="OFC" itemValue="OFC"/>
-                        <f:selectItem itemLabel="UEFA" itemValue="UEFA"/>
-
-                    </p:selectOneMenu>
-
-                    <p:outputLabel
-                            for="clasificacionEditar"
-                            value="Clasificación:"/>
-
-                    <p:inputText
-                            id="clasificacionEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.clasificacion
-                            }"
-                            required="true"
-                            requiredMessage="
-                                La forma de clasificación es obligatoria.
-                            "
-                            styleClass="campo-completo"/>
-
-                    <p:outputLabel
-                            for="anfitrionEditar"
-                            value="Es anfitrión:"/>
-
-                    <p:selectBooleanCheckbox
-                            id="anfitrionEditar"
-                            value="#{
-                                seleccionBean.seleccionEditada.esAnfitrion
-                            }"/>
-
-                </p:panelGrid>
-
-                <div class="botones-dialogo">
-
-                    <p:commandButton
-                            value="Cancelar"
-                            icon="pi pi-times"
-                            type="button"
-                            onclick="PF('dlgEditarSeleccion').hide()"
-                            styleClass="ui-button-secondary"/>
-
-                    <p:commandButton
-                            value="Guardar cambios"
-                            icon="pi pi-check"
-                            action="#{seleccionBean.actualizarSeleccion}"
-                            process="@form"
-                            update="
-                                @form
-                                :formSelecciones:tablaSelecciones
-                                :formSelecciones:mensajes
-                            "
-                            oncomplete="
-                                if (!args.validationFailed) {
-                                    PF('dlgEditarSeleccion').hide();
-                                }
-                            "
-                            styleClass="ui-button-success"/>
-
+                    <p:commandButton value="Guardar cambios"
+                                     icon="pi pi-save"
+                                     action="#{seleccionBean.actualizarSeleccion}"
+                                     process="@form"
+                                     update=":formSeleccion:tablaPanel :formSeleccion:contador :formSeleccion:mensajes panelEditar mensajesEditar"
+                                     oncomplete="if (args.operacionExitosa) PF('dlgEditarSeleccion').hide()"/>
                 </div>
-
-            </h:form>
-
-        </p:dialog>
-
-        <!-- Confirmación global de eliminación -->
-        <p:confirmDialog global="true">
-
-            <p:commandButton
-                    value="Sí"
-                    type="button"
-                    styleClass="ui-confirmdialog-yes ui-button-danger"
-                    icon="pi pi-check"/>
-
-            <p:commandButton
-                    value="No"
-                    type="button"
-                    styleClass="ui-confirmdialog-no ui-button-secondary"
-                    icon="pi pi-times"/>
-
-        </p:confirmDialog>
-
-    </main>
-
-    <footer class="pie">
-
-        <h3>UTN GolMundial 2026</h3>
-
-        <p>
-            Proyecto Integrador · Ingeniería en Software
-        </p>
-
-        <small>
-            © 2026 Todos los derechos reservados
-        </small>
-
-    </footer>
-
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
 </h:body>
+
 </html>

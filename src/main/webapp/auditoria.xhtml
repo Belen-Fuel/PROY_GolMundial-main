@@ -6,339 +6,1136 @@
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui">
 
-    <f:metadata>
-        <f:viewAction
-                action="#{loginBean.verificarAccesoAdministrador}"
-                onPostback="false"/>
-   </f:metadata>
-
 <h:head>
-
     <title>Auditoría - UTN GolMundial 2026</title>
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0"/>
 
     <style>
-
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #1e293b;
+        * {
+            box-sizing: border-box;
         }
 
-        .barra {
-            background: #0f172a;
-            color: white;
-            padding: 16px 24px;
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            background: #f4f7fb;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #172033;
+        }
+
+        body .ui-button {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        body .ui-inputfield {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .aplicacion {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr);
+        }
+
+        .barra-lateral {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 24px 18px;
+            background: linear-gradient(180deg, #0b1732 0%, #132752 100%);
+            color: #ffffff;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .marca {
+            display: flex;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 13px;
+            padding: 4px 8px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .marca-icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #2f80ed, #1fd1a5);
+            box-shadow: 0 10px 24px rgba(24, 144, 255, 0.28);
+            font-size: 23px;
         }
 
         .marca h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 18px;
+            line-height: 1.2;
         }
 
-        .marca small {
-            color: #cbd5e1;
+        .marca span {
+            display: block;
+            margin-top: 4px;
+            color: #a9b8d6;
+            font-size: 12px;
+        }
+
+        .titulo-menu {
+            margin: 24px 10px 10px;
+            color: #8094bc;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
         }
 
         .menu {
+            display: grid;
+            gap: 7px;
+        }
+
+        .menu-item {
+            min-height: 46px;
+            padding: 0 14px;
+            border-radius: 11px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            color: #dce5f5;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.18s ease;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.09);
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+
+        .menu-item.activo {
+            background: linear-gradient(90deg, #2c7df0, #365fdb);
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(31, 103, 226, 0.26);
+        }
+
+        .pie-lateral {
+            margin-top: auto;
+            padding: 18px 10px 2px;
+            color: #8295ba;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .area-principal {
+            min-width: 0;
+        }
+
+        .barra-superior {
+            min-height: 76px;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid #e5eaf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(12px);
+        }
+
+        .encabezado-pagina h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .encabezado-pagina p {
+            margin: 5px 0 0;
+            color: #758198;
+            font-size: 13px;
+        }
+
+        .acciones-superiores {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
-        .sesion-usuario {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .contenedor {
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-       .encabezado {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #2563eb 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 30px 28px;
-            margin-bottom: 18px;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .encabezado::after {
-            content: "";
-            position: absolute;
-            width: 230px;
-            height: 230px;
-            right: -80px;
-            top: -95px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 50%;
-        }
-
-        .encabezado h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
+        .usuario-conectado {
+            min-height: 43px;
+            padding: 7px 12px 7px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #e8f1ff;
+            color: #2563eb;
+        }
+
+        .usuario-datos strong,
+        .usuario-datos small {
+            display: block;
+        }
+
+        .usuario-datos strong {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        .usuario-datos small {
+            margin-top: 2px;
+            color: #8792a6;
+            font-size: 11px;
+        }
+
+        .contenido {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 30px 40px;
+        }
+
+        .hero-auditoria {
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+            padding: 30px;
+            border-radius: 22px;
+            background: linear-gradient(120deg, #102759 0%, #1e4fbb 58%, #2577ec 100%);
+            color: #ffffff;
+            box-shadow: 0 15px 38px rgba(19, 67, 154, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .hero-auditoria::before,
+        .hero-auditoria::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-auditoria::before {
+            width: 260px;
+            height: 260px;
+            right: -70px;
+            top: -105px;
+        }
+
+        .hero-auditoria::after {
+            width: 145px;
+            height: 145px;
+            right: 210px;
+            bottom: -100px;
+        }
+
+        .hero-texto,
+        .hero-estado {
             position: relative;
             z-index: 1;
         }
 
-        .encabezado p {
-            margin: 12px 0 0;
+        .hero-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .hero-texto h3 {
+            margin: 15px 0 8px;
+            font-size: 29px;
+        }
+
+        .hero-texto p {
+            max-width: 680px;
+            margin: 0;
+            color: #dbe8ff;
             font-size: 14px;
-            color: #dbeafe;
-            line-height: 1.5;
+            line-height: 1.65;
+        }
+
+        .hero-estado {
+            min-width: 230px;
+            padding: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            background: rgba(8, 29, 70, 0.28);
+        }
+
+        .estado-linea {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .estado-punto {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 0 5px rgba(74, 222, 128, 0.16);
+        }
+
+        .hero-estado small {
+            display: block;
+            margin-top: 12px;
+            color: #bed2f6;
+            line-height: 1.6;
+        }
+
+        .resumen-auditoria {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .tarjeta-resumen {
+            min-height: 125px;
+            padding: 20px;
+            border: 1px solid #e4eaf3;
+            border-radius: 17px;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(19, 40, 82, 0.07);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tarjeta-icono {
+            width: 47px;
+            height: 47px;
+            flex: 0 0 47px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+        }
+
+        .icono-azul {
+            background: #e8f1ff;
+            color: #2563eb;
+        }
+
+        .icono-verde {
+            background: #e8f8ee;
+            color: #198754;
+        }
+
+        .icono-morado {
+            background: #f1ebff;
+            color: #7c3aed;
+        }
+
+        .icono-naranja {
+            background: #fff3df;
+            color: #d97706;
+        }
+
+        .tarjeta-dato strong {
+            display: block;
+            font-size: 27px;
+            line-height: 1;
+        }
+
+        .tarjeta-dato span {
+            display: block;
+            margin-top: 8px;
+            color: #6f7d94;
+            font-size: 13px;
+        }
+
+        .barra-herramientas {
+            margin-top: 22px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 15px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .buscador {
+            width: min(560px, 100%);
             position: relative;
-            z-index: 1;
         }
 
-        .acciones{
-            background:#fff;
-            border-radius:14px;
-            padding:16px 20px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:22px;
-            box-shadow:0 4px 15px rgba(0,0,0,.08);
+        .buscador i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            z-index: 2;
+            color: #8190a8;
+            transform: translateY(-50%);
         }
 
-        .detalle {
+        .buscador .ui-inputfield {
+            min-height: 43px;
+            padding-left: 41px;
+        }
+
+        .acciones-herramientas {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .panel-tabla {
+            margin-top: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(19, 40, 82, 0.07);
+            overflow: hidden;
+        }
+
+        .panel-tabla-cabecera {
+            padding: 20px 21px;
+            border-bottom: 1px solid #e4e9f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .panel-tabla-cabecera h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .panel-tabla-cabecera p {
+            margin: 5px 0 0;
+            color: #7b879a;
+            font-size: 12px;
+        }
+
+        .contador-registros {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #edf4ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .tabla-auditoria .ui-datatable-tablewrapper {
+            overflow: visible;
+        }
+
+        .tabla-auditoria table {
+            min-width: 1160px;
+        }
+
+        .tabla-auditoria .ui-datatable-thead > tr > th {
+            padding: 13px 12px;
+            border-color: #e3e8f0;
+            background: #f8fafc;
+            color: #4b5565;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tabla-auditoria .ui-datatable-tbody > tr > td {
+            padding: 13px 12px;
+            border-color: #e8edf4;
+            color: #4a5568;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .tabla-auditoria .ui-column-filter {
+            width: 100%;
+            margin-top: 8px;
+            border-radius: 9px;
+            font-size: 12px;
+        }
+
+        .fecha-registro {
+            color: #445269;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .accion-etiqueta {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .accion-verde {
+            background: #e7f7ed;
+            color: #1f7a45;
+        }
+
+        .accion-azul {
+            background: #e7f0ff;
+            color: #245fc2;
+        }
+
+        .accion-roja {
+            background: #fdeaea;
+            color: #bd3030;
+        }
+
+        .accion-morada {
+            background: #f1eaff;
+            color: #7542ba;
+        }
+
+        .accion-gris {
+            background: #eef1f5;
+            color: #586576;
+        }
+
+        .accion-neutra {
+            background: #fff4df;
+            color: #a96800;
+        }
+
+        .entidad-bloque strong,
+        .entidad-bloque small {
+            display: block;
+        }
+
+        .entidad-bloque strong {
+            color: #354156;
+            font-size: 13px;
+        }
+
+        .entidad-bloque small {
+            margin-top: 3px;
+            color: #8a96a9;
+            font-size: 11px;
+        }
+
+        .usuario-registro {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .usuario-registro-icono {
+            width: 31px;
+            height: 31px;
+            flex: 0 0 31px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #edf4ff;
+            color: #2867cf;
+        }
+
+        .detalle-corto {
+            display: block;
+            max-width: 380px;
+            overflow: hidden;
+            color: #566278;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .expansion-auditoria {
+            padding: 18px 20px;
+            background: #f8fafc;
+        }
+
+        .expansion-titulo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #27364d;
+            font-weight: 700;
+        }
+
+        .expansion-detalle {
+            margin-top: 12px;
+            padding: 15px;
+            border: 1px solid #e0e7f0;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #526077;
+            line-height: 1.65;
             white-space: normal;
             word-break: break-word;
         }
 
-    </style>
+        .expansion-meta {
+            margin-top: 12px;
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
 
+        .meta-item {
+            padding: 6px 9px;
+            border-radius: 8px;
+            background: #eaf0f8;
+            color: #526077;
+            font-size: 11px;
+        }
+
+        .leyenda {
+            margin-top: 15px;
+            padding: 15px 17px;
+            border: 1px solid #e3e8f0;
+            border-radius: 14px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px 16px;
+            flex-wrap: wrap;
+        }
+
+        .leyenda strong {
+            color: #3d495d;
+            font-size: 12px;
+        }
+
+        .leyenda-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #68758a;
+            font-size: 11px;
+        }
+
+        .leyenda-punto {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .punto-verde {
+            background: #34a853;
+        }
+
+        .punto-azul {
+            background: #3b82f6;
+        }
+
+        .punto-rojo {
+            background: #dc3545;
+        }
+
+        .punto-morado {
+            background: #8b5cf6;
+        }
+
+        .punto-gris {
+            background: #7b8794;
+        }
+
+        @media (max-width: 1180px) {
+            .resumen-auditoria {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 920px) {
+            .aplicacion {
+                display: block;
+            }
+
+            .barra-lateral {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .menu {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .pie-lateral {
+                display: none;
+            }
+
+            .barra-superior {
+                position: relative;
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 17px 20px;
+            }
+
+            .acciones-superiores {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .contenido {
+                padding: 22px 20px 35px;
+            }
+
+            .hero-auditoria {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .hero-estado {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 680px) {
+            .menu,
+            .resumen-auditoria {
+                grid-template-columns: 1fr;
+            }
+
+            .contenido {
+                padding: 16px 12px 28px;
+            }
+
+            .hero-auditoria {
+                padding: 23px;
+                border-radius: 17px;
+            }
+
+            .hero-texto h3 {
+                font-size: 25px;
+            }
+
+            .barra-herramientas,
+            .panel-tabla-cabecera {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .buscador,
+            .acciones-herramientas,
+            .acciones-herramientas .ui-button {
+                width: 100%;
+            }
+
+            .acciones-herramientas {
+                flex-direction: column;
+            }
+        }
+    </style>
 </h:head>
 
 <h:body>
+    <div class="aplicacion">
+        <aside class="barra-lateral">
+            <div class="marca">
+                <div class="marca-icono">
+                    <i class="pi pi-shield"></i>
+                </div>
 
-<div class="barra">
+                <div>
+                    <h1>UTN GolMundial</h1>
+                    <span>Administración 2026</span>
+                </div>
+            </div>
 
-    <div class="marca">
-        <h1>UTN GolMundial 2026</h1>
-        <small>Panel administrativo del torneo</small>
+            <div class="titulo-menu">Menú principal</div>
+
+            <nav class="menu">
+                <h:link outcome="/dashboard.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-home"></i>
+                    <span>Dashboard</span>
+                </h:link>
+
+                <h:link outcome="/partidos.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>Partidos</span>
+                </h:link>
+
+                <h:link outcome="/selecciones.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-flag"></i>
+                    <span>Selecciones</span>
+                </h:link>
+
+                <h:link outcome="/sedes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-map-marker"></i>
+                    <span>Sedes</span>
+                </h:link>
+
+                <h:link outcome="/usuarios.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-users"></i>
+                    <span>Usuarios</span>
+                </h:link>
+
+                <h:link outcome="/reportes.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-chart-line"></i>
+                    <span>Reportes</span>
+                </h:link>
+
+                <h:link outcome="/auditoria.xhtml"
+                        styleClass="menu-item activo">
+                    <i class="pi pi-book"></i>
+                    <span>Auditoría</span>
+                </h:link>
+
+                <h:link outcome="/publico/inicio.xhtml"
+                        styleClass="menu-item">
+                    <i class="pi pi-globe"></i>
+                    <span>Portal público</span>
+                </h:link>
+            </nav>
+
+            <div class="pie-lateral">
+                Historial de las acciones administrativas registradas en el sistema.
+            </div>
+        </aside>
+
+        <main class="area-principal">
+            <header class="barra-superior">
+                <div class="encabezado-pagina">
+                    <h2>Auditoría del sistema</h2>
+                    <p>Consulte las operaciones administrativas realizadas en la plataforma.</p>
+                </div>
+
+                <div class="acciones-superiores">
+                    <div class="usuario-conectado">
+                        <div class="avatar">
+                            <i class="pi pi-user"></i>
+                        </div>
+
+                        <div class="usuario-datos">
+                            <strong>#{loginBean.usuario.nombre}</strong>
+                            <small>#{loginBean.usuario.rol}</small>
+                        </div>
+                    </div>
+
+                    <p:button value="Ver portal"
+                              icon="pi pi-external-link"
+                              outcome="/publico/inicio.xhtml"
+                              styleClass="ui-button-outlined"/>
+
+                    <h:form id="formSesion">
+                        <p:commandButton value="Salir"
+                                         icon="pi pi-sign-out"
+                                         action="#{loginBean.cerrarSesion}"
+                                         ajax="false"
+                                         styleClass="ui-button-danger"/>
+                    </h:form>
+                </div>
+            </header>
+
+            <div class="contenido">
+                <h:form id="formAuditoria">
+                    <p:growl id="mensajes"
+                             showDetail="true"
+                             life="5000"/>
+
+                    <section class="hero-auditoria">
+                        <div class="hero-texto">
+                            <span class="hero-etiqueta">
+                                <i class="pi pi-history"></i>
+                                Trazabilidad administrativa
+                            </span>
+
+                            <h3>Historial de actividad del sistema</h3>
+
+                            <p>
+                                Revise las operaciones realizadas por los usuarios,
+                                identifique la entidad afectada y consulte el detalle
+                                completo de cada registro de auditoría.
+                            </p>
+                        </div>
+
+                        <div class="hero-estado">
+                            <div class="estado-linea">
+                                <span class="estado-punto"></span>
+                                <span>Auditoría disponible</span>
+                            </div>
+
+                            <small>
+                                Se muestran los 100 registros más recientes.<br/>
+                                Última actualización: #{auditoriaBean.fechaActualizacion}
+                            </small>
+                        </div>
+                    </section>
+
+                    <section class="resumen-auditoria">
+                        <div class="tarjeta-resumen">
+                            <div class="tarjeta-icono icono-azul">
+                                <i class="pi pi-list"></i>
+                            </div>
+
+                            <div class="tarjeta-dato">
+                                <strong>#{auditoriaBean.totalRegistros}</strong>
+                                <span>Registros cargados</span>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-resumen">
+                            <div class="tarjeta-icono icono-verde">
+                                <i class="pi pi-calendar"></i>
+                            </div>
+
+                            <div class="tarjeta-dato">
+                                <strong>#{auditoriaBean.registrosHoy}</strong>
+                                <span>Acciones realizadas hoy</span>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-resumen">
+                            <div class="tarjeta-icono icono-morado">
+                                <i class="pi pi-users"></i>
+                            </div>
+
+                            <div class="tarjeta-dato">
+                                <strong>#{auditoriaBean.usuariosDistintos}</strong>
+                                <span>Usuarios identificados</span>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-resumen">
+                            <div class="tarjeta-icono icono-naranja">
+                                <i class="pi pi-box"></i>
+                            </div>
+
+                            <div class="tarjeta-dato">
+                                <strong>#{auditoriaBean.entidadesDistintas}</strong>
+                                <span>Entidades auditadas</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="barra-herramientas">
+                        <div class="buscador">
+                            <i class="pi pi-search"></i>
+
+                            <p:inputText id="globalFilter"
+                                         placeholder="Buscar por acción, usuario, entidad, fecha o detalle..."
+                                         onkeyup="PF('tablaAuditoriaWidget').filter()"/>
+                        </div>
+
+                        <div class="acciones-herramientas">
+                            <p:commandButton value="Limpiar filtros"
+                                             icon="pi pi-filter-slash"
+                                             type="button"
+                                             onclick="document.getElementById('formAuditoria:globalFilter').value=''; PF('tablaAuditoriaWidget').clearFilters();"
+                                             styleClass="ui-button-outlined ui-button-secondary"/>
+
+                            <p:commandButton value="Actualizar"
+                                             icon="pi pi-refresh"
+                                             actionListener="#{auditoriaBean.cargarAuditorias}"
+                                             process="@this"
+                                             update="@form"/>
+                        </div>
+                    </div>
+
+                    <div class="leyenda">
+                        <strong>Tipos de acción:</strong>
+
+                        <span class="leyenda-item">
+                            <span class="leyenda-punto punto-verde"></span>
+                            Creación o activación
+                        </span>
+
+                        <span class="leyenda-item">
+                            <span class="leyenda-punto punto-azul"></span>
+                            Actualización
+                        </span>
+
+                        <span class="leyenda-item">
+                            <span class="leyenda-punto punto-rojo"></span>
+                            Eliminación o desactivación
+                        </span>
+
+                        <span class="leyenda-item">
+                            <span class="leyenda-punto punto-morado"></span>
+                            Resultados deportivos
+                        </span>
+
+                        <span class="leyenda-item">
+                            <span class="leyenda-punto punto-gris"></span>
+                            Sesión o actividad general
+                        </span>
+                    </div>
+
+                    <section class="panel-tabla">
+                        <div class="panel-tabla-cabecera">
+                            <div>
+                                <h3>Registros de auditoría</h3>
+                                <p>
+                                    Utilice los filtros de cada columna o el buscador general
+                                    para localizar una operación específica.
+                                </p>
+                            </div>
+
+                            <h:panelGroup id="contadorMostrado"
+                                          layout="block"
+                                          styleClass="contador-registros">
+                                #{auditoriaBean.cantidadMostrada} registros
+                            </h:panelGroup>
+                        </div>
+
+                        <div class="tabla-contenedor">
+                            <p:dataTable id="tablaAuditoria"
+                                         widgetVar="tablaAuditoriaWidget"
+                                         value="#{auditoriaBean.auditorias}"
+                                         filteredValue="#{auditoriaBean.auditoriasFiltradas}"
+                                         var="a"
+                                         rowKey="#{a.id}"
+                                         globalFilterFunction="#{auditoriaBean.filtroGlobal}"
+                                         paginator="true"
+                                         rows="10"
+                                         rowsPerPageTemplate="10,20,50"
+                                         paginatorPosition="bottom"
+                                         emptyMessage="No existen registros que coincidan con la búsqueda."
+                                         styleClass="tabla-auditoria">
+
+                                <p:ajax event="filter"
+                                        update=":formAuditoria:contadorMostrado"/>
+
+                                <p:column style="width:46px"
+                                          exportable="false">
+                                    <p:rowToggler/>
+                                </p:column>
+
+                                <p:column headerText="Fecha y hora"
+                                          filterBy="#{a.fechaHoraUtc}"
+                                          filterMatchMode="contains"
+                                          style="width:175px">
+                                    <h:outputText value="#{auditoriaBean.fechaVisible(a.fechaHoraUtc)}"
+                                                  styleClass="fecha-registro"/>
+                                </p:column>
+
+                                <p:column headerText="Acción"
+                                          filterBy="#{a.accion}"
+                                          filterMatchMode="contains"
+                                          style="width:205px">
+                                    <span class="accion-etiqueta #{auditoriaBean.accionClase(a.accion)}">
+                                        <i class="#{auditoriaBean.accionIcono(a.accion)}"></i>
+                                        #{auditoriaBean.accionVisible(a.accion)}
+                                    </span>
+                                </p:column>
+
+                                <p:column headerText="Entidad"
+                                          filterBy="#{a.entidad}"
+                                          filterMatchMode="contains"
+                                          style="width:160px">
+                                    <div class="entidad-bloque">
+                                        <strong>#{auditoriaBean.entidadVisible(a.entidad)}</strong>
+                                        <small>
+                                            ID: #{empty a.entidadId ? 'No aplica' : a.entidadId}
+                                        </small>
+                                    </div>
+                                </p:column>
+
+                                <p:column headerText="Usuario"
+                                          filterBy="#{a.usuarioReferencia}"
+                                          filterMatchMode="contains"
+                                          style="width:180px">
+                                    <div class="usuario-registro">
+                                        <span class="usuario-registro-icono">
+                                            <i class="pi pi-user"></i>
+                                        </span>
+
+                                        <strong>#{auditoriaBean.usuarioVisible(a.usuarioReferencia)}</strong>
+                                    </div>
+                                </p:column>
+
+                                <p:column headerText="Detalle"
+                                          style="min-width:390px">
+                                    <h:outputText value="#{auditoriaBean.detalleVisible(a.detalle)}"
+                                                  styleClass="detalle-corto"
+                                                  title="#{auditoriaBean.detalleVisible(a.detalle)}"/>
+                                </p:column>
+
+                                <p:rowExpansion>
+                                    <div class="expansion-auditoria">
+                                        <div class="expansion-titulo">
+                                            <i class="pi pi-align-left"></i>
+                                            Detalle completo del registro ##{a.id}
+                                        </div>
+
+                                        <div class="expansion-detalle">
+                                            <h:outputText value="#{auditoriaBean.detalleVisible(a.detalle)}"/>
+                                        </div>
+
+                                        <div class="expansion-meta">
+                                            <span class="meta-item">
+                                                Acción original: #{a.accion}
+                                            </span>
+
+                                            <span class="meta-item">
+                                                Entidad original: #{a.entidad}
+                                            </span>
+
+                                            <span class="meta-item">
+                                                Usuario: #{auditoriaBean.usuarioVisible(a.usuarioReferencia)}
+                                            </span>
+
+                                            <span class="meta-item">
+                                                Fecha UTC: #{a.fechaHoraUtc}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </p:rowExpansion>
+                            </p:dataTable>
+                        </div>
+                    </section>
+
+                </h:form>
+            </div>
+        </main>
     </div>
-
-    <h:form id="formMenu">
-
-        <div class="menu">
-
-            <p:button
-                    value="Panel"
-                    icon="pi pi-home"
-                    href="#{request.contextPath}/dashboard.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Partidos"
-                    icon="pi pi-calendar"
-                    href="#{request.contextPath}/partidos.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Selecciones"
-                    icon="pi pi-flag"
-                    href="#{request.contextPath}/selecciones.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Sedes"
-                    icon="pi pi-map-marker"
-                    href="#{request.contextPath}/sedes.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Usuarios"
-                    icon="pi pi-users"
-                    href="#{request.contextPath}/usuarios.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <p:button
-                    value="Auditoría"
-                    icon="pi pi-search"
-                    href="#{request.contextPath}/auditoria.xhtml"/>
-
-            <p:button
-                    value="Reportes"
-                    icon="pi pi-chart-bar"
-                    href="#{request.contextPath}/reportes.xhtml"
-                    styleClass="ui-button-outlined"/>
-
-            <h:panelGroup
-                    rendered="#{loginBean.logueado and loginBean.administrador}"
-                    layout="block"
-                    style="display:inline-flex;align-items:center;gap:8px;">
-
-                <span class="sesion-usuario">
-                    <i class="pi pi-user"></i>
-                    #{loginBean.usuario.nombre}
-                </span>
-
-                <p:commandButton
-                        value="Cerrar sesión"
-                        icon="pi pi-sign-out"
-                        action="#{loginBean.cerrarSesion}"
-                        ajax="false"
-                        styleClass="ui-button-danger"/>
-
-            </h:panelGroup>
-
-        </div>
-
-    </h:form>
-
-</div>
-
-<div class="contenedor">
-
-    <div class="encabezado">
-
-        <div>
-
-            <h1>
-                <i class="pi pi-history"></i>
-                Auditoría del Sistema
-            </h1>
-
-            <p>
-                Consulta las acciones administrativas realizadas en el sistema.
-            </p>
-
-
-        </div>
-
-    </div>
-
-    <h:form id="formAuditoria">
-
-        <p:growl
-                id="mensajes"
-                showDetail="true"/>
-
-        <div class="acciones">
-
-            <p:button
-                    value="Volver al panel"
-                    icon="pi pi-home"
-                    href="#{request.contextPath}/dashboard.xhtml"
-                    styleClass="ui-button-secondary"/>
-
-            <p:commandButton
-                    value="Actualizar"
-                    icon="pi pi-refresh"
-                    actionListener="#{auditoriaBean.cargarAuditorias}"
-                    process="@this"
-                    update=":formAuditoria:tablaAuditoria
-                            :formAuditoria:mensajes"/>
-
-        </div>
-
-        <p:dataTable
-                id="tablaAuditoria"
-                value="#{auditoriaBean.auditorias}"
-                var="a"
-
-                paginator="true"
-                rows="10"
-
-                reflow="true"
-
-                rowsPerPageTemplate="10,20,50"
-
-                emptyMessage="No existen registros de auditoría.">
-
-            <p:column
-                    headerText="ID"
-                    style="width:60px">
-
-                #{a.id}
-
-            </p:column>
-
-            <p:column
-                    headerText="Acción">
-
-                <h:outputText
-                    value="#{a.accion == 'CREAR_USUARIO'
-                    ? 'Crear usuario'
-                    : a.accion == 'CAMBIAR_ROL_USUARIO'
-                    ? 'Cambiar rol'
-                    : a.accion == 'ACTIVAR_USUARIO'
-                    ? 'Activar usuario'
-                    : a.accion == 'DESACTIVAR_USUARIO'
-                    ? 'Desactivar usuario'
-                    : a.accion == 'RESTABLECER_PASSWORD'
-                    ? 'Restablecer contraseña'
-                    : a.accion == 'REGISTRO_USUARIO'
-                    ? 'Registro de usuario'
-                    : a.accion}"/>
-
-            </p:column>
-
-            <p:column
-                    headerText="Entidad">
-
-                #{a.entidad}
-
-            </p:column>
-                        <p:column
-                    headerText="ID Entidad"
-                    style="width:90px">
-
-                #{a.entidadId}
-
-            </p:column>
-
-            <p:column
-                    headerText="Usuario">
-
-                #{a.usuarioReferencia}
-
-            </p:column>
-
-            <p:column
-                    headerText="Detalle">
-
-                <h:outputText
-                        value="#{a.detalle}"
-                        styleClass="detalle"/>
-
-            </p:column>
-
-            <p:column
-                    headerText="Fecha y hora">
-
-                #{a.fechaHoraUtc}
-
-            </p:column>
-
-        </p:dataTable>
-
-    </h:form>
-
-</div>
-
 </h:body>
 
 </html>

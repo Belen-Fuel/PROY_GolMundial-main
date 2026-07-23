@@ -2,358 +2,575 @@ package ec.edu.utn.golmundial.bean;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primefaces.PrimeFaces;
+
 import ec.edu.utn.golmundial.dto.PartidoDTO;
+import ec.edu.utn.golmundial.dto.ResultadoPartidoRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
-import jakarta.inject.Named;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Named("partidoBean") // Mantiene la coincidencia exacta con tu archivo xhtml
+@Named("partioBean")
 @ViewScoped
 public class PartidoBean implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final String API_URL =
+            "http://localhost:8080/golmundial-estadisticas/api/partidos";
+
+    private static final DateTimeFormatter FORMATO_FECHA =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     @Inject
     private LoginBean loginBean;
 
-    private List<PartidoDTO> partidos = new ArrayList<>();
-    private PartidoDTO partidoSeleccionado = new PartidoDTO(); // Partido que se edita en el modal
+    private List<PartidoDTO> partidos =
+            new ArrayList<>();
 
-    // URL de la API del Backend de Estadísticas
-    private static final String API_URL = "http://localhost:8080/golmundial-estadisticas/api/partidos";
+    private PartidoDTO partidoSeleccionado =
+            new PartidoDTO();
 
     @PostConstruct
     public void init() {
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
         cargarPartidos();
     }
 
-    // Método para traer todos los partidos desde el backend mediante API REST (JSON)
     public void cargarPartidos() {
-        Client cliente = null;
-        try {
-            cliente = ClientBuilder.newClient();
-            this.partidos = cliente.target(API_URL)
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
+        try (Client cliente = ClientBuilder.newClient()) {
+
+            this.partidos = cliente
+                    .target(API_URL)
                     .request(MediaType.APPLICATION_JSON)
-                    .get(new GenericType<List<PartidoDTO>>() {});
-        } catch (Exception e) {
-            System.err.println("Error al obtener los partidos: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (cliente != null) {
-                cliente.close();
+                    .get(new GenericType<List<PartidoDTO>>() {
+                    });
+
+            if (this.partidos == null) {
+                this.partidos = new ArrayList<>();
             }
+
+        } catch (Exception excepcion) {
+
+            this.partidos = new ArrayList<>();
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error",
+                    "No se pudieron cargar los partidos."
+            );
+
+            excepcion.printStackTrace();
         }
     }
 
-    private boolean validarResultado() {
+    public void actualizarPartidos() {
 
-        FacesContext context = FacesContext.getCurrentInstance();
+        cargarPartidos();
+
+        mostrarMensaje(
+                FacesMessage.SEVERITY_INFO,
+                "Actualizado",
+                "La información de los partidos se actualizó correctamente."
+        );
+    }
+
+    public void prepararResultado(
+            PartidoDTO partido
+    ) {
+
+        this.partidoSeleccionado =
+                copiarPartido(partido);
+
+        if (this.partidoSeleccionado.getGolesLocal() == null) {
+            this.partidoSeleccionado.setGolesLocal(0);
+        }
+
+        if (this.partidoSeleccionado.getGolesVisitante() == null) {
+            this.partidoSeleccionado.setGolesVisitante(0);
+        }
+    }
+
+    public void guardarResultado() {
+
+        agregarResultadoAjax(false);
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
 
         if (partidoSeleccionado == null
                 || partidoSeleccionado.getId() == null) {
 
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Partido inválido",
-                            "Debe seleccionar un partido."
-                    ));
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Advertencia",
+                    "No se ha seleccionado un partido."
+            );
 
-            context.validationFailed();
-            return false;
-        }
-
-        Integer golesLocal =
-                partidoSeleccionado.getGolesLocal();
-
-        Integer golesVisitante =
-                partidoSeleccionado.getGolesVisitante();
-
-        if (golesLocal == null || golesVisitante == null) {
-
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Marcador incompleto",
-                            "Debe ingresar los goles de ambos equipos."
-                    ));
-
-            context.validationFailed();
-            return false;
-        }
-
-        if (golesLocal < 0 || golesVisitante < 0) {
-
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Marcador inválido",
-                            "Los goles no pueden ser negativos."
-                    ));
-
-            context.validationFailed();
-            return false;
-        }
-
-        String codigoLocal =
-                partidoSeleccionado.getCodigoFifaLocal();
-
-        String codigoVisitante =
-                partidoSeleccionado.getCodigoFifaVisitante();
-
-        if (codigoLocal != null
-                && codigoVisitante != null
-                && codigoLocal.equalsIgnoreCase(codigoVisitante)) {
-
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Selecciones inválidas",
-                            "Una selección no puede jugar contra sí misma."
-                    ));
-
-            context.validationFailed();
-            return false;
-        }
-
-        boolean faseEliminatoria =
-                partidoSeleccionado.getGrupo() == null
-                || partidoSeleccionado.getGrupo().isBlank();
-
-        if (faseEliminatoria
-                && golesLocal.equals(golesVisitante)) {
-
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_ERROR,
-                            "Empate no permitido",
-                            "En una fase eliminatoria debe existir un ganador."
-                    ));
-
-            context.validationFailed();
-            return false;
-        }
-
-        return true;
-    }
-
-    // Método corregido para registrar el marcador oficial siguiendo el contrato de datos del Backend
-    public void guardarResultado() {
-
-        FacesContext context = FacesContext.getCurrentInstance();
-
-        if (!validarResultado()) {
             return;
         }
 
-        Client cliente = null;
-        Response respuesta = null;
+        if (partidoSeleccionado.getGolesLocal() == null
+                || partidoSeleccionado.getGolesVisitante() == null) {
 
-        try {
-
-            cliente = ClientBuilder.newClient();
-
-            ec.edu.utn.golmundial.dto.ResultadoPartidoRequest solicitudGoles =
-                    new ec.edu.utn.golmundial.dto.ResultadoPartidoRequest();
-
-            solicitudGoles.setGolesLocal(
-                    partidoSeleccionado.getGolesLocal()
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Marcador incompleto",
+                    "Debe ingresar los goles de ambas selecciones."
             );
 
-            solicitudGoles.setGolesVisitante(
-                    partidoSeleccionado.getGolesVisitante()
+            return;
+        }
+
+        if (partidoSeleccionado.getGolesLocal() < 0
+                || partidoSeleccionado.getGolesVisitante() < 0) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Marcador inválido",
+                    "Los goles no pueden ser negativos."
             );
 
-            String urlConId =
-                    API_URL
-                    + "/"
-                    + partidoSeleccionado.getId()
-                    + "/resultado";
+            return;
+        }
 
-            respuesta = cliente
-                    .target(urlConId)
-                    .request(MediaType.APPLICATION_JSON)
-                    .header(
-                            jakarta.ws.rs.core.HttpHeaders.AUTHORIZATION,
-                            loginBean.getAuthorizationHeader()
-                    )
-                    .put(
-                            Entity.entity(
-                                    solicitudGoles,
-                                    MediaType.APPLICATION_JSON
-                            )
-                    );
+        ResultadoPartidoRequest solicitud =
+                new ResultadoPartidoRequest();
+
+        solicitud.setGolesLocal(
+                partidoSeleccionado.getGolesLocal()
+        );
+
+        solicitud.setGolesVisitante(
+                partidoSeleccionado.getGolesVisitante()
+        );
+
+        String url = API_URL
+                + "/"
+                + partidoSeleccionado.getId()
+                + "/resultado";
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(url)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .put(
+                             Entity.entity(
+                                     solicitud,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
 
             if (respuesta.getStatus()
                     == Response.Status.OK.getStatusCode()) {
 
                 cargarPartidos();
 
-                context.addMessage(null,
-                        new FacesMessage(
-                                FacesMessage.SEVERITY_INFO,
-                                "Resultado registrado",
-                                "El marcador se guardó correctamente."
-                        ));
+                mostrarMensaje(
+                        FacesMessage.SEVERITY_INFO,
+                        "Resultado registrado",
+                        "El marcador oficial se guardó correctamente."
+                );
 
-            } else {
-
-                String detalle = "El backend rechazó el resultado.";
-
-                if (respuesta.hasEntity()) {
-                    detalle = respuesta.readEntity(String.class);
-                }
-
-                context.addMessage(null,
-                        new FacesMessage(
-                                FacesMessage.SEVERITY_ERROR,
-                                "No se pudo guardar",
-                                detalle
-                        ));
-
-                /*
-                * Evita que el diálogo se cierre cuando
-                * el backend rechaza el resultado.
-                */
-                context.validationFailed();
+                agregarResultadoAjax(true);
+                return;
             }
 
-        } catch (Exception e) {
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudo registrar el resultado."
+            );
 
-            context.addMessage(null,
-                    new FacesMessage(
-                            FacesMessage.SEVERITY_FATAL,
-                            "Error de comunicación",
-                            "No fue posible comunicarse con el backend."
-                    ));
+        } catch (Exception excepcion) {
 
-            context.validationFailed();
-            e.printStackTrace();
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible registrar el resultado del partido."
+            );
 
-        } finally {
-
-            if (respuesta != null) {
-                respuesta.close();
-            }
-
-            if (cliente != null) {
-                cliente.close();
-            }
+            excepcion.printStackTrace();
         }
     }
-    public void verificarAcceso() {
 
-        if (!loginBean.isLogueado()
-                || !loginBean.isAdministrador()) {
+    public int getTotalPartidos() {
+        return partidos == null
+                ? 0
+                : partidos.size();
+    }
 
-            try {
-                FacesContext facesContext =
-                        FacesContext.getCurrentInstance();
+    public long getPartidosProgramados() {
+        return contarPorEstado("PROGRAMADO");
+    }
 
-                String contexto =
-                        facesContext
-                                .getExternalContext()
-                                .getRequestContextPath();
+    public long getPartidosEnJuego() {
+        return contarPorEstado("EN_JUEGO");
+    }
 
-                facesContext
-                        .getExternalContext()
-                        .redirect(contexto + "/login.xhtml");
+    public long getPartidosFinalizados() {
+        return contarPorEstado("FINALIZADO");
+    }
 
-                facesContext.responseComplete();
+    public String textoEstado(
+            String estado
+    ) {
 
-            } catch (IOException e) {
-                throw new RuntimeException(
-                        "No se pudo redirigir al login",
-                        e
+        if (estado == null || estado.isBlank()) {
+            return "Sin estado";
+        }
+
+        return switch (estado.toUpperCase()) {
+            case "PROGRAMADO" -> "Programado";
+            case "EN_JUEGO" -> "En juego";
+            case "FINALIZADO" -> "Finalizado";
+            case "SUSPENDIDO" -> "Suspendido";
+            case "CANCELADO" -> "Cancelado";
+            default -> estado.replace('_', ' ');
+        };
+    }
+
+    public String claseEstado(
+            String estado
+    ) {
+
+        if (estado == null || estado.isBlank()) {
+            return "neutro";
+        }
+
+        return switch (estado.toUpperCase()) {
+            case "PROGRAMADO" -> "programado";
+            case "EN_JUEGO" -> "en-juego";
+            case "FINALIZADO" -> "finalizado";
+            case "SUSPENDIDO" -> "suspendido";
+            case "CANCELADO" -> "cancelado";
+            default -> "neutro";
+        };
+    }
+
+    public String textoFase(
+            String fase
+    ) {
+
+        if (fase == null || fase.isBlank()) {
+            return "Sin fase";
+        }
+
+        return switch (fase.toUpperCase()) {
+            case "GRUPOS" -> "Fase de grupos";
+            case "DIECISEISAVOS" -> "Dieciseisavos de final";
+            case "OCTAVOS" -> "Octavos de final";
+            case "CUARTOS" -> "Cuartos de final";
+            case "SEMIFINAL" -> "Semifinal";
+            case "TERCER_PUESTO" -> "Tercer puesto";
+            case "FINAL" -> "Final";
+            default -> fase.replace('_', ' ');
+        };
+    }
+
+    public String formatearFecha(
+            String fecha
+    ) {
+
+        if (fecha == null || fecha.isBlank()) {
+            return "Fecha no disponible";
+        }
+
+        try {
+            return OffsetDateTime
+                    .parse(fecha)
+                    .format(FORMATO_FECHA);
+
+        } catch (DateTimeParseException ignorada) {
+        }
+
+        try {
+            return LocalDateTime
+                    .parse(fecha)
+                    .format(FORMATO_FECHA);
+
+        } catch (DateTimeParseException ignorada) {
+        }
+
+        return fecha
+                .replace('T', ' ')
+                .replace("Z", "");
+    }
+
+    public boolean resultadoDisponible(
+            String estado
+    ) {
+
+        if (estado == null) {
+            return true;
+        }
+
+        return !"FINALIZADO".equalsIgnoreCase(estado)
+                && !"CANCELADO".equalsIgnoreCase(estado)
+                && !"SUSPENDIDO".equalsIgnoreCase(estado);
+    }
+
+    private long contarPorEstado(
+            String estado
+    ) {
+
+        if (partidos == null) {
+            return 0;
+        }
+
+        return partidos
+                .stream()
+                .filter(partido -> partido != null
+                        && partido.getEstado() != null
+                        && estado.equalsIgnoreCase(
+                                partido.getEstado()
+                        ))
+                .count();
+    }
+
+    private PartidoDTO copiarPartido(
+            PartidoDTO origen
+    ) {
+
+        PartidoDTO copia = new PartidoDTO();
+
+        if (origen == null) {
+            return copia;
+        }
+
+        copia.setId(origen.getId());
+        copia.setNumeroPartidoFifa(
+                origen.getNumeroPartidoFifa()
+        );
+        copia.setFase(origen.getFase());
+        copia.setGrupo(origen.getGrupo());
+
+        copia.setSeleccionLocalId(
+                origen.getSeleccionLocalId()
+        );
+        copia.setCodigoFifaLocal(
+                origen.getCodigoFifaLocal()
+        );
+        copia.setSeleccionLocal(
+                origen.getSeleccionLocal()
+        );
+
+        copia.setSeleccionVisitanteId(
+                origen.getSeleccionVisitanteId()
+        );
+        copia.setCodigoFifaVisitante(
+                origen.getCodigoFifaVisitante()
+        );
+        copia.setSeleccionVisitante(
+                origen.getSeleccionVisitante()
+        );
+
+        copia.setFechaHoraUtc(
+                origen.getFechaHoraUtc()
+        );
+        copia.setFechaHoraEt(
+                origen.getFechaHoraEt()
+        );
+
+        copia.setSedeId(origen.getSedeId());
+        copia.setSede(origen.getSede());
+        copia.setCiudad(origen.getCiudad());
+        copia.setPais(origen.getPais());
+
+        copia.setEstado(origen.getEstado());
+        copia.setGolesLocal(origen.getGolesLocal());
+        copia.setGolesVisitante(
+                origen.getGolesVisitante()
+        );
+
+        copia.setCuotaLocal(origen.getCuotaLocal());
+        copia.setCuotaEmpate(origen.getCuotaEmpate());
+        copia.setCuotaVisitante(
+                origen.getCuotaVisitante()
+        );
+        copia.setResultadoNotificado(
+                origen.isResultadoNotificado()
+        );
+
+        return copia;
+    }
+
+    private boolean sesionValida() {
+
+        return loginBean != null
+                && loginBean.isAdministrador()
+                && loginBean.getAuthorizationHeader() != null;
+    }
+
+    private void manejarRespuestaError(
+            Response respuesta,
+            String mensajePredeterminado
+    ) {
+
+        agregarResultadoAjax(false);
+
+        if (respuesta.getStatus()
+                == Response.Status.UNAUTHORIZED.getStatusCode()) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Sesión expirada",
+                    "Debe iniciar sesión nuevamente."
+            );
+
+            redirigirAlLogin();
+            return;
+        }
+
+        String detalle = mensajePredeterminado;
+
+        try {
+
+            if (respuesta.hasEntity()) {
+                detalle = extraerMensajeError(
+                        respuesta.readEntity(String.class),
+                        mensajePredeterminado
                 );
             }
+
+        } catch (Exception ignorada) {
+        }
+
+        mostrarMensaje(
+                FacesMessage.SEVERITY_ERROR,
+                "No se pudo guardar",
+                detalle
+        );
+    }
+
+    private String extraerMensajeError(
+            String contenido,
+            String mensajePredeterminado
+    ) {
+
+        if (contenido == null || contenido.isBlank()) {
+            return mensajePredeterminado;
+        }
+
+        String marca = "\"error\":\"";
+        int inicio = contenido.indexOf(marca);
+
+        if (inicio < 0) {
+            return contenido;
+        }
+
+        inicio += marca.length();
+        int fin = contenido.indexOf('"', inicio);
+
+        if (fin < 0) {
+            return contenido;
+        }
+
+        return contenido.substring(inicio, fin)
+                .replace("\\\"", "\"");
+    }
+
+    private void agregarResultadoAjax(
+            boolean operacionExitosa
+    ) {
+
+        PrimeFaces.current()
+                .ajax()
+                .addCallbackParam(
+                        "operacionExitosa",
+                        operacionExitosa
+                );
+    }
+
+    private void redirigirAlLogin() {
+
+        FacesContext contexto =
+                FacesContext.getCurrentInstance();
+
+        if (contexto == null
+                || contexto.getResponseComplete()) {
+            return;
+        }
+
+        String ruta =
+                contexto.getExternalContext()
+                        .getRequestContextPath()
+                        + "/login.xhtml";
+
+        try {
+
+            contexto.getExternalContext()
+                    .redirect(ruta);
+
+            contexto.responseComplete();
+
+        } catch (IOException excepcion) {
+            excepcion.printStackTrace();
         }
     }
 
-    public String obtenerCodigoBandera(String codigoFifa) {
+    private void mostrarMensaje(
+            FacesMessage.Severity severidad,
+            String titulo,
+            String detalle
+    ) {
 
-    if (codigoFifa == null || codigoFifa.isBlank()) {
-        return "desconocido";
+        FacesContext contexto =
+                FacesContext.getCurrentInstance();
+
+        if (contexto != null) {
+
+            contexto.addMessage(
+                    null,
+                    new FacesMessage(
+                            severidad,
+                            titulo,
+                            detalle
+                    )
+            );
+        }
     }
-
-    return switch (codigoFifa.trim().toUpperCase()) {
-
-        case "USA" -> "us";
-        case "CAN" -> "ca";
-        case "MEX" -> "mx";
-
-        case "ARG" -> "ar";
-        case "BRA" -> "br";
-        case "ECU" -> "ec";
-        case "COL" -> "co";
-        case "URU" -> "uy";
-        case "PAR" -> "py";
-        case "CHI" -> "cl";
-        case "PER" -> "pe";
-        case "BOL" -> "bo";
-        case "VEN" -> "ve";
-
-        case "ESP" -> "es";
-        case "FRA" -> "fr";
-        case "GER" -> "de";
-        case "ENG" -> "gb-eng";
-        case "POR" -> "pt";
-        case "ITA" -> "it";
-        case "NED" -> "nl";
-        case "BEL" -> "be";
-        case "CRO" -> "hr";
-        case "SUI" -> "ch";
-        case "DEN" -> "dk";
-        case "NOR" -> "no";
-        case "SWE" -> "se";
-        case "POL" -> "pl";
-        case "AUT" -> "at";
-        case "SRB" -> "rs";
-        case "UKR" -> "ua";
-        case "SCO" -> "gb-sct";
-        case "WAL" -> "gb-wls";
-
-        case "JPN" -> "jp";
-        case "KOR" -> "kr";
-        case "IRN" -> "ir";
-        case "KSA" -> "sa";
-        case "AUS" -> "au";
-        case "QAT" -> "qa";
-
-        case "MAR" -> "ma";
-        case "SEN" -> "sn";
-        case "EGY" -> "eg";
-        case "ALG" -> "dz";
-        case "TUN" -> "tn";
-        case "GHA" -> "gh";
-        case "NGA" -> "ng";
-        case "CMR" -> "cm";
-        case "CIV" -> "ci";
-        case "RSA" -> "za";
-
-        case "NZL" -> "nz";
-
-        default -> codigoFifa.trim().toLowerCase();
-    };
-}
-    
-
-    // --- GETTERS Y SETTERS ---
 
     public List<PartidoDTO> getPartidos() {
         return partidos;
     }
 
-    public void setPartidos(List<PartidoDTO> partidos) {
+    public void setPartidos(
+            List<PartidoDTO> partidos
+    ) {
         this.partidos = partidos;
     }
 
@@ -361,7 +578,10 @@ public class PartidoBean implements Serializable {
         return partidoSeleccionado;
     }
 
-    public void setPartidoSeleccionado(PartidoDTO partidoSeleccionado) {
-        this.partidoSeleccionado = partidoSeleccionado;
+    public void setPartidoSeleccionado(
+            PartidoDTO partidoSeleccionado
+    ) {
+        this.partidoSeleccionado =
+                partidoSeleccionado;
     }
 }

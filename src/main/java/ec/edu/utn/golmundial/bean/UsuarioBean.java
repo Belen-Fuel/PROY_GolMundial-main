@@ -5,7 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.primefaces.PrimeFaces;
+
 import ec.edu.utn.golmundial.dto.CambiarEstadoUsuarioRequest;
+import ec.edu.utn.golmundial.dto.CambiarPasswordUsuarioRequest;
 import ec.edu.utn.golmundial.dto.CambiarRolUsuarioRequest;
 import ec.edu.utn.golmundial.dto.CrearUsuarioRequest;
 import ec.edu.utn.golmundial.dto.UsuarioDTO;
@@ -26,601 +29,645 @@ import jakarta.ws.rs.core.Response;
 @Named("usuarioBean")
 @ViewScoped
 public class UsuarioBean implements Serializable {
-        private static final long serialVersionUID = 1L;
 
-        private static final String API_URL =
-                "http://localhost:8080/golmundial-estadisticas/api/usuarios";
+    private static final long serialVersionUID = 1L;
 
-        @Inject
-        private LoginBean loginBean;
+    private static final String API_URL =
+            "http://localhost:8080/golmundial-estadisticas/api/usuarios";
 
-        private List<UsuarioDTO> usuarios = new ArrayList<>();
+    @Inject
+    private LoginBean loginBean;
 
-        private CrearUsuarioRequest nuevoUsuario =
-                new CrearUsuarioRequest();
+    private List<UsuarioDTO> usuarios =
+            new ArrayList<>();
 
-        private UsuarioDTO usuarioSeleccionado;
+    private CrearUsuarioRequest nuevoUsuario =
+            new CrearUsuarioRequest();
 
-        private String nuevoRol;
+    private UsuarioDTO usuarioSeleccionado;
 
-        @PostConstruct
-        public void init() {
+    private String nuevoRol;
 
-                if (loginBean == null || !loginBean.isAdministrador()) {
-                redirigirAlLogin();
-                return;
+    private CambiarPasswordUsuarioRequest cambioPassword =
+            new CambiarPasswordUsuarioRequest();
+
+    @PostConstruct
+    public void init() {
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
+        prepararNuevoUsuario();
+        prepararCambioPassword(null);
+        cargarUsuarios();
+    }
+
+    public void cargarUsuarios() {
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(API_URL)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .get()) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
+
+                usuarios = respuesta.readEntity(
+                        new GenericType<List<UsuarioDTO>>() {
+                        }
+                );
+
+                if (usuarios == null) {
+                    usuarios = new ArrayList<>();
                 }
 
-                nuevoUsuario.setActivo(true);
+                return;
+            }
+
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudieron cargar los usuarios."
+            );
+
+        } catch (Exception e) {
+
+            usuarios = new ArrayList<>();
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible conectarse con la API de usuarios."
+            );
+
+            e.printStackTrace();
+        }
+    }
+
+    public void prepararNuevoUsuario() {
+
+        nuevoUsuario = new CrearUsuarioRequest();
+        nuevoUsuario.setActivo(true);
+        nuevoUsuario.setRol("USUARIO");
+    }
+
+    public void crearUsuario() {
+
+        agregarResultadoAjax(false);
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(API_URL)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .post(
+                             Entity.entity(
+                                     nuevoUsuario,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.CREATED.getStatusCode()) {
+
                 cargarUsuarios();
-        }
+                prepararNuevoUsuario();
 
-        public void cargarUsuarios() {
+                mostrarMensaje(
+                        FacesMessage.SEVERITY_INFO,
+                        "Usuario creado",
+                        "La cuenta fue registrada correctamente."
+                );
 
-                if (!sesionValida()) {
-                redirigirAlLogin();
+                agregarResultadoAjax(true);
                 return;
-                }
+            }
 
-                try (Client cliente = ClientBuilder.newClient();
-                Response respuesta = cliente
-                        .target(API_URL)
-                        .request(MediaType.APPLICATION_JSON)
-                        .header(
-                                HttpHeaders.AUTHORIZATION,
-                                loginBean.getAuthorizationHeader()
-                        )
-                        .get()) {
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudo crear el usuario."
+            );
 
-                if (respuesta.getStatus()
-                        == Response.Status.OK.getStatusCode()) {
+        } catch (Exception e) {
 
-                        usuarios = respuesta.readEntity(
-                                new GenericType<List<UsuarioDTO>>() {
-                                }
-                        );
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible registrar el usuario."
+            );
 
-                        if (usuarios == null) {
-                        usuarios = new ArrayList<>();
-                        }
+            e.printStackTrace();
+        }
+    }
 
-                        return;
-                }
+    public void prepararCambioRol(
+            UsuarioDTO usuario
+    ) {
 
-                manejarRespuestaError(
-                        respuesta,
-                        "No se pudieron cargar los usuarios."
-                );
+        usuarioSeleccionado = usuario;
+        nuevoRol = usuario == null
+                ? null
+                : usuario.getRol();
+    }
 
-                } catch (Exception e) {
+    public void cambiarRol() {
 
-                usuarios = new ArrayList<>();
+        agregarResultadoAjax(false);
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
+        }
+
+        if (usuarioSeleccionado == null
+                || usuarioSeleccionado.getId() == null) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Advertencia",
+                    "No se ha seleccionado un usuario."
+            );
+
+            return;
+        }
+
+        if (nuevoRol == null || nuevoRol.isBlank()) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Advertencia",
+                    "Seleccione un rol."
+            );
+
+            return;
+        }
+
+        CambiarRolUsuarioRequest solicitud =
+                new CambiarRolUsuarioRequest();
+
+        solicitud.setRol(nuevoRol);
+
+        String url =
+                API_URL
+                        + "/"
+                        + usuarioSeleccionado.getId()
+                        + "/rol";
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(url)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .put(
+                             Entity.entity(
+                                     solicitud,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
+
+                cargarUsuarios();
 
                 mostrarMensaje(
-                        FacesMessage.SEVERITY_ERROR,
-                        "Error de comunicación",
-                        "No fue posible conectarse con la API de usuarios."
+                        FacesMessage.SEVERITY_INFO,
+                        "Rol actualizado",
+                        "El nuevo rol fue guardado correctamente."
                 );
 
-                e.printStackTrace();
-                }
-        }
-
-        public void crearUsuario() {
-
-                if (!sesionValida()) {
-                        redirigirAlLogin();
-                        return;
-                }
-                if (!validarNuevoUsuario()) {
-                        return;
-                }
-
-                try (Client cliente = ClientBuilder.newClient();
-                Response respuesta = cliente
-                        .target(API_URL)
-                        .request(MediaType.APPLICATION_JSON)
-                        .header(
-                                HttpHeaders.AUTHORIZATION,
-                                loginBean.getAuthorizationHeader()
-                        )
-                        .post(
-                                Entity.entity(
-                                        nuevoUsuario,
-                                        MediaType.APPLICATION_JSON
-                                )
-                        )) {
-
-                if (respuesta.getStatus()
-                        == Response.Status.CREATED.getStatusCode()) {
-
-                        nuevoUsuario = new CrearUsuarioRequest();
-                        nuevoUsuario.setActivo(true);
-
-                        cargarUsuarios();
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_INFO,
-                                "Éxito",
-                                "Usuario creado correctamente."
-                        );
-
-                        return;
-                }
-
-                manejarRespuestaError(
-                        respuesta,
-                        "No se pudo crear el usuario."
-                );
-
-                } catch (Exception e) {
-
-                mostrarMensaje(
-                        FacesMessage.SEVERITY_ERROR,
-                        "Error de comunicación",
-                        "No fue posible registrar el usuario."
-                );
-
-                e.printStackTrace();
-                }
-        }
-
-        public void prepararCambioRol(
-                UsuarioDTO usuario
-        ) {
-
-                this.usuarioSeleccionado = usuario;
-                this.nuevoRol = usuario.getRol();
-        }
-
-        public void cambiarRol() {
-
-                if (usuarioSeleccionado == null
-                        || usuarioSeleccionado.getId() == null) {
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Advertencia",
-                                "No se ha seleccionado un usuario."
-                        );
-
-                        FacesContext.getCurrentInstance().validationFailed();
-                        return;
-                }
-
-                String usuarioActual = loginBean.getUsername();
-
-                if (usuarioActual != null
-                        && usuarioSeleccionado.getUsername() != null
-                        && usuarioActual.equalsIgnoreCase(
-                                usuarioSeleccionado.getUsername()
-                        )) {
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Operación no permitida",
-                                "No puede cambiar el rol de su propia cuenta."
-                        );
-
-                        FacesContext.getCurrentInstance().validationFailed();
-                        return;
-                }
-
-                if (nuevoRol == null || nuevoRol.isBlank()) {
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Advertencia",
-                                "Seleccione un rol."
-                        );
-
-                        FacesContext.getCurrentInstance().validationFailed();
-                        return;
-                }
-
-                CambiarRolUsuarioRequest solicitud =
-                        new CambiarRolUsuarioRequest();
-
-                solicitud.setRol(nuevoRol);
-
-                String url =
-                        API_URL
-                                + "/"
-                                + usuarioSeleccionado.getId()
-                                + "/rol";
-
-                try (Client cliente = ClientBuilder.newClient();
-                        Response respuesta = cliente
-                                .target(url)
-                                .request(MediaType.APPLICATION_JSON)
-                                .header(
-                                        HttpHeaders.AUTHORIZATION,
-                                        loginBean.getAuthorizationHeader()
-                                )
-                                .put(
-                                        Entity.entity(
-                                                solicitud,
-                                                MediaType.APPLICATION_JSON
-                                        )
-                                )) {
-
-                        if (respuesta.getStatus()
-                                == Response.Status.OK.getStatusCode()) {
-
-                        cargarUsuarios();
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_INFO,
-                                "Éxito",
-                                "Rol actualizado correctamente."
-                        );
-
-                        return;
-                        }
-
-                        manejarRespuestaError(
-                                respuesta,
-                                "No se pudo cambiar el rol."
-                        );
-
-                        FacesContext.getCurrentInstance().validationFailed();
-
-                } catch (Exception e) {
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_ERROR,
-                                "Error de comunicación",
-                                "No fue posible cambiar el rol."
-                        );
-
-                        FacesContext.getCurrentInstance().validationFailed();
-                        e.printStackTrace();
-                }
-                }
-
-        public void cambiarEstado(
-                UsuarioDTO usuario
-        ) {
-
-                if (usuario == null || usuario.getId() == null) {
+                agregarResultadoAjax(true);
                 return;
-                }
+            }
 
-                CambiarEstadoUsuarioRequest solicitud =
-                        new CambiarEstadoUsuarioRequest();
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudo cambiar el rol."
+            );
 
-                solicitud.setActivo(!usuario.isActivo());
+        } catch (Exception e) {
 
-                String url =
-                        API_URL
-                                + "/"
-                                + usuario.getId()
-                                + "/estado";
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible cambiar el rol."
+            );
 
-                try (Client cliente = ClientBuilder.newClient();
-                Response respuesta = cliente
-                        .target(url)
-                        .request(MediaType.APPLICATION_JSON)
-                        .header(
-                                HttpHeaders.AUTHORIZATION,
-                                loginBean.getAuthorizationHeader()
-                        )
-                        .put(
-                                Entity.entity(
-                                        solicitud,
-                                        MediaType.APPLICATION_JSON
-                                )
-                        )) {
+            e.printStackTrace();
+        }
+    }
 
-                if (respuesta.getStatus()
-                        == Response.Status.OK.getStatusCode()) {
+    public void cambiarEstado(
+            UsuarioDTO usuario
+    ) {
 
-                        cargarUsuarios();
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_INFO,
-                                "Éxito",
-                                solicitud.getActivo()
-                                        ? "Usuario activado correctamente."
-                                        : "Usuario desactivado correctamente."
-                        );
-
-                        return;
-                }
-
-                manejarRespuestaError(
-                        respuesta,
-                        "No se pudo cambiar el estado del usuario."
-                );
-
-                } catch (Exception e) {
-
-                mostrarMensaje(
-                        FacesMessage.SEVERITY_ERROR,
-                        "Error de comunicación",
-                        "No fue posible cambiar el estado."
-                );
-
-                e.printStackTrace();
-                }
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
         }
 
-        private boolean sesionValida() {
-                return loginBean != null
-                        && loginBean.isAdministrador()
-                        && loginBean.getAuthorizationHeader() != null;
+        if (usuario == null || usuario.getId() == null) {
+            return;
         }
 
-        private void manejarRespuestaError(
-                Response respuesta,
-                String mensajePredeterminado
-        ) {
+        CambiarEstadoUsuarioRequest solicitud =
+                new CambiarEstadoUsuarioRequest();
 
-                if (respuesta.getStatus()
-                        == Response.Status.UNAUTHORIZED.getStatusCode()) {
+        solicitud.setActivo(!usuario.isActivo());
+
+        String url =
+                API_URL
+                        + "/"
+                        + usuario.getId()
+                        + "/estado";
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(url)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .put(
+                             Entity.entity(
+                                     solicitud,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
+
+                cargarUsuarios();
 
                 mostrarMensaje(
-                        FacesMessage.SEVERITY_WARN,
-                        "Sesión expirada",
-                        "Debe iniciar sesión nuevamente."
+                        FacesMessage.SEVERITY_INFO,
+                        solicitud.getActivo()
+                                ? "Usuario activado"
+                                : "Usuario desactivado",
+                        solicitud.getActivo()
+                                ? "La cuenta ya puede iniciar sesión."
+                                : "La cuenta quedó bloqueada y sus sesiones fueron revocadas."
                 );
 
-                redirigirAlLogin();
                 return;
-                }
+            }
 
-                String detalle = mensajePredeterminado;
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudo cambiar el estado del usuario."
+            );
 
-                try {
+        } catch (Exception e) {
 
-                if (respuesta.hasEntity()) {
-                        detalle = respuesta.readEntity(String.class);
-                }
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible cambiar el estado."
+            );
 
-                } catch (Exception ignored) {
-                }
+            e.printStackTrace();
+        }
+    }
 
-                mostrarMensaje(
-                        FacesMessage.SEVERITY_ERROR,
-                        "Error",
-                        detalle
-                );
+    public void prepararCambioPassword(
+            UsuarioDTO usuario
+    ) {
+
+        usuarioSeleccionado = usuario;
+        cambioPassword = new CambiarPasswordUsuarioRequest();
+        cambioPassword.setObligarCambio(true);
+    }
+
+    public void cambiarPassword() {
+
+        agregarResultadoAjax(false);
+
+        if (!sesionValida()) {
+            redirigirAlLogin();
+            return;
         }
 
-        private void redirigirAlLogin() {
+        if (usuarioSeleccionado == null
+                || usuarioSeleccionado.getId() == null) {
 
-                FacesContext contexto =
-                        FacesContext.getCurrentInstance();
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Advertencia",
+                    "No se ha seleccionado un usuario."
+            );
 
-                if (contexto == null
-                        || contexto.getResponseComplete()) {
+            return;
+        }
+
+        if (cambioPassword == null
+                || cambioPassword.getNuevaPassword() == null
+                || cambioPassword.getNuevaPassword().isBlank()) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Contraseña requerida",
+                    "Ingrese una nueva contraseña."
+            );
+
+            return;
+        }
+
+        String url =
+                API_URL
+                        + "/"
+                        + usuarioSeleccionado.getId()
+                        + "/password";
+
+        try (Client cliente = ClientBuilder.newClient();
+             Response respuesta = cliente
+                     .target(url)
+                     .request(MediaType.APPLICATION_JSON)
+                     .header(
+                             HttpHeaders.AUTHORIZATION,
+                             loginBean.getAuthorizationHeader()
+                     )
+                     .put(
+                             Entity.entity(
+                                     cambioPassword,
+                                     MediaType.APPLICATION_JSON
+                             )
+                     )) {
+
+            if (respuesta.getStatus()
+                    == Response.Status.OK.getStatusCode()) {
+
+                cargarUsuarios();
+                cambioPassword = new CambiarPasswordUsuarioRequest();
+                cambioPassword.setObligarCambio(true);
+
+                mostrarMensaje(
+                        FacesMessage.SEVERITY_INFO,
+                        "Contraseña restablecida",
+                        "La contraseña se actualizó y las sesiones anteriores fueron cerradas."
+                );
+
+                agregarResultadoAjax(true);
                 return;
-                }
+            }
 
-                String ruta =
-                        contexto.getExternalContext()
-                                .getRequestContextPath()
-                                + "/login.xhtml";
+            manejarRespuestaError(
+                    respuesta,
+                    "No se pudo restablecer la contraseña."
+            );
 
-                try {
+        } catch (Exception e) {
 
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_ERROR,
+                    "Error de comunicación",
+                    "No fue posible restablecer la contraseña."
+            );
+
+            e.printStackTrace();
+        }
+    }
+
+    public int getCantidadUsuarios() {
+        return usuarios == null ? 0 : usuarios.size();
+    }
+
+    public long getCantidadActivos() {
+
+        if (usuarios == null) {
+            return 0L;
+        }
+
+        return usuarios.stream()
+                .filter(usuario -> usuario != null
+                        && usuario.isActivo())
+                .count();
+    }
+
+    public long getCantidadInactivos() {
+        return getCantidadUsuarios() - getCantidadActivos();
+    }
+
+    public long getCantidadCambioPendiente() {
+
+        if (usuarios == null) {
+            return 0L;
+        }
+
+        return usuarios.stream()
+                .filter(usuario -> usuario != null
+                        && usuario.isCambioPasswordObligatorio())
+                .count();
+    }
+
+    public long getCantidadUsuariosRegistrados() {
+
+        if (usuarios == null) {
+            return 0L;
+        }
+
+        return usuarios.stream()
+                .filter(usuario -> usuario != null
+                        && "USUARIO".equalsIgnoreCase(
+                        usuario.getRol()
+                ))
+                .count();
+    }
+
+    public long getCantidadInvitados() {
+
+        if (usuarios == null) {
+            return 0L;
+        }
+
+        return usuarios.stream()
+                .filter(usuario -> usuario != null
+                        && "INVITADO".equalsIgnoreCase(
+                        usuario.getRol()
+                ))
+                .count();
+    }
+
+    private boolean sesionValida() {
+        return loginBean != null
+                && loginBean.isAdministrador()
+                && loginBean.getAuthorizationHeader() != null;
+    }
+
+    private void manejarRespuestaError(
+            Response respuesta,
+            String mensajePredeterminado
+    ) {
+
+        if (respuesta.getStatus()
+                == Response.Status.UNAUTHORIZED.getStatusCode()) {
+
+            mostrarMensaje(
+                    FacesMessage.SEVERITY_WARN,
+                    "Sesión expirada",
+                    "Debe iniciar sesión nuevamente."
+            );
+
+            redirigirAlLogin();
+            return;
+        }
+
+        String detalle = mensajePredeterminado;
+
+        try {
+
+            if (respuesta.hasEntity()) {
+                detalle = respuesta.readEntity(String.class);
+            }
+
+        } catch (Exception ignored) {
+        }
+
+        mostrarMensaje(
+                FacesMessage.SEVERITY_ERROR,
+                "No se pudo completar la operación",
+                detalle
+        );
+    }
+
+    private void agregarResultadoAjax(
+            boolean operacionExitosa
+    ) {
+
+        FacesContext contexto =
+                FacesContext.getCurrentInstance();
+
+        if (contexto != null
+                && contexto.isPostback()) {
+
+            PrimeFaces.current()
+                    .ajax()
+                    .addCallbackParam(
+                            "operacionExitosa",
+                            operacionExitosa
+                    );
+        }
+    }
+
+    private void redirigirAlLogin() {
+
+        FacesContext contexto =
+                FacesContext.getCurrentInstance();
+
+        if (contexto == null
+                || contexto.getResponseComplete()) {
+            return;
+        }
+
+        String ruta =
                 contexto.getExternalContext()
-                        .redirect(ruta);
+                        .getRequestContextPath()
+                        + "/login.xhtml";
 
-                contexto.responseComplete();
+        try {
 
-                } catch (IOException e) {
-                e.printStackTrace();
-                }
+            contexto.getExternalContext()
+                    .redirect(ruta);
+
+            contexto.responseComplete();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        private void mostrarMensaje(
-                FacesMessage.Severity severidad,
-                String titulo,
-                String detalle
-        ) {
+    private void mostrarMensaje(
+            FacesMessage.Severity severidad,
+            String titulo,
+            String detalle
+    ) {
 
-                FacesContext contexto =
-                        FacesContext.getCurrentInstance();
+        FacesContext contexto =
+                FacesContext.getCurrentInstance();
 
-                if (contexto != null) {
+        if (contexto != null) {
 
-                contexto.addMessage(
-                        null,
-                        new FacesMessage(
-                                severidad,
-                                titulo,
-                                detalle
-                        )
-                );
-                }
+            contexto.addMessage(
+                    null,
+                    new FacesMessage(
+                            severidad,
+                            titulo,
+                            detalle
+                    )
+            );
         }
+    }
 
-       private boolean validarNuevoUsuario() {
+    public List<UsuarioDTO> getUsuarios() {
+        return usuarios;
+    }
 
-                FacesContext context = FacesContext.getCurrentInstance();
+    public void setUsuarios(
+            List<UsuarioDTO> usuarios
+    ) {
+        this.usuarios = usuarios;
+    }
 
-                if (nuevoUsuario == null) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_ERROR,
-                                "Datos inválidos",
-                                "No se recibieron los datos del usuario."
-                        );
+    public CrearUsuarioRequest getNuevoUsuario() {
+        return nuevoUsuario;
+    }
 
-                        context.validationFailed();
-                        return false;
-                }
+    public void setNuevoUsuario(
+            CrearUsuarioRequest nuevoUsuario
+    ) {
+        this.nuevoUsuario = nuevoUsuario;
+    }
 
-                String username = nuevoUsuario.getUsername();
-                String nombre = nuevoUsuario.getNombre();
-                String password = nuevoUsuario.getPassword();
-                String rol = nuevoUsuario.getRol();
+    public UsuarioDTO getUsuarioSeleccionado() {
+        return usuarioSeleccionado;
+    }
 
-                if (username == null || username.isBlank()) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Usuario obligatorio",
-                                "Ingrese un nombre de usuario."
-                        );
+    public void setUsuarioSeleccionado(
+            UsuarioDTO usuarioSeleccionado
+    ) {
+        this.usuarioSeleccionado = usuarioSeleccionado;
+    }
 
-                        context.validationFailed();
-                        return false;
-                }
+    public String getNuevoRol() {
+        return nuevoRol;
+    }
 
-                final String usernameNormalizado = username.trim();
+    public void setNuevoRol(
+            String nuevoRol
+    ) {
+        this.nuevoRol = nuevoRol;
+    }
 
-                if (usernameNormalizado.length() < 4) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Usuario inválido",
-                                "El nombre de usuario debe tener al menos 4 caracteres."
-                        );
+    public CambiarPasswordUsuarioRequest getCambioPassword() {
+        return cambioPassword;
+    }
 
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (!usernameNormalizado.matches("^[a-zA-Z0-9._-]+$")) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Usuario inválido",
-                                "El usuario solo puede contener letras, números, punto, guion y guion bajo."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (nombre == null || nombre.isBlank()) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Nombre obligatorio",
-                                "Ingrese el nombre completo."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                final String nombreNormalizado = nombre.trim();
-
-                if (nombreNormalizado.length() < 3) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Nombre inválido",
-                                "El nombre debe tener al menos 3 caracteres."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (password == null || password.isBlank()) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Contraseña obligatoria",
-                                "Ingrese una contraseña."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (password.length() < 8) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Contraseña inválida",
-                                "La contraseña debe tener al menos 8 caracteres."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (rol == null || rol.isBlank()) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Rol obligatorio",
-                                "Seleccione un rol."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                if (!rol.equals("USUARIO")
-                        && !rol.equals("INVITADO")) {
-
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_WARN,
-                                "Rol inválido",
-                                "El rol seleccionado no es válido."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                boolean usuarioRepetido = usuarios.stream()
-                        .anyMatch(u ->
-                                u.getUsername() != null
-                                        && u.getUsername()
-                                        .equalsIgnoreCase(usernameNormalizado)
-                        );
-
-                if (usuarioRepetido) {
-                        mostrarMensaje(
-                                FacesMessage.SEVERITY_ERROR,
-                                "Usuario duplicado",
-                                "Ya existe una cuenta con ese nombre de usuario."
-                        );
-
-                        context.validationFailed();
-                        return false;
-                }
-
-                nuevoUsuario.setUsername(usernameNormalizado);
-                nuevoUsuario.setNombre(nombreNormalizado);
-
-                return true;
-                }
-        public List<UsuarioDTO> getUsuarios() {
-                return usuarios;
-        }
-
-        public void setUsuarios(
-                List<UsuarioDTO> usuarios
-        ) {
-                this.usuarios = usuarios;
-        }
-
-        public CrearUsuarioRequest getNuevoUsuario() {
-                return nuevoUsuario;
-        }
-
-        public void setNuevoUsuario(
-                CrearUsuarioRequest nuevoUsuario
-        ) {
-                this.nuevoUsuario = nuevoUsuario;
-        }
-
-        public UsuarioDTO getUsuarioSeleccionado() {
-                return usuarioSeleccionado;
-        }
-
-        public void setUsuarioSeleccionado(
-                UsuarioDTO usuarioSeleccionado
-        ) {
-                this.usuarioSeleccionado = usuarioSeleccionado;
-        }
-
-        public String getNuevoRol() {
-                return nuevoRol;
-        }
-
-        public void setNuevoRol(
-                String nuevoRol
-        ) {
-                this.nuevoRol = nuevoRol;
-        }
+    public void setCambioPassword(
+            CambiarPasswordUsuarioRequest cambioPassword
+    ) {
+        this.cambioPassword = cambioPassword;
+    }
 }
